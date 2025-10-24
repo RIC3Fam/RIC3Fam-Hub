@@ -24,6 +24,7 @@ deleteButtons.forEach(function (button, index) {
         if (currentIndex >= images.length) {
             currentIndex = 0;
         }
+	rotateImages();
     });
 });
 
@@ -50,7 +51,7 @@ async function handleDeletion(fullImagePath) {
             isEventPage: isEventPage,
         }),
     });
-    rotateImages();
+    
 
     return response;
 }
