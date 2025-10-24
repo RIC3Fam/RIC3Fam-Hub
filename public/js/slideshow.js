@@ -50,6 +50,7 @@ async function handleDeletion(fullImagePath) {
             isEventPage: isEventPage,
         }),
     });
+    rotateImages();
 
     return response;
 }
