@@ -1,0 +1,34 @@
+<main id="index-main">
+    <div class="welcome-container" align="left">
+        <img src="https://i.ibb.co/xKjHhqYq/RIC3-FAMILY-White.jpg" alt="RIC3 Family White Logo" class="logo-image" >
+    </div>
+
+    <p class="index">
+        Welcome to the RIC3 Family Hub, created to support the people, events and activities of Wilkin Lai’s RIC3 to RICE initiatives.       
+        <br>
+Breakdown: the “RI” in RIC3 stands for Real Investment, our motto is Real People - Real Investment. The last character “3” can be seen as a “C” resulting in “C3” (Commerce, Creativity and Community) or as n “E” resulting in “CE” (RICE).  We are a family! When we work collectively as a community and share in our creativity we begin to see that there is plenty of RICE for Everyone! 
+    </p>
+    <br>
+    {{!<img src="https://i.ibb.co/34CRHxy/NPYP-Frizz-Bee-Jam-Final-RIC3-CC-Ult.png" alt="FrizzBee Jam Poster" align="left" width="10%" class="index">}}
+    <p class ="index">
+        <a href="https://frisbee.ric3family.com/groups/65b0907ab7fd3c9bb3883d16">NPYP FrizBee Jam</a> – NPYP stands for the New Paltz Youth Program (aka “youth center”). NPYP FrizzBee Jam is a youth cypher mixing music (live, recorded, karaoke), art plus other activities while collaborating with flying frisbees of all colors, shapes and sizes and frisbee games such as frizzbee jazz, ultimate frisbee, disc golf and games that we create.
+    </p>
+    <br>
+
+    <img src="https://i.ibb.co/VvPjRZb/RIC3-FAM.png" alt="RIC3 FAM Logo" align="left" width="10%" class="index">
+
+    <p class="index">
+        The RIC3 Fam Event Hub was created to support the event and activities associated with RIC3 Family Ultimate Frisbee along with other frisbee, youth ultimate &amp; pickup ultimate frisbee happenings in New York &amp; Michigan (primarily Hudson Valley &amp; Detroit, communities where the Event Hub sponsor RIC3 Mortgage Broker serves).
+        <br>
+        Please use the Events and Search menu tabs to find events coming up and to learn more about RIC3 Family Ultimate Frisbee and other local frisbee happenings. Click to see <a href="https://adobe.ly/3So9pl9">RIC3 Family Ultimate Frisbee photo album</a>
+    </p>
+
+
+    <p class="index">
+        We welcome everyone to create a user profile which takes only a minute. Apple users may need to hold the login/User Name tab for it to activate. If you have questions or would like to reach out for any reason, feel free to email <a href="mailto: ultimate@RIC3Family.com">ultimate@RIC3Family.com</a>.
+    </p>
+    <div class="mortgage-container">
+        <img src="https://i.ibb.co/0MwySt2/Organized-RIC3-CC-Sponsored-RIC3-MB.jpg" alt="Organized by RIC3 Creative Community - Sponsored by RIC3 Mortgage Broker." class="mortgage-logo">
+    </div>
+</main>
+
