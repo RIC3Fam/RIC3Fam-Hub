@@ -5,13 +5,12 @@ automatic_scaling:
   max_instances: 1
 
 handlers:
+# This tells Google: "The homepage is right here in the main list"
 - url: /
-  static_files: RIC3Fam-Hub/index.html
-  upload: RIC3Fam-Hub/index.html
+  static_files: index.html
+  upload: index.html
 
+# This tells Google where to find everything else (CSS, images)
 - url: /(.*)
-  static_files: RIC3Fam-Hub/\1
-  upload: RIC3Fam-Hub/(.*)
-
-env_variables:
-  MONGO_URI: "YOUR_MONGODB_LINK_HERE"
+  static_files: \1
+  upload: (.*)
