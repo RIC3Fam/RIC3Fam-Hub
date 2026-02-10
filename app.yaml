@@ -5,15 +5,13 @@ automatic_scaling:
   max_instances: 1
 
 handlers:
-  # This fixes the "Not Found" by looking inside your folder
-  - url: /
-    static_files: RIC3Fam-Hub/index.html
-    upload: RIC3Fam-Hub/index.html
+- url: /
+  static_files: RIC3Fam-Hub/index.html
+  upload: RIC3Fam-Hub/index.html
 
-  - url: /(.*)
-    static_files: RIC3Fam-Hub/\1
-    upload: RIC3Fam-Hub/(.*)
+- url: /(.*)
+  static_files: RIC3Fam-Hub/\1
+  upload: RIC3Fam-Hub/(.*)
 
 env_variables:
-  # Paste the connection string from the cluster you "picked" here
-  MONGO_URI: "PASTE_YOUR_STRING_HERE"
+  MONGO_URI: "YOUR_MONGODB_LINK_HERE"
