@@ -1,16 +1,19 @@
 runtime: nodejs20
 instance_class: F1
 
-# This keeps your costs at $0 by only running 1 "machine"
 automatic_scaling:
   max_instances: 1
 
-# This tells Google how to find your homepage
 handlers:
-- url: /
-  static_files: index.html
-  upload: index.html
+  # This fixes the "Not Found" by looking inside your folder
+  - url: /
+    static_files: RIC3Fam-Hub/index.html
+    upload: RIC3Fam-Hub/index.html
 
-- url: /(.*)
-  static_files: \1
-  upload: (.*)
+  - url: /(.*)
+    static_files: RIC3Fam-Hub/\1
+    upload: RIC3Fam-Hub/(.*)
+
+env_variables:
+  # Paste the connection string from the cluster you "picked" here
+  MONGO_URI: "PASTE_YOUR_STRING_HERE"
