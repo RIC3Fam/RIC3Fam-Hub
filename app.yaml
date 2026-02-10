@@ -1,0 +1,2 @@
+runtime: nodejs20 # Or whichever version your app uses
+instance_class: F1
