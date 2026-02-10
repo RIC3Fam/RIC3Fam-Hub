@@ -1,16 +1,19 @@
 runtime: nodejs20
 instance_class: F1
 
-automatic_scaling:
-  max_instances: 1
+# This tells Google to run your main file
+entrypoint: node app.js
+
+env_variables:
+  # The "Key" we found earlier
+  MONGODB_URI: "mongodb+srv://admin:FT2JpgUvQSfzG8Za@frisbeepickup.mrvwtah.mongodb.net/?retryWrites=true&w=majority"
+  NODE_ENV: "production"
 
 handlers:
-# This tells Google: "The homepage is right here in the main list"
-- url: /
-  static_files: index.html
-  upload: index.html
+  # If you have a folder for images/css, Google handles it here
+  - url: /public
+    static_dir: public
 
-# This tells Google where to find everything else (CSS, images)
-- url: /(.*)
-  static_files: \1
-  upload: (.*)
+  # This sends all other traffic to your app.js logic
+  - url: /.*
+    script: auto
