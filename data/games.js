@@ -14,7 +14,7 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     //if (link != ""){ linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300); }
 
     if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
-    if (helpers.isDateInFuture(gameDate)) throw 'Event Date has to be in the future';
+    
     if (!helpers.isValidTime(startTime) || !helpers.isValidTime(endTime)) throw 'Start and/or end time is not valid';
     if (!helpers.compareTimes(startTime, endTime)) throw 'Start time has to be 30min before end time';
 
@@ -25,7 +25,6 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     helpers.validateLocation(gameLocation);
 
     helpers.isValidId(organizer);
-    if (user.isAdmin !== true) throw 'User is not an admin';
 
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
