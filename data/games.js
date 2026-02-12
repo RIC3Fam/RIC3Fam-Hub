@@ -13,7 +13,7 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
 
     //if (link != ""){ linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300); }
 
-    if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
+    
     
     if (!helpers.isValidTime(startTime) || !helpers.isValidTime(endTime)) throw 'Start and/or end time is not valid';
     if (!helpers.compareTimes(startTime, endTime)) throw 'Start time has to be 30min before end time';
@@ -22,9 +22,9 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     if (maxCapacity <= 0) throw 'Max cap. should be > 0';
     if (maxCapacity % 1 != 0) throw 'Max cap. not a whole number';
 
-    helpers.validateLocation(gameLocation);
+    
 
-    helpers.isValidId(organizer);
+    
 
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
