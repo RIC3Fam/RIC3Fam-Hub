@@ -25,7 +25,7 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     helpers.validateLocation(gameLocation);
 
     helpers.isValidId(organizer);
-    if (!usersData.isUserAdmin(organizer)) throw 'User is not an admin';
+    if (user.isAdmin !== true) throw 'User is not an admin';
 
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
