@@ -17,7 +17,16 @@ const groupName = req.body.groupName;
         const groupLeader = req.session.user._id;
         try {
             helpers.validateGroup(groupName, groupDescription, groupLeader)
-const createResult = await groupsData.create(groupName, groupDescription, groupLeader, uppercaseTitle, lowercaseTitle, numericTitle);                 
+const createResult = await groupsData.create(
+    groupName, 
+    groupDescription, 
+    groupLeader, 
+    [], // Pass the empty array as the 4th argument
+    uppercaseTitle, 
+    lowercaseTitle, 
+    numericTitle
+);
+    // ...other fields,uppercaseTitle, lowercaseTitle, numericTitle);                 
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
             return res.status(400).render('error', { title: 'Error', error: err });
