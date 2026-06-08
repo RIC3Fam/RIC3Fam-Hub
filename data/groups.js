@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { usersData, gamesData, picturesData } from './index.js';
 import xss from 'xss';
 
-const create = async (groupName, groupDescription, groupLeader, uppercaseTitle, lowercaseTitle, numericTitle) => {
+const create = async (groupName, groupDescription, groupLeader, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle) => {
     // Input Validation
     helpers.validateGroup(groupName, groupDescription, groupLeader);
 
@@ -17,17 +17,16 @@ const create = async (groupName, groupDescription, groupLeader, uppercaseTitle, 
     numericTitle = numericTitle && numericTitle.trim() ? xss(numericTitle.trim()) : "Numbered Members";
 
     // Add group to database
-    let newgroup = {
+    const newgroup = {
         groupName: xss(groupName),
         description: xss(groupDescription),
         groupLeader,
+        coLeaders, // <--- Add this line here
         uppercaseTitle,
         lowercaseTitle,
         numericTitle,
         comments: [],
-        players: [groupLeader],
-        totalNumberOfPlayers: 1,
-        groupImage: 'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
+        // ... rest of the object
     };
     const groupCollection = await groups();
     const insertInfo = await groupCollection.insertOne(newgroup);
