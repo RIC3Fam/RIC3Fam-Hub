@@ -6,10 +6,29 @@ import groups from '../data/groups.js';
 const router = Router();
 
 router
-    .route('/')
-    .post(async (req, res) => {
-const groupName = req.body.groupName;
-    const groupDescription = req.body.groupDescription;
+// routes/groups.js
+
+router
+  .route('/')
+  .post(async (req, res) => {
+    // 1. Capture the data from the form (this matches the name="..." in your handlebars)
+    const { groupName, groupDescription, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle } = req.body;
+    
+    // ... rest of your route logic (session checks, try/catch)
+    
+    // 2. Call the data function
+    const createResult = await groupsData.create(
+      groupName, 
+      groupDescription, 
+      req.session.user._id, // groupLeader
+      coLeaders ? coLeaders.split(',').map(s => s.trim()) : [], // Process array
+      uppercaseTitle, 
+      lowercaseTitle, 
+      numericTitle
+    );
+    
+    res.redirect(`/groups/${createResult._id}`);
+  });
     const uppercaseTitle = req.body.uppercaseTitle;
     const lowercaseTitle = req.body.lowercaseTitle;
     const numericTitle = req.body.numericTitle;       
@@ -17,15 +36,21 @@ const groupName = req.body.groupName;
         const groupLeader = req.session.user._id;
         try {
             helpers.validateGroup(groupName, groupDescription, groupLeader)
-const createResult = await groupsData.create(
-    groupName, 
-    groupDescription, 
-    groupLeader, 
-    [], // Pass the empty array as the 4th argument
-    uppercaseTitle, 
-    lowercaseTitle, 
-    numericTitle
-);
+// Ensure your function definition includes coLeaders
+const create = async (groupName, groupDescription, groupLeader, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle) => {
+    // ... validation ...
+    const newGroup = {
+        groupName: xss(groupName),
+        description: xss(groupDescription),
+        groupLeader,
+        coLeaders, // Now it is correctly included in the object
+        uppercaseTitle,
+        lowercaseTitle,
+        numericTitle,
+        comments: []
+    };
+    // ... insert logic ...
+};
     // ...other fields,uppercaseTitle, lowercaseTitle, numericTitle);                 
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
