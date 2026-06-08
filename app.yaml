@@ -1,0 +1,3 @@
+runtime: nodejs20
+env_variables:
+  DB_URL: 'mongodb+srv://ric3user:Weareafamily3$nah@ric3-cluster.atoiy3s.mongodb.net/RIC3-Frisbee?appName=RIC3-Cluster'

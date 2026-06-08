@@ -99,7 +99,7 @@ const getAll = async (includeExpired = false) => {
     const gameCollection = await games();
     let gameList = await gameCollection.find(query).toArray();
 
-    if (!gameList) throw 'Could not get all games';
+    // In data/games.js inside getAll if (gameList === null || gameList === undefined) throw 'Could not get all games';
 
     gameList = gameList.map((element) => {
         element._id = element._id.toString();
@@ -336,7 +336,7 @@ const keepStatusUpdated = async () => {
     //console.log('Checking for expired games');
 
     for (let game of gamesList) {
-        if (helpers.isDateInFuture(game.gameDate)) {
+        if (!helpers.isDateInFuture(game.gameDate)) {
             try {
                 await gameCollection.updateOne({ _id: new ObjectId(game._id) }, { $set: { expired: true } });
             } catch (err) {

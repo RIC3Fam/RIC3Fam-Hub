@@ -33,9 +33,12 @@ export function validatePassword(password) {
     }
 }
 
-export function validateGroup(groupName, groupDescription, groupLeader) {
-    // Input Validation
-    if (groupName == null || groupDescription == null || groupLeader == null) throw 'All fields need to have valid values';
+export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
+    if (groupName == null || groupDescription == null || groupLeader == null ||coLeaders==null ) {
+        throw 'All fields need to have valid values';
+    }
+    // ...
+}
 
     if (typeof groupName !== 'string' || typeof groupDescription !== 'string') throw 'One or more string fields not given as string';
 
