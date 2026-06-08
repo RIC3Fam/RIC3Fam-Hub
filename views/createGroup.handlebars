@@ -2,32 +2,36 @@
     <div class="form-wrapper">
         <form action="/groups" method="POST" id="create-group-form" class="create-form">
             <h3>Create group</h3>
-            <label class="form-label" for="group-name">Group Name:</label>
-                <input class="form-input" type="text" id="group-name" name="groupName">
-                <br>
-           <label class="form-label" for="description">Description</label>
-  <label class="form-label" for="coLeaders">Co-leaders (Enter names):</label>
-<input class="form-input" type="text" id="coLeaders" name="coLeaders" placeholder="Type name and press Enter">
-<br>
-<br>
-        <br>
-
-        <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
-        <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" placeholder="e.g., Gold Tier Members">
-        <br>
-
-        <label class="form-label" for="lowercaseTitle">Lowercase Section Title:</label>
-        <input class="form-input" type="text" id="lowercaseTitle" name="lowercaseTitle" placeholder="e.g., Standard Members">
-        <br>
-
-        <label class="form-label" for="numericTitle">Numbered Section Title:</label>
-        <input class="form-input" type="text" id="numericTitle" name="numericTitle" placeholder="e.g., Digit Accounts">
-        <br>
-
-        <button type="submit" id="group-submit-button" class="form-submit-button">Create</button>
             
+            <label class="form-label" for="groupName">Group Name:</label>
+            <input class="form-input" type="text" id="groupName" name="groupName" required>
+            <br>
+            
+            <label class="form-label" for="groupDescription">Description:</label>
+            <input class="form-input" type="text" id="groupDescription" name="groupDescription" required>
+            <br>
+            
+            <label class="form-label" for="coLeaders">Co-leaders (Enter names, comma-separated):</label>
+            <input class="form-input" type="text" id="coLeaders" name="coLeaders" placeholder="e.g. Alice, Bob">
+            <br>
+            <br>
+            
+            <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
+            <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" placeholder="e.g., Gold Tier Members">
+            <br>
+            
+            <label class="form-label" for="lowercaseTitle">Lowercase Section Title:</label>
+            <input class="form-input" type="text" id="lowercaseTitle" name="lowercaseTitle" placeholder="e.g., Standard Members">
+            <br>
+            
+            <label class="form-label" for="numericTitle">Numbered Section Title:</label>
+            <input class="form-input" type="text" id="numericTitle" name="numericTitle" placeholder="e.g., Digit Accounts">
+            <br>
+            
+            <button type="submit" id="group-submit-button" class="form-submit-button">Create</button>
         </form>
     </div>
+    
     <a class="message-label" hidden></a>
     <a class="error-label" hidden></a>
     <script src='/public/js/groupValidation.js'></script>
