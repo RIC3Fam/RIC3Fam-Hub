@@ -33,22 +33,24 @@ export function validatePassword(password) {
     }
 }
 
-export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) {
-    // Ensure description is treated as an empty string if null/undefined
-    groupDescription = groupDescription || "";
+// Add 'allMemberNames' as a new parameter to check against
+// Ensure this is the only version of validateGroup in your file
+export function validateGroup(groupName, coLeaderInput, allMembers) {
+    if (!groupName || groupName.trim().length === 0) throw 'Error: Group Name is required';
 
-    // Validate strictly required fields
-    if (!groupName || groupName.trim().length === 0) {
-        throw 'Error: Group Name is required';
-    }
-    if (!groupLeader) {
-        throw 'Error: Group Leader is required';
-    }
+    let foundMember = null;
+    if (coLeaderInput && coLeaderInput.trim().length > 0) {
+        // Find the full member object
+        foundMember = allMembers.find(m => 
+            m.name === coLeaderInput.trim() || m.id === coLeaderInput.trim()
+        );
 
-    // Ensure groupName is a string
-    if (typeof groupName !== 'string') {
-        throw 'Error: Group Name must be a string';
+        if (!foundMember) throw 'Error: That member name or ID was not found.';
     }
+    return foundMember; // Return the object so you can save the ID
+}
+    }
+}  }
 }
  
 }
