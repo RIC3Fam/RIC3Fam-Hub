@@ -34,7 +34,7 @@ export function validatePassword(password) {
 }
 
 export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
-    if (groupName == null || groupDescription == null || groupLeader == null ||coLeaders==null ) {
+    if (groupName == null || groupDescription == null || groupLeader == null ) {
         throw 'All fields need to have valid values';
     }
     // ...
