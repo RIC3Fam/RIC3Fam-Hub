@@ -33,32 +33,25 @@ export function validatePassword(password) {
     }
 }
 
-export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
-    // Check for nulls
-    if (groupName == null) throw 'Error: Group Name is missing';
-    if (groupDescription == null) throw 'Error: Group Description is missing';
-    if (groupLeader == null) throw 'Error: Group Leader is missing';
-    
-    // Check for empty strings
-    if (groupName.trim().length === 0) throw 'Error: Group Name is empty';
-    if (groupDescription.trim().length === 0) throw 'Error: Group Description is empty';
+export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) {
+    // Ensure description is treated as an empty string if null/undefined
+    groupDescription = groupDescription || "";
 
-    // ... rest of your code
-}
+    // Validate strictly required fields
+    if (!groupName || groupName.trim().length === 0) {
+        throw 'Error: Group Name is required';
     }
-    // ...
+    if (!groupLeader) {
+        throw 'Error: Group Leader is required';
+    }
+
+    // Ensure groupName is a string
+    if (typeof groupName !== 'string') {
+        throw 'Error: Group Name must be a string';
+    }
 }
-
-    if (typeof groupName !== 'string' || typeof groupDescription !== 'string') throw 'One or more string fields not given as string';
-
-    groupName = groupName.trim();
-    groupDescription = groupDescription.trim();
-
-    if (groupName.length === 0 || groupDescription.length === 0) throw 'One or more string fields empty';
-
-    if (groupName.length < 5) throw 'group name less than 5 chars';
-    if (groupDescription.length == 0) throw 'group description is too short';
-    isValidId(groupLeader);
+ 
+}
 }
 
 export function validateLocation(gameLocation) {
