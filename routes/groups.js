@@ -9,53 +9,27 @@ router
 // routes/groups.js
 
 router
-  .route('/')
-  .post(async (req, res) => {
-    // 1. Capture the data from the form (this matches the name="..." in your handlebars)
-    const { groupName, groupDescription, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle } = req.body;
-    
-    // ... rest of your route logic (session checks, try/catch)
-    
-    // 2. Call the data function
-    const createResult = await groupsData.create(
-      groupName, 
-      groupDescription, 
-      req.session.user._id, // groupLeader
-      coLeaders ? coLeaders.split(',').map(s => s.trim()) : [], // Process array
-      uppercaseTitle, 
-      lowercaseTitle, 
-      numericTitle
-    );
+ // 1. Fetch members and validate
+    const allMembers = await User.find({}, 'name id'); 
+    const foundMember = helpers.validateGroup(groupName, req.body.coLeaders, allMembers);
+
+    // 2. Extract the ID if a co-leader was found
+    const coLeaderId = foundMember ? foundMember._id : null;
+
+    // 3. Create the group (Removing groupDescription and using coLeaderId)
+   // 3. Create the group (Corrected to use req.body)
+const createResult = await groupsData.create(
+    req.body.groupName,           // Grab from the form
+    req.session.user._id,         // Leader
+    coLeaderId,                   // The ID we just found
+    req.body.uppercaseTitle,
+    req.body.lowercaseTitle,
+    req.body.numericTitle
+);
     
     res.redirect(`/groups/${createResult._id}`);
   });
-    const uppercaseTitle = req.body.uppercaseTitle;
-    const lowercaseTitle = req.body.lowercaseTitle;
-    const numericTitle = req.body.numericTitle;       
-        if(!req.session.user) return res.status(400).render('error', { error: "Must be logged in" });
-        const groupLeader = req.session.user._id;
-        try {
-            helpers.validateGroup(groupName, groupDescription, groupLeader)
-// Ensure your function definition includes coLeaders
-const create = async (groupName, groupDescription, groupLeader, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle) => {
-    // ... validation ...
-    const newGroup = {
-        groupName: xss(groupName),
-        description: xss(groupDescription),
-        groupLeader,
-        coLeaders, // Now it is correctly included in the object
-        uppercaseTitle,
-        lowercaseTitle,
-        numericTitle,
-        comments: []
-    };
-    // ... insert logic ...
-};
-    // ...other fields,uppercaseTitle, lowercaseTitle, numericTitle);                 
-            res.redirect(`groups/${createResult._id}`);
-        } catch (err) {
-            return res.status(400).render('error', { title: 'Error', error: err });
-        }
+   
     });
 
 router.route('/:groupId').get(async (req, res) => {
