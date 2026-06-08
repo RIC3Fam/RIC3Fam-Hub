@@ -4,24 +4,30 @@ import { ObjectId } from 'mongodb';
 import { usersData, gamesData, picturesData } from './index.js';
 import xss from 'xss';
 
-const create = async (groupName, groupDescription, groupLeader) => {
+const create = async (groupName, groupDescription, groupLeader, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle) => {
     // Input Validation
     helpers.validateGroup(groupName, groupDescription, groupLeader);
 
     groupName = groupName.trim();
     groupDescription = groupDescription.trim();
+    
+    // Default fallback values if fields were left blank in the form
+    uppercaseTitle = uppercaseTitle && uppercaseTitle.trim() ? xss(uppercaseTitle.trim()) : "All Caps Members";
+    lowercaseTitle = lowercaseTitle && lowercaseTitle.trim() ? xss(lowercaseTitle.trim()) : "Lowercase Members";
+    numericTitle = numericTitle && numericTitle.trim() ? xss(numericTitle.trim()) : "Numbered Members";
 
     // Add group to database
-    let newgroup = {
+    const newgroup = {
         groupName: xss(groupName),
         description: xss(groupDescription),
         groupLeader,
+        coLeaders, // <--- Add this line here
+        uppercaseTitle,
+        lowercaseTitle,
+        numericTitle,
         comments: [],
-        players: [groupLeader],
-        totalNumberOfPlayers: 1,
-        groupImage: 'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
+        // ... rest of the object
     };
-
     const groupCollection = await groups();
     const insertInfo = await groupCollection.insertOne(newgroup);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw 'Could not add group';

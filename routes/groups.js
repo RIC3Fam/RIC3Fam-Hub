@@ -6,16 +6,52 @@ import groups from '../data/groups.js';
 const router = Router();
 
 router
-    .route('/')
-    .post(async (req, res) => {
-        const groupName = req.body.groupName;
-        const groupDescription = req.body.groupDescription;
-        
+// routes/groups.js
+
+router
+  .route('/')
+  .post(async (req, res) => {
+    // 1. Capture the data from the form (this matches the name="..." in your handlebars)
+    const { groupName, groupDescription, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle } = req.body;
+    
+    // ... rest of your route logic (session checks, try/catch)
+    
+    // 2. Call the data function
+    const createResult = await groupsData.create(
+      groupName, 
+      groupDescription, 
+      req.session.user._id, // groupLeader
+      coLeaders ? coLeaders.split(',').map(s => s.trim()) : [], // Process array
+      uppercaseTitle, 
+      lowercaseTitle, 
+      numericTitle
+    );
+    
+    res.redirect(`/groups/${createResult._id}`);
+  });
+    const uppercaseTitle = req.body.uppercaseTitle;
+    const lowercaseTitle = req.body.lowercaseTitle;
+    const numericTitle = req.body.numericTitle;       
         if(!req.session.user) return res.status(400).render('error', { error: "Must be logged in" });
         const groupLeader = req.session.user._id;
         try {
             helpers.validateGroup(groupName, groupDescription, groupLeader)
-            const createResult = await groupsData.create(groupName, groupDescription, groupLeader);     
+// Ensure your function definition includes coLeaders
+const create = async (groupName, groupDescription, groupLeader, coLeaders, uppercaseTitle, lowercaseTitle, numericTitle) => {
+    // ... validation ...
+    const newGroup = {
+        groupName: xss(groupName),
+        description: xss(groupDescription),
+        groupLeader,
+        coLeaders, // Now it is correctly included in the object
+        uppercaseTitle,
+        lowercaseTitle,
+        numericTitle,
+        comments: []
+    };
+    // ... insert logic ...
+};
+    // ...other fields,uppercaseTitle, lowercaseTitle, numericTitle);                 
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
             return res.status(400).render('error', { title: 'Error', error: err });
@@ -24,12 +60,44 @@ router
 
 router.route('/:groupId').get(async (req, res) => {
     try {
+
+        function stringsAllCaps (string1, string2) {
+   
+            let string1AllCaps = string1 == string1.toUpperCase();
+            let string2AllCaps = string2 == string2.toUpperCase();
+            if (string1AllCaps == string2AllCaps) { return 0 }
+            if (string1AllCaps > string2AllCaps) { return -1 }
+            return 1;
+        }
+
+
         let groupId = req.params.groupId;
         helpers.isValidId(groupId);
         const groupObj = await groupsData.get(groupId);
         let players=  groupObj.players;
         players = players.filter(player => player !== groupObj.groupLeader)
-        const members = await usersData.getIDName(players);
+       // Get the list of group members from the database
+let members = await usersData.getIDName(players);
+
+// Separate the members into 3 distinct buckets based on their starting letters
+// Separate the members into 3 distinct buckets based on character rules
+// Separate the members based on what their username starts with
+// Separate the members based on character rules
+    // 1. MUST be all letters AND entirely uppercase (e.g., TEST, PRICETAG)
+    const uppercaseMembers = members.filter(m => m.name && /^[A-Z]+$/.test(m.name));
+
+    // 2. Contains numbers/digits anywhere or starts with a digit (e.g., 1firsttest)
+    const numericMembers = members.filter(m => m.name && /[0-9]/.test(m.name));
+
+    // 3. Anyone else who didn't fit the strict all-caps or numeric buckets (e.g., Alice, Wilkin Lai)
+    const lowercaseMembers = members.filter(m => {
+        return !uppercaseMembers.includes(m) && !numericMembers.includes(m);
+    });
+
+// Sort each bucket alphabetically so they look nice and organized
+uppercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
+lowercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
+numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         let games = await gamesData.getAllByGroup(groupId);
         games = games.map(game => ({_id: game._id, name: game.gameName}));
         let owner = null;
@@ -53,14 +121,20 @@ router.route('/:groupId').get(async (req, res) => {
         });
         
         return res.render('group', {
-            title:"Group: " + groupObj.groupName,
-            group: groupObj,
-            members: members,
-            games: games,
-            owner: owner,
-            isMember: isMember,
-            isOwner: isOwner
-        });
+        title: "Group: " + groupObj.groupName,
+        group: groupObj,
+        members: members,
+        uppercaseMembers: uppercaseMembers,
+        uppercaseTitle: groupObj.uppercaseTitle || "All Caps Members",
+        lowercaseMembers: lowercaseMembers,
+        lowercaseTitle: groupObj.lowercaseTitle || "Lowercase Members",
+        numericMembers: numericMembers,
+        numericTitle: groupObj.numericTitle || "Numbered Members",
+        games: games,
+        owner: owner,
+        isMember: isMember,
+        isOwner: isOwner
+      });
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });
     }

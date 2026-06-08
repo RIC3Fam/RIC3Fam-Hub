@@ -6,12 +6,32 @@
             {{#if owner}}
             <p>Group Leader: <a href="/users/{{owner._id}}">{{owner.username}}</a></p>
             {{/if}}
-            <p>Members:</p>
-            <ul>
-                {{#each members}}
-                    <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
-                {{/each}}
-            </ul>
+          {{#if uppercaseMembers}}
+  <p><strong>{{uppercaseTitle}}</strong></p>
+  <ul>
+    {{#each uppercaseMembers}}
+      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+    {{/each}}
+  </ul>
+{{/if}}
+
+{{#if lowercaseMembers}}
+  <p><strong>{{lowercaseTitle}}</strong></p>
+  <ul>
+    {{#each lowercaseMembers}}
+      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+    {{/each}}
+  </ul>
+{{/if}}
+
+{{#if numericMembers}}
+  <p><strong>{{numericTitle}}</strong></p>
+  <ul>
+    {{#each numericMembers}}
+      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+    {{/each}}
+  </ul>
+{{/if}}
             <a>Upcoming Events:</a>
             <ul>
                 {{#each games}}

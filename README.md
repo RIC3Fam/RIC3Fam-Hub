@@ -1,6 +1,6 @@
-# Ultimate Frisbee pickup website
+# RIC3FAM Hub
 
-A website for coordinating Ultimate Frisbee pickup.
+The RIC3FAM Hub was created to support the people, communities and events of RIC3FAM and the RIC3 2 R1CE Movement.  
 Github repo: https://github.com/kaikune/FrisbeePickup
 
 ### How to run

@@ -22,6 +22,15 @@ let addRow = function (parentElement, linkText, linkTarget) {
     parentElement.appendChild(dd);
 };
 
+function stringsAllCaps (string1, string2) {
+   
+    let string1AllCaps = string1 == string1.toUpperCase();
+    let string2AllCaps = string2 == string2.toUpperCase();
+    if (string1AllCaps == string2AllCaps) { return 0 }
+    if (string1AllCaps > string2AllCaps) { return 1 }
+    return -1;
+}
+
 (function ($) {
     let executeSearch = function () {
         usersUL.replaceChildren();
@@ -36,6 +45,8 @@ let addRow = function (parentElement, linkText, linkTarget) {
             //console.log(data);
             let usersList = data.users;
             let groupsList = data.groups;
+            usersList.sort((a, b) => stringsAllCaps(a.username, b.username) || a.username.localeCompare(b.username))
+            groupsList.sort((a, b) => stringsAllCaps(a.groupName, b.groupName) || a.groupName.localeCompare(b.groupName));
             //let gamesList = data.games;
             //addHeader(usersUL, 'Family Frisbee Members:');
             for (let i = 0; i < usersList.length; i++) {
