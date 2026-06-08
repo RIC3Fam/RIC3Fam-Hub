@@ -33,9 +33,18 @@ export function validatePassword(password) {
     }
 }
 
-export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
-    if (groupName == null || groupDescription == null || groupLeader == null ) {
-        throw 'All fields need to have valid values';
+eexport function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
+    // Check for nulls
+    if (groupName == null) throw 'Error: Group Name is missing';
+    if (groupDescription == null) throw 'Error: Group Description is missing';
+    if (groupLeader == null) throw 'Error: Group Leader is missing';
+    
+    // Check for empty strings
+    if (groupName.trim().length === 0) throw 'Error: Group Name is empty';
+    if (groupDescription.trim().length === 0) throw 'Error: Group Description is empty';
+
+    // ... rest of your code
+}
     }
     // ...
 }
