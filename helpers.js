@@ -33,7 +33,7 @@ export function validatePassword(password) {
     }
 }
 
-eexport function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
+export function validateGroup(groupName, groupDescription, groupLeader, coLeaders) { 
     // Check for nulls
     if (groupName == null) throw 'Error: Group Name is missing';
     if (groupDescription == null) throw 'Error: Group Description is missing';
