@@ -287,16 +287,17 @@ footer {
 /* PHOTO GALLERY STUFF */
 
 .gallery-wrapper {
-  width: 100%;
-  margin: 0 0 20px 0;
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto 20px auto;
 }
 
 .gallery-grid {
   display: grid;
-  /* Fill the full screen width with as many pictures per row as fit. */
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  /* Two columns, stacking vertically. */
+  grid-template-columns: repeat(2, 1fr);
   align-items: start;
-  gap: 10px;
+  gap: 12px;
 }
 
 .gallery-item {
@@ -309,6 +310,33 @@ footer {
   height: auto;
   display: block;
   border-radius: 5px;
+  cursor: zoom-in; /* hint: double-click to enlarge */
+}
+
+/* Per-picture caption: a bar pinned to the bottom of the image.
+   Collapsed to one line by default; click it to expand the full text. */
+.gallery-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gallery-item.caption-open .gallery-caption {
+  white-space: normal;
+  overflow: visible;
+  background-color: rgba(0, 0, 0, 0.82);
 }
 
 .gallery-delete-button {
@@ -325,6 +353,50 @@ footer {
 
 .gallery-delete-button:hover {
   background-color: rgba(170, 33, 15, 1);
+}
+
+/* Enlarged-picture overlay (double-click a picture). */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.gallery-lightbox[hidden] {
+  display: none;
+}
+
+.gallery-lightbox-image {
+  max-width: 90%;
+  max-height: 80%;
+  object-fit: contain;
+}
+
+.gallery-lightbox-caption {
+  margin-top: 12px;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  max-width: 90%;
+}
+
+.gallery-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 /* Messages Stuff */

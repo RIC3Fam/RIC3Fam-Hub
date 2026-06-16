@@ -4,6 +4,7 @@
         {{#each slideshowImages}}
             <figure class="gallery-item">
                 <img src="{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">
+                <figcaption class="gallery-caption"></figcaption>
                 {{#if ../isOwner}}
                     <button type="button" class="gallery-delete-button">Delete</button>
                 {{/if}}
@@ -18,6 +19,13 @@
 
     <p id="error-label" hidden></p>
     <p id="message-label" hidden></p>
+</div>
+
+<!-- Enlarged-picture overlay (shown on double-click of a picture) -->
+<div id="gallery-lightbox" class="gallery-lightbox" hidden>
+    <button type="button" class="gallery-lightbox-close" aria-label="Close">&times;</button>
+    <img class="gallery-lightbox-image" src="" alt="Enlarged picture">
+    <div class="gallery-lightbox-caption"></div>
 </div>
 {{/if}}
 
