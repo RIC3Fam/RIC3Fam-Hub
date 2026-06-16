@@ -107,16 +107,15 @@ router.route('/:gameId').get(async (req, res) => {
 
         //const weather = await weatherData.getWeather(gameObj.gameLocation.zip);
 
-        gameObj.comments.forEach(async (comment) => {
+        const currentUserId = req.session.user ? req.session.user._id : null;
+        for (const comment of gameObj.comments) {
             try {
                 comment.sender = (await usersData.getIDName([comment.userId]))[0];
-                if (req.session.user._id === comment.userId) {
-                    comment.isSender = true;
-                }
+                comment.isSender = currentUserId === comment.userId;
             } catch {
                 comment.isSender = false;
             }
-        });
+        }
 
         return res.render('game', {
             title: 'Game: ' + gameObj.gameName,

@@ -1,7 +1,5 @@
-<div class="form-wrapper">
-    <form id="pfp-form">
-        <label for="pfp-upload">Upload new profile picture</label>
-            <input id="pfp-upload" type="file" name="profilePicture" accept="image/jpeg">
-        <button type="submit" id="image-submit-button">Upload</button>
-    </form>
-</div>
+{{> partials/imageUploadForm
+    formId="pfp-form"
+    inputId="pfp-upload"
+    inputName="profilePicture"
+    labelText="Upload new profile picture"}}

@@ -1,31 +1,25 @@
-<div class="slideshow-container">
-    {{#each slideshowImages}}
-        <div class="slideshow-image-container">
-            <button class="add-image-button" onclick="previousImage();">&lt</button>
-
-            <img src="{{this}}" class="slideshow-image" alt="Slideshow image">
-            
-            <button class="add-image-button" onclick="nextImage();">&gt</button>
-
-            {{#if ../isOwner}}
-                <button class="delete-image-button">Delete</button>
-            {{/if}}
-            {{#unless ../isOwner}}
-                {{#if ../currentUser.isAdmin}}
-                    <button class="delete-image-button">Delete</button>
+{{#if slideshowImages.length}}
+<div class="gallery-wrapper">
+    <div class="gallery-grid">
+        {{#each slideshowImages}}
+            <figure class="gallery-item">
+                <img src="{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">
+                {{#if ../isOwner}}
+                    <button type="button" class="gallery-delete-button">Delete</button>
                 {{/if}}
-            {{/unless}}
-        </div>
-    {{/each}}
-    <!--
-    {{#if isOwner}}
-        <button class="add-image-button">Add Image</button>
-    {{/if}}
-    -->
+                {{#unless ../isOwner}}
+                    {{#if ../currentUser.isAdmin}}
+                        <button type="button" class="gallery-delete-button">Delete</button>
+                    {{/if}}
+                {{/unless}}
+            </figure>
+        {{/each}}
+    </div>
 
     <p id="error-label" hidden></p>
     <p id="message-label" hidden></p>
 </div>
+{{/if}}
 
 <script src="/public/js/slideshow.js"></script>
 <script src="/public/js/pictures.js"></script>

@@ -16,8 +16,10 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
+// In production set ALLOWED_ORIGINS to a comma-separated allowlist of origins.
+// When unset (e.g. local dev) the request origin is reflected, matching prior behavior.
 const corsOptions = {
-    origin: true,
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()) : true,
 };
 
 app.use(cors(corsOptions));
@@ -28,7 +30,6 @@ const staticDir = express.static(__dirname + '/public');
 app.use('/public', staticDir);
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 var hbs = exphbs.create({
     // Set helper functions
@@ -50,7 +51,7 @@ app.set('view engine', 'handlebars');
 app.use(
     session({
         name: 'CoolSession',
-        secret: 'crazy super secret signing key!',
+        secret: process.env.SESSION_SECRET || 'dev-only-insecure-session-secret',
         saveUninitialized: false,
         resave: false,
         cookie: { maxAge: 60 * 10000 }, // 1 hr
@@ -98,22 +99,25 @@ app.use('/', (req, res, next) => {
     return next();
 });
 
-// Update DB Middlware
-app.use('/games', async (req, res, next) => {
-    if (req.method === 'GET') {
-        try {
-            await gamesData.keepStatusUpdated();
-        } catch (err) {
-            console.log(err);
-        }
-    }
-    return next();
-});
-
 configRoutesFunction(app);
 
 const port = process.env.PORT || 3000;
 
+// Periodically mark past events as expired instead of running a full
+// collection sweep on every GET /games request. Runs once at startup and
+// then on a fixed interval.
+const EXPIRY_SWEEP_INTERVAL_MS = 1000 * 60 * 10; // 10 minutes
+
+const runExpirySweep = async () => {
+    try {
+        await gamesData.keepStatusUpdated();
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 app.listen(port, () => {
     console.log(`Up and running on port ${port}!`);
+    runExpirySweep();
+    setInterval(runExpirySweep, EXPIRY_SWEEP_INTERVAL_MS).unref();
 });

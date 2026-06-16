@@ -1,0 +1,25 @@
+{{!--
+    Reusable image-upload form.
+
+    Renders the JPEG upload form used for profile pictures, event images and
+    group images. The form/input ids below are wired to public/js/pictures.js,
+    so callers must pass the exact ids that script listens for.
+
+    Params:
+      formId             - id for the <form>  (e.g. "pfp-form", "game-image-form", "group-image-form")
+      inputId            - id for the file <input> (e.g. "pfp-upload", "game-upload", "group-upload")
+      inputName          - name attribute for the file <input>
+      labelText          - visible label text
+      hiddenIdElementId  - (optional) id of a hidden <p> holding a record id (e.g. "game-id", "group-id")
+      hiddenIdValue      - (optional) value rendered inside that hidden <p>
+--}}
+<div class="form-wrapper">
+    <form id="{{formId}}">
+        <label for="{{inputId}}">{{labelText}}</label>
+            <input id="{{inputId}}" type="file" name="{{inputName}}" accept="image/jpeg">
+        <button type="submit" id="image-submit-button">Upload</button>
+    </form>
+    {{#if hiddenIdElementId}}
+    <p id="{{hiddenIdElementId}}" hidden>{{hiddenIdValue}}</p>
+    {{/if}}
+</div>

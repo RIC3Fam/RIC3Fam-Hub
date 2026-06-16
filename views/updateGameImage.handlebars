@@ -1,9 +1,7 @@
-<div class="form-wrapper">
-    <form id="game-image-form">
-        <label for="game-upload">Upload new event image</label>
-            <input id="game-upload" type="file" name="gameImage" accept="image/jpeg">
-        <button type="submit" id="image-submit-button">Upload</button>
-    </form>
-
-    <p id='game-id' hidden>{{gameObj._id}}</p>
-</div>
+{{> partials/imageUploadForm
+    formId="game-image-form"
+    inputId="game-upload"
+    inputName="gameImage"
+    labelText="Upload new event image"
+    hiddenIdElementId="game-id"
+    hiddenIdValue=gameObj._id}}

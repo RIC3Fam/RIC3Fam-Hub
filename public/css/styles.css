@@ -284,58 +284,47 @@ footer {
 
 /* END USER */
 
-/* SLIDESHOW  STUFF */
+/* PHOTO GALLERY STUFF */
 
-.slideshow-container {
-  width: 75%;
-  height: 75%;
+.gallery-wrapper {
+  width: 100%;
+  margin: 0 0 20px 0;
+}
+
+.gallery-grid {
+  display: grid;
+  /* Fill the full screen width with as many pictures per row as fit. */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+
+.gallery-item {
   position: relative;
-  margin: auto;
+  margin: 0;
 }
 
-.slideshow-image-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
+.gallery-image {
   width: 100%;
-  height: 100%;
+  height: auto;
+  display: block;
+  border-radius: 5px;
 }
 
-.slideshow-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.add-image-button {
+.gallery-delete-button {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 8px;
+  right: 8px;
+  background-color: rgba(170, 33, 15, 0.85);
   color: white;
   border: none;
   cursor: pointer;
-  height: 10%;
-  padding: 10px;
+  padding: 6px 10px;
+  border-radius: 5px;
 }
 
-.delete-image-button {
-  position: absolute;
-  bottom: -30px; /* Adjust as needed */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  cursor: pointer;
-  width: 25%;
-  padding: 9px;
-}
-
-.delete-image-button:hover,
-.add-image-button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+.gallery-delete-button:hover {
+  background-color: rgba(170, 33, 15, 1);
 }
 
 /* Messages Stuff */
@@ -630,3 +619,19 @@ p.index {
   font-size: 8pt;
 }
 /* END MISC. */
+
+/* ===== REUSABLE SPACING UTILITIES ===== */
+/* Small, composable helpers so page-specific spacing tweaks live in CSS
+   instead of inline style="" attributes. Extend the scale as needed
+   (e.g. .mt-10, .mb-20) to keep markup free of inline styles. */
+.mt-5 {
+  margin-top: 5px;
+}
+.mb-5 {
+  margin-bottom: 5px;
+}
+.my-5 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+/* ===== END UTILITIES ===== */
