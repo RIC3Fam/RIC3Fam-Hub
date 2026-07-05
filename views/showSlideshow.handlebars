@@ -3,7 +3,7 @@
     <div class="gallery-grid">
         {{#each slideshowImages}}
             <figure class="gallery-item">
-                <img src="{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">
+               <img src="/{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">
                 <figcaption class="gallery-caption"></figcaption>
                 {{#if ../isOwner}}
                     <button type="button" class="gallery-delete-button">Delete</button>
