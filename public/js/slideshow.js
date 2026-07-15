@@ -64,17 +64,18 @@ document.querySelectorAll('.gallery-item').forEach((item) => {
     img.addEventListener('dblclick', () => openLightbox(img.src, text));
 });
 
-// --- Image deletion ---
+// --- Image deletion (masonry gallery + picture slider) ---
 document.querySelectorAll('.gallery-delete-button').forEach((button) => {
     button.addEventListener('click', async () => {
-        const item = button.closest('.gallery-item');
-        const img = item ? item.querySelector('.gallery-image') : null;
+        const item = button.closest('.gallery-item') || button.closest('.picture-slider-slide');
+        const img = item ? item.querySelector('img') : null;
         if (!img) return;
 
         try {
             await handleDeletion(img.src);
             setMessage('Successfully deleted image');
             item.remove();
+            location.reload();
         } catch (err) {
             console.log(err);
             setError(err);
@@ -87,6 +88,14 @@ async function handleDeletion(fullImagePath) {
 
     // Presence of the hidden #is-event-page marker means we're on the event page.
     const isEventPage = document.getElementById('is-event-page') != null;
+    const groupSlideshowId = document.getElementById('group-slideshow-id');
+    const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+
+    const body = {
+        filename: filename,
+        isEventPage: isEventPage,
+    };
+    if (groupId) body.groupId = groupId;
 
     const response = await fetch('/pictures/slideshow', {
         mode: 'cors',
@@ -94,10 +103,7 @@ async function handleDeletion(fullImagePath) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            filename: filename,
-            isEventPage: isEventPage,
-        }),
+        body: JSON.stringify(body),
     });
 
     return response;

@@ -33,7 +33,7 @@ if (createGameForm) {
             isValidNum(maxPlayers.value);
             let maxPlayersNumber = parseInt(maxPlayers.value, 10);
             validateGame(gameName.value, description.value, location, maxPlayersNumber, date.value, startTime.value, endTime.value, link.value, linkdesc.value);
-            messageLabel.innerHTML = 'Game Created';
+            messageLabel.innerHTML = 'Event Created';
             messageLabel.hidden = false;
 
             createGameForm.submit();
@@ -47,12 +47,12 @@ if (createGameForm) {
 function validateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, link, linkdesc) {
     // Input Validation
 
-    if (!gameName) throw 'Game name is required';
-    if (!gameDescription) throw 'Game description is required';
+    if (!gameName) throw 'Event name is required';
+    if (!gameDescription) throw 'Event description is required';
     if (!gameLocation || !gameLocation.streetAddress || !gameLocation.city || !gameLocation.state || !gameLocation.zip)
         throw 'Complete game location information is required';
     if (!maxCapacity) throw 'Max capacity is required';
-    if (!gameDate) throw 'Game date is required';
+    if (!gameDate) throw 'Event date is required';
     if (!startTime) throw 'Start time is required';
     if (!endTime) throw 'End time is required';
     if (link && !linkdesc) throw 'Link Description is required if link is included';

@@ -4,17 +4,28 @@ import { ObjectId } from 'mongodb';
 import { usersData, gamesData, picturesData } from './index.js';
 import xss from 'xss';
 
-const create = async (groupName, groupDescription, groupLeader, uppercaseTitle, lowercaseTitle, numericTitle) => {
+const create = async (
+    groupName,
+    groupDescription,
+    groupLeader,
+    uppercaseTitle,
+    lowercaseTitle,
+    numericTitle,
+    visibility = 'public',
+    privateDescription = ''
+) => {
     // Input Validation
     helpers.validateGroup(groupName, groupDescription, groupLeader);
 
     groupName = groupName.trim();
     groupDescription = groupDescription.trim();
-    
+
     // Default fallback values if fields were left blank in the form
-    uppercaseTitle = uppercaseTitle && uppercaseTitle.trim() ? xss(uppercaseTitle.trim()) : "All Caps Members";
-    lowercaseTitle = lowercaseTitle && lowercaseTitle.trim() ? xss(lowercaseTitle.trim()) : "Lowercase Members";
-    numericTitle = numericTitle && numericTitle.trim() ? xss(numericTitle.trim()) : "Numbered Members";
+    uppercaseTitle = uppercaseTitle && uppercaseTitle.trim() ? xss(uppercaseTitle.trim()) : 'All Caps Members';
+    lowercaseTitle = lowercaseTitle && lowercaseTitle.trim() ? xss(lowercaseTitle.trim()) : 'Lowercase Members';
+    numericTitle = numericTitle && numericTitle.trim() ? xss(numericTitle.trim()) : 'Numbered Members';
+    visibility = helpers.normalizeVisibility(visibility);
+    privateDescription = helpers.optionalString(privateDescription, 'Private description');
 
     // Add group to database
     let newgroup = {
@@ -28,6 +39,10 @@ const create = async (groupName, groupDescription, groupLeader, uppercaseTitle, 
         players: [groupLeader],
         totalNumberOfPlayers: 1,
         groupImage: 'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
+        visibility,
+        privateDescription,
+        slideshowImages: [],
+        slideshowDescription: '',
     };
     const groupCollection = await groups();
     const insertInfo = await groupCollection.insertOne(newgroup);
@@ -61,13 +76,28 @@ const getIDName = async (groupIds) => {
     return ret;
 };
 
-const getAll = async () => {
+const filterPrivateGroups = (groupList, viewerId = null) => {
+    return groupList.filter((g) => {
+        const vis = g.visibility === 'private' ? 'private' : 'public';
+        if (vis !== 'private') return true;
+        if (!viewerId) return false;
+        if (g.groupLeader === viewerId) return true;
+        return Array.isArray(g.players) && g.players.includes(viewerId);
+    });
+};
+
+const getAll = async (viewerId = null) => {
     const groupCollection = await groups();
-    let groupList = await groupCollection.find({}).project({ _id: 1, groupName: 1 }).toArray();
+    let groupList = await groupCollection
+        .find({})
+        .project({ _id: 1, groupName: 1, visibility: 1, groupLeader: 1, players: 1 })
+        .toArray();
 
     if (!groupList) throw 'Could not get all groups';
+    groupList = filterPrivateGroups(groupList, viewerId);
     groupList = groupList.map((element) => {
         element._id = element._id.toString();
+        if (element.visibility !== 'private') element.visibility = 'public';
         return element;
     });
 
@@ -101,8 +131,9 @@ const get = async (groupId) => {
 
     if (group === null) throw 'No group with that id';
     group._id = group._id.toString();
-
-    return group;
+    if (!Array.isArray(group.slideshowImages)) group.slideshowImages = [];
+    if (group.slideshowDescription == null) group.slideshowDescription = '';
+    return helpers.withVisibilityDefaults(group);
 };
 
 const remove = async (groupId) => {
@@ -141,7 +172,7 @@ const remove = async (groupId) => {
     return res;
 };
 
-const update = async (groupId, groupName, groupDescription, groupLeader, groupImage) => {
+const update = async (groupId, groupName, groupDescription, groupLeader, groupImage, visibility, privateDescription) => {
     // Input Validation
     helpers.isValidId(groupId);
     groupId = groupId.trim();
@@ -158,10 +189,20 @@ const update = async (groupId, groupName, groupDescription, groupLeader, groupIm
         groupName: xss(groupName),
         description: xss(groupDescription),
         groupLeader,
+        uppercaseTitle: oldGroup.uppercaseTitle,
+        lowercaseTitle: oldGroup.lowercaseTitle,
+        numericTitle: oldGroup.numericTitle,
         comments: oldGroup.comments,
         players: oldGroup.players,
         totalNumberOfPlayers: oldGroup.totalNumberOfPlayers,
         groupImage: groupImage ? groupImage : oldGroup.groupImage,
+        slideshowImages: oldGroup.slideshowImages || [],
+        slideshowDescription: oldGroup.slideshowDescription || '',
+        visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGroup.visibility || 'public',
+        privateDescription:
+            privateDescription != null
+                ? helpers.optionalString(privateDescription, 'Private description')
+                : oldGroup.privateDescription || '',
     };
 
     const groupCollection = await groups();
@@ -260,7 +301,7 @@ const addUser = async (userId, groupId) => {
     return { updateGame, updateUser };
 };
 
-const searchGroups = async (search) => {
+const searchGroups = async (search, viewerId = null) => {
     //Returns the first 10 users that start with a search query
     let resultSize = 10;
 
@@ -282,7 +323,13 @@ const searchGroups = async (search) => {
         throw "Couldn't find any groups with that name";
     }
 
-    //Returns the entire grouplist right now
+    groupList = filterPrivateGroups(groupList, viewerId);
+    groupList = groupList.map((element) => {
+        element._id = element._id.toString();
+        if (element.visibility !== 'private') element.visibility = 'public';
+        return element;
+    });
+
     return groupList;
 };
 const leaveGroup = async (userId, groupId) => {
@@ -322,8 +369,63 @@ const editGroupImage = async (groupId, imagePath) => {
     const base = 'https://storage.googleapis.com';
 
     const url = `${base}/${bucketName}/${groupId}/${imagePath}`;
-    await update(groupId, group.groupName, group.description, group.groupLeader, url);
+    await update(
+        groupId,
+        group.groupName,
+        group.description,
+        group.groupLeader,
+        url,
+        group.visibility,
+        group.privateDescription
+    );
 };
+
+/**
+ *
+ * @param {string} groupId
+ * @param {string} imagePath - /type/imageName/imageNum
+ * @returns {object}
+ */
+const addSlideshowImage = async (groupId, imagePath) => {
+    helpers.isValidId(groupId);
+    helpers.stringHelper(imagePath, 'Image Path', 1, 100);
+
+    const bucketName = process.env.BUCKET_NAME;
+    const base = 'https://storage.googleapis.com';
+
+    const url = `${base}/${bucketName}/${groupId}/${imagePath}`;
+
+    const groupCollection = await groups();
+    const updatedInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $push: { slideshowImages: url } });
+
+    if (!updatedInfo) throw 'Could not update group successfully';
+
+    return updatedInfo;
+};
+
+/**
+ *
+ * @param {string} groupId
+ * @param {string} imagePath - /type/imageName/imageNum
+ * @returns {object}
+ */
+const removeSlideshowImage = async (groupId, imagePath) => {
+    helpers.isValidId(groupId);
+    helpers.stringHelper(imagePath, 'Image Path', 1, 100);
+
+    const bucketName = process.env.BUCKET_NAME;
+    const base = 'https://storage.googleapis.com';
+
+    const url = `${base}/${bucketName}/${groupId}/${imagePath}`;
+
+    const groupCollection = await groups();
+    const updatedInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $pull: { slideshowImages: url } });
+
+    if (!updatedInfo) throw 'Could not update group successfully';
+
+    return updatedInfo;
+};
+
 export default {
     create,
     leaveGroup,
@@ -338,4 +440,6 @@ export default {
     getAllGroupsbyUserID,
     removeComment,
     editGroupImage,
+    addSlideshowImage,
+    removeSlideshowImage,
 };

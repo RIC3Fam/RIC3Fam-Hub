@@ -15,31 +15,33 @@ router
         helpers.stringHelper(term, 'Search term');
         term = term.trim();
 
+        const viewer = req.session.user;
         let usersList, groupsList, gamesList;
 
         try {
             if (term == "") {
                 usersList = await usersData.getAllUsers();
+                usersList = usersList.filter((u) => helpers.viewerCanAccessUser(viewer, u));
             } else {
-                usersList = await usersData.searchUsers(term);
+                usersList = await usersData.searchUsers(term, viewer);
             }
         } catch (e) {
             usersList = [];
         }
         try {
             if (term == "") {
-                groupsList = await groupsData.getAll();
+                groupsList = await groupsData.getAll(viewer?._id);
             } else {
-                groupsList = await groupsData.searchGroups(term);
+                groupsList = await groupsData.searchGroups(term, viewer?._id);
             }
         } catch (e) {
             groupsList = [];
         }
         try {
             if (term == "") {
-                gamesList = await gamesData.getAll();
+                gamesList = await gamesData.getAll(false, viewer?._id);
             } else {
-                gamesList = await gamesData.searchGames(term);
+                gamesList = await gamesData.searchGames(term, viewer?._id);
             }
         } catch (e) {
             gamesList = [];

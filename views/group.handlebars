@@ -1,8 +1,36 @@
 <main>
     <div class="group-container">
         <div class="group-content">
-            <h1>{{group.groupName}}</h1>
+            <h1>{{group.groupName}}
+                {{#ifEquals group.visibility "private"}}
+                    <span class="visibility-badge">Private</span>
+                {{else}}
+                    <span class="visibility-badge">Public</span>
+                {{/ifEquals}}
+            </h1>
             <p>About Us: {{group.description}}</p>
+            {{#if canSeePrivateBox}}
+                <section class="private-box">
+                    <h3>Private Description</h3>
+                    {{#if group.privateDescription}}
+                        <div class="description-box">{{group.privateDescription}}</div>
+                    {{else}}
+                        <p class="muted">No private description yet.</p>
+                    {{/if}}
+                </section>
+            {{/if}}
+
+            {{#if group.slideshowDescription}}
+                <p class="picture-bar-description">{{group.slideshowDescription}}</p>
+            {{/if}}
+            {{#if slideshowImages.length}}
+                <h3>Picture Bar</h3>
+            {{/if}}
+            {{> partials/pictureSlider}}
+            {{#if isOwner}}
+                {{> addToSlideshow groupId=group._id}}
+            {{/if}}
+
             {{#if owner}}
             <p>Group Leader: <a href="/users/{{owner._id}}">{{owner.username}}</a></p>
             {{/if}}

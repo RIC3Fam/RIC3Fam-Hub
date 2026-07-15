@@ -351,3 +351,69 @@ export const states = [
     'WV',
     'WY',
 ];
+
+export function optionalString(value, name, maxLength = null) {
+    if (value == null || value === '') return '';
+    return stringHelper(String(value), name, null, maxLength);
+}
+
+export function normalizeVisibility(value) {
+    if (value === true || value === 'private' || value === 'on' || value === 'true') return 'private';
+    return 'public';
+}
+
+export function isPrivateEntity(entity) {
+    return !!(entity && entity.visibility === 'private');
+}
+
+/** Public entities are visible to everyone; private profiles only to owner, family, or admin. */
+export function viewerIsAdmin(viewer) {
+    return !!(viewer && (viewer.isAdmin === true || viewer.admin === true));
+}
+
+export function viewerCanAccessUser(viewer, user) {
+    if (!isPrivateEntity(user)) return true;
+    if (!viewer) return false;
+    if (viewerIsAdmin(viewer)) return true;
+    if (viewer._id === user._id) return true;
+    return Array.isArray(user.friends) && user.friends.includes(viewer._id);
+}
+
+/** Private groups: leader + members. */
+export function viewerCanAccessGroup(viewer, group) {
+    if (!isPrivateEntity(group)) return true;
+    if (!viewer) return false;
+    if (group.groupLeader === viewer._id) return true;
+    return Array.isArray(group.players) && group.players.includes(viewer._id);
+}
+
+/** Private events: organizer + joined players. */
+export function viewerCanAccessGame(viewer, game) {
+    if (!isPrivateEntity(game)) return true;
+    if (!viewer) return false;
+    if (game.organizer === viewer._id) return true;
+    return Array.isArray(game.players) && game.players.includes(viewer._id);
+}
+
+/** Private description box — family/owner/members (admins for profiles). */
+export function viewerCanSeePrivateBox(viewer, entity, type) {
+    if (!viewer || !entity) return false;
+    if (type === 'user') {
+        if (viewerIsAdmin(viewer)) return true;
+        return viewer._id === entity._id || (Array.isArray(entity.friends) && entity.friends.includes(viewer._id));
+    }
+    if (type === 'group') {
+        return entity.groupLeader === viewer._id || (Array.isArray(entity.players) && entity.players.includes(viewer._id));
+    }
+    if (type === 'game') {
+        return entity.organizer === viewer._id || (Array.isArray(entity.players) && entity.players.includes(viewer._id));
+    }
+    return false;
+}
+
+export function withVisibilityDefaults(entity) {
+    if (!entity) return entity;
+    if (entity.visibility !== 'private') entity.visibility = 'public';
+    if (entity.privateDescription == null) entity.privateDescription = '';
+    return entity;
+}

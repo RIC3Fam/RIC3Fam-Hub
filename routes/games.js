@@ -9,7 +9,7 @@ router
     .route('/')
     .get(async (req, res) => {
         try {
-            const allEvents = await gamesData.getAll();
+            const allEvents = await gamesData.getAll(false, req.session.user?._id);
             const eventsPageSlideshow = await mediaData.getEventPageSlideshow();
             //const eventsPage = await gamesData.getGamesPage();
 
@@ -22,7 +22,7 @@ router
             return res.render('eventsList', ret);
         } catch (err) {
             console.log(err);
-            return res.status(500).json({ error: 'An error occurred while retrieving games' });
+            return res.status(500).json({ error: 'An error occurred while retrieving events' });
         }
     })
     .post(async (req, res) => {
@@ -41,13 +41,15 @@ router
         const organizer = req.session.user._id;
         let link = req.body.link;
         let linkdesc = req.body.linkdesc;
+        const visibility = req.body.visibility;
+        const privateDescription = req.body.privateDescription;
 
         try {
             helpers.isValidNum(req.body.maxPlayers);
             let maxPlayersNumber = parseInt(maxCapacity, 10);
             startTime = helpers.stringHelper(startTime, 'Start Time');
             endTime = helpers.stringHelper(endTime, 'End Time');
-            gameDate = helpers.stringHelper(gameDate, 'Game Date');
+            gameDate = helpers.stringHelper(gameDate, 'Event Date');
             if(link != null && link != ""){
                 link = helpers.stringHelper(link, 'Link');
                 linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300);
@@ -68,11 +70,13 @@ router
                 group,
                 organizer,
                 link,
-                linkdesc
+                linkdesc,
+                visibility,
+                privateDescription
             );
             return res.redirect(`games/${createResult._id}`);
         } catch (err) {
-            return res.status(400).render('error', { title: 'Error', error: err || 'An error occurred' });
+            return res.status(400).render('error', { title: 'Error', error: err || 'An error occurred while creating the event' });
         }
     });
 
@@ -82,6 +86,17 @@ router.route('/:gameId').get(async (req, res) => {
 
         helpers.isValidId(gameId);
         let gameObj = await gamesData.get(gameId);
+
+        if (!helpers.viewerCanAccessGame(req.session.user, gameObj)) {
+            return res.status(403).render('privateEntity', {
+                title: 'Private Event',
+                entityType: 'event',
+                entityName: gameObj.gameName,
+                canJoin: !!req.session.user,
+                joinUrl: '/games/join/' + gameId
+            });
+        }
+
         let hostGroup = null;
 
         if (gameObj.group !== 'N/A') {
@@ -118,13 +133,15 @@ router.route('/:gameId').get(async (req, res) => {
         }
 
         return res.render('game', {
-            title: 'Game: ' + gameObj.gameName,
+            title: 'Event: ' + gameObj.gameName,
             game: gameObj,
             players: playersArr,
             organizer: organizerArr[0],
             hostGroup: hostGroup,
             isOwner: isOwner,
             isMember: isMember,
+            canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, gameObj, 'game'),
+            isPublic: gameObj.visibility !== 'private',
             //weather: weather,
         });
     } catch (e) {
@@ -146,7 +163,7 @@ router
                 allGroupsData = await groupsData.getAllGroupsbyUserID(userId);
             }
 
-            return res.render('editGame', { title: 'Edit Games', user: req.session.user, gameObj, states: helpers.states, groups: allGroupsData });
+            return res.render('editGame', { title: 'Edit Event', user: req.session.user, gameObj, states: helpers.states, groups: allGroupsData });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
         }
@@ -168,7 +185,7 @@ router
             let maxPlayersNumber = parseInt(req.body.maxPlayers, 10);
             let startTime = helpers.stringHelper(req.body.startTime, 'Start Time');
             let endTime = helpers.stringHelper(req.body.endTime, 'End Time');
-            let gameDate = helpers.stringHelper(req.body.date, 'Game Date');
+            let gameDate = helpers.stringHelper(req.body.date, 'Event Date');
             let map = helpers.stringHelper(req.body.map, 'Map Link');
             let directions = helpers.stringHelper(req.body.directions, 'Directions');
             const organizer = req.session.user._id;
@@ -211,7 +228,9 @@ router
                 map,
                 directions,
                 link,
-                linkdesc
+                linkdesc,
+                req.body.visibility,
+                req.body.privateDescription
             );
 
             return res.redirect('/games/' + gameId);

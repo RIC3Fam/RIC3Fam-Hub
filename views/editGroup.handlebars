@@ -8,6 +8,15 @@
             <label class="form-label" for="description">Description</label>
                 <textarea class="form-input" id="description" name="groupDescription">{{groupObj.description}}</textarea>
                 <br>
+            <label class="form-label" for="visibility">Visibility:</label>
+                <select class="form-input" id="visibility" name="visibility">
+                    <option value="public" {{#elseEquals groupObj.visibility "private"}}selected{{/elseEquals}}>Public</option>
+                    <option value="private" {{#ifEquals groupObj.visibility "private"}}selected{{/ifEquals}}>Private</option>
+                </select>
+                <br>
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input" id="privateDescription" name="privateDescription">{{groupObj.privateDescription}}</textarea>
+                <br>
             {{#if currentUser}}
                 <button type="submit" id="group-submit-button" class="form-submit-button">Edit</button>
             {{ else }}

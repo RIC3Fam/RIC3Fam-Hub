@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node app.js",
     "seed": "node seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
   },
   "keywords": [],
   "author": "Charles Canata, Alex D'Agostino, Luke Roumy, Zachary Petrov",
@@ -26,5 +28,8 @@
     "path": "^0.12.7",
     "url": "^0.11.3",
     "xss": "^1.0.14"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
   }
 }

@@ -16,11 +16,27 @@ router
     .post(async function (req, res) {
         const filenames = req.body.filenames;
         const isEventPage = req.body.isEventPage;
+        const groupId = req.body.groupId;
         let urls = [];
         let id = '';
 
-        if (isEventPage) id = 'eventPage';
-        else id = req.session.user._id;
+        if (groupId) {
+            try {
+                helpers.isValidId(groupId);
+                const group = await groupsData.get(groupId);
+                if (group.groupLeader !== req.session.user._id) {
+                    throw 'You are not the leader of this group';
+                }
+                id = groupId;
+            } catch (err) {
+                console.log(err);
+                return res.status(500).render('error', { title: 'Error', error: err });
+            }
+        } else if (isEventPage) {
+            id = 'eventPage';
+        } else {
+            id = req.session.user._id;
+        }
 
         console.log('Generating signed urls');
 
@@ -41,11 +57,12 @@ router
         console.log('Urls generated');
         console.log('Adding to slideshow');
 
-        // Updates image urls in user collection
+        // Updates image urls in the relevant collection
         try {
             for (let i = 0; i < urls.length; i++) {
                 const imagePath = `slideshow/${filenames[i]}`;
-                if (isEventPage) await mediaData.addEventPageSlideshowImage(imagePath);
+                if (groupId) await groupsData.addSlideshowImage(groupId, imagePath);
+                else if (isEventPage) await mediaData.addEventPageSlideshowImage(imagePath);
                 else await usersData.addSlideshowImage(req.session.user._id, imagePath);
             }
         } catch (err) {
@@ -57,18 +74,32 @@ router
         return res.json(urls);
     })
     .delete(async function (req, res) {
-        // Updates image urls in user collection
+        // Updates image urls in the relevant collection
         const isEventPage = req.body.isEventPage;
+        const groupId = req.body.groupId;
 
         try {
             const filename = req.body.filename;
             const imagePath = `slideshow/${filename}`;
             const BUCKET_NAME = process.env.BUCKET_NAME;
-            const id = isEventPage ? 'eventPage' : req.session.user._id;
+            let id;
+            if (groupId) {
+                helpers.isValidId(groupId);
+                const group = await groupsData.get(groupId);
+                if (group.groupLeader !== req.session.user._id) {
+                    throw 'You are not the leader of this group';
+                }
+                id = groupId;
+            } else if (isEventPage) {
+                id = 'eventPage';
+            } else {
+                id = req.session.user._id;
+            }
             const bucketPath = `https://storage.googleapis.com/${BUCKET_NAME}/${id}/${imagePath}`;
 
             console.log('Removing from slideshow');
-            if (isEventPage) await mediaData.removeEventPageSlideshowImage(imagePath);
+            if (groupId) await groupsData.removeSlideshowImage(groupId, imagePath);
+            else if (isEventPage) await mediaData.removeEventPageSlideshowImage(imagePath);
             else await usersData.removeSlideshowImage(req.session.user._id, imagePath);
 
             console.log('Deleting from bucket');
@@ -79,6 +110,8 @@ router
         }
 
         req.method = 'GET';
+        if (groupId) return res.redirect(303, '/groups/' + groupId);
+        if (isEventPage) return res.redirect(303, '/games');
         return res.redirect(303, '/users/' + req.session.user._id);
     });
 

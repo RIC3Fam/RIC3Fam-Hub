@@ -1,67 +1,112 @@
 <main>
-    <div class="user-info-wrapper">
-        <h1>{{user.username}}</h1>
-        <!--
-            <p>
-                Email: <a href="mailto:{{user.emailAddress}}">{{user.emailAddress}}</a>
-            </p>
-        -->
-        <img src="{{user.profilePicture}}" class="profile-picture" alt="Your profile picture">
-        <p>{{user.name}}</p>
-        <p>{{user.description}}</p>
-        <a href="{{user.link1}}">{{user.link1desc}}</a>
-        <a href="{{user.link2}}">{{user.link2desc}}</a>
+    {{#if isPublic}}
+        <span class="visibility-badge visibility-public">Public</span>
+    {{else}}
+        <span class="visibility-badge visibility-private">Private</span>
+    {{/if}}
 
-
+    <div class="profile-layout">
+        <div class="profile-left">
+            <h1 class="profile-name">{{user.name}}</h1>
+            <img src="{{user.profilePicture}}" class="profile-picture" alt="{{user.name}}'s profile picture">
+            <p class="profile-username">@{{user.username}}</p>
+        </div>
+        <div class="profile-right">
+            {{#if user.statement}}
+                <h3>Personal / Artist Statement</h3>
+                <p class="profile-statement">{{user.statement}}</p>
+            {{/if}}
+            {{#if user.link1}}
+                <p class="profile-link">
+                    <span class="profile-link-label">Website:</span>
+                    <a href="{{user.link1}}" target="_blank" rel="noopener noreferrer">{{#if user.link1desc}}{{user.link1desc}}{{else}}{{user.link1}}{{/if}}</a>
+                </p>
+            {{/if}}
+            {{#if user.link2}}
+                <p class="profile-link">
+                    <span class="profile-link-label">Social:</span>
+                    <a href="{{user.link2}}" target="_blank" rel="noopener noreferrer">{{#if user.link2desc}}{{user.link2desc}}{{else}}{{user.link2}}{{/if}}</a>
+                </p>
+            {{/if}}
+            {{#if user.description}}
+                <h3>Description</h3>
+                <div class="description-box">{{user.description}}</div>
+            {{/if}}
+        </div>
     </div>
 
-    <h3>Family:</h3>
-    <ul>
-        {{#each friends}}
-            <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
-        {{/each}}
-    </ul>
-    <h3>Groups:</h3>
-    <ul>
-        {{#each groups}}
-            <li><a href="/groups/{{this._id}}">{{this.name}}</a></li>
-        {{/each}}
-    </ul>
-    <h3>Events:</h3>
-    <ul>
-        {{#each games}}
-            <li><a href="/games/{{this._id}}">{{this.name}}</a></li>
-        {{/each}}
-    </ul>
+    {{#if user.slideshowImages.length}}
+        <section class="profile-section">
+            <h3>Picture Bar</h3>
+            {{#if user.slideshowDescription}}
+                <p class="picture-bar-description">{{user.slideshowDescription}}</p>
+            {{/if}}
+            {{> showSlideshow}}
+        </section>
+    {{/if}}
 
-    <div id="skill-wrapper">
+    {{#if user.additionalDescription}}
+        <section class="profile-section">
+            <h3>Additional Description</h3>
+            <div class="description-box">{{user.additionalDescription}}</div>
+        </section>
+    {{/if}}
+
+    <section class="profile-section">
+        <h3>Family</h3>
+        <ul>
+            {{#each friends}}
+                <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+            {{/each}}
+        </ul>
+    </section>
+
+    <section class="profile-section">
+        <h3>Groups</h3>
+        <ul>
+            {{#each groups}}
+                <li><a href="/groups/{{this._id}}">{{this.name}}</a></li>
+            {{/each}}
+        </ul>
+    </section>
+
+    {{#if canSeePrivateBox}}
+        <section class="profile-section private-box">
+            <h3>Private Description</h3>
+            {{#if user.privateDescription}}
+                <div class="description-box">{{user.privateDescription}}</div>
+            {{else}}
+                <p class="muted">No private description yet.</p>
+            {{/if}}
+        </section>
+    {{/if}}
+
+    <section class="profile-section">
+        <h3>Events</h3>
+        <ul>
+            {{#each games}}
+                <li><a href="/games/{{this._id}}">{{this.name}}</a></li>
+            {{/each}}
+        </ul>
+    </section>
+
+    <div id="skill-wrapper" class="profile-section">
         <h3>Skills</h3>
         <ul>
             {{#each user.skills}}
-                <!-- If skill then checkmark or X -->
                 {{#ifEquals this.type "checkbox"}}
-                        {{#if this.value}}
-                            <li>
-                                {{this.desc}}: &#x2713;
-                            </li>
-                        {{/if}}
+                    {{#if this.value}}
+                        <li>{{this.desc}}: &#x2713;</li>
+                    {{/if}}
                 {{/ifEquals}}
-
                 {{#ifEquals this.type "text"}}
                     {{#elseEquals this.value ''}}
-                        <li>
-                            {{this.desc}}: 
-                            {{this.value}}
-                        </li>
+                        <li>{{this.desc}}: {{this.value}}</li>
                     {{/elseEquals}}
                 {{/ifEquals}}
-
                 {{#ifEquals this.type "number"}}
                     {{#elseEquals this.value 0}}
-                        <li>
-                            {{this.desc}}: 
-                            {{this.value}}
-                        </li>
+                        <li>{{this.desc}}: {{this.value}}</li>
                     {{/elseEquals}}
                 {{/ifEquals}}
             {{/each}}
@@ -70,7 +115,7 @@
 
     {{#if isOwner}}
         {{#if requests}}
-            <div id="friend-request-wrapper">
+            <div id="friend-request-wrapper" class="profile-section">
                 <h3>Incoming Family Requests</h3>
                 {{#each requests}}
                     <div id="friend-request">
@@ -99,13 +144,7 @@
             <button type="submit" class="add-friend">Add Family</button>
         </form>
         {{/if}}
-    {{ else }}
+    {{else}}
         <p>To add this user as family, please <a href="/login">login</a>.</p>
-    {{/if}}
-
-    {{#if user.slideshowImages.length}}
-        <h3>Picture Bar</h3>
-        {{> showSlideshow}}
-        <br>
     {{/if}}
 </main>
