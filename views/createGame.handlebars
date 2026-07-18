@@ -35,7 +35,7 @@
             <label class="form-label" for="end-time">End Time:</label>
                 <input class="form-input" type="time" id="end-time" name="endTime" required>
                 <br>
-            <label class="form-label" for="max-players">Max players:</label>
+            <label class="form-label" for="max-players">Max attendees:</label>
                 <input class="form-input" type="text" id="max-players" name="maxPlayers">
                 <br>
             <label class="form-label" for="group">Group:</label>
@@ -55,6 +55,15 @@
                 <br>
             <label class="form-label" for="linkdesc">Link Description:</label>
                 <input class="form-input" type="text" id="linkdesc" name="linkdesc">
+                <br>
+            <label class="form-label" for="visibility">Visibility:</label>
+                <select class="form-input" id="visibility" name="visibility">
+                    <option value="public" selected>Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <br>
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input" id="privateDescription" name="privateDescription"></textarea>
                 <br>
             <button type="submit" id="game-submit-button" class="form-submit-button">Submit</button>
             

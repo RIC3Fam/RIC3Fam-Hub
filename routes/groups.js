@@ -17,7 +17,16 @@ const groupName = req.body.groupName;
         const groupLeader = req.session.user._id;
         try {
             helpers.validateGroup(groupName, groupDescription, groupLeader)
-const createResult = await groupsData.create(groupName, groupDescription, groupLeader, uppercaseTitle, lowercaseTitle, numericTitle);                 
+const createResult = await groupsData.create(
+                groupName,
+                groupDescription,
+                groupLeader,
+                uppercaseTitle,
+                lowercaseTitle,
+                numericTitle,
+                req.body.visibility,
+                req.body.privateDescription
+            );
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
             return res.status(400).render('error', { title: 'Error', error: err });
@@ -40,6 +49,17 @@ router.route('/:groupId').get(async (req, res) => {
         let groupId = req.params.groupId;
         helpers.isValidId(groupId);
         const groupObj = await groupsData.get(groupId);
+
+        if (!helpers.viewerCanAccessGroup(req.session.user, groupObj)) {
+            return res.status(403).render('privateEntity', {
+                title: 'Private Group',
+                entityType: 'group',
+                entityName: groupObj.groupName,
+                canJoin: !!req.session.user,
+                joinUrl: '/groups/join/' + groupId
+            });
+        }
+
         let players=  groupObj.players;
         players = players.filter(player => player !== groupObj.groupLeader)
        // Get the list of group members from the database
@@ -64,15 +84,15 @@ let members = await usersData.getIDName(players);
 uppercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
 lowercaseMembers.sort((a, b) => a.name.localeCompare(b.name));
 numericMembers.sort((a, b) => a.name.localeCompare(b.name));
-        let games = await gamesData.getAllByGroup(groupId);
+        let currentUser = req.session.user;
+        let games = await gamesData.getAllByGroup(groupId, true, currentUser?._id);
         games = games.map(game => ({_id: game._id, name: game.gameName}));
         let owner = null;
         if(groupObj.groupLeader !== null){
             owner = await usersData.getUser(groupObj.groupLeader);
         }
-        let currentUser = req.session.user;
         let isMember = currentUser && groupObj.players.includes(currentUser._id);
-        let isOwner = currentUser && owner._id == currentUser._id;
+        let isOwner = currentUser && owner && owner._id == currentUser._id;
 
         groupObj.comments.forEach(async comment => {
             try{
@@ -99,7 +119,10 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         games: games,
         owner: owner,
         isMember: isMember,
-        isOwner: isOwner
+        isOwner: isOwner,
+        canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, groupObj, 'group'),
+        isPublic: groupObj.visibility !== 'private',
+        slideshowImages: groupObj.slideshowImages || []
       });
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });
@@ -170,7 +193,15 @@ router
                 throw 'You are not the leader of this group';
             }
    
-            await groupsData.update(groupId, req.body.groupName, req.body.groupDescription, currentUser._id);
+            await groupsData.update(
+                groupId,
+                req.body.groupName,
+                req.body.groupDescription,
+                currentUser._id,
+                null,
+                req.body.visibility,
+                req.body.privateDescription
+            );
             return res.redirect("/groups/" + groupId);
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });

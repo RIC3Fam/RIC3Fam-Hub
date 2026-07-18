@@ -1,8 +1,24 @@
 <main>
     <div class="event-container">
         <div class="event-content">
-            <h1>{{game.gameName}}</h1>
+            <h1>{{game.gameName}}
+                {{#ifEquals game.visibility "private"}}
+                    <span class="visibility-badge">Private</span>
+                {{else}}
+                    <span class="visibility-badge">Public</span>
+                {{/ifEquals}}
+            </h1>
             <p>Event Info: {{game.description}}</p>
+            {{#if canSeePrivateBox}}
+                <section class="private-box">
+                    <h3>Private Description</h3>
+                    {{#if game.privateDescription}}
+                        <div class="description-box">{{game.privateDescription}}</div>
+                    {{else}}
+                        <p class="muted">No private description yet.</p>
+                    {{/if}}
+                </section>
+            {{/if}}
             <h3>Registered Members:</h3>
             <ul>
                 {{#each players}}

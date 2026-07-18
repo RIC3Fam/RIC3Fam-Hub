@@ -8,6 +8,11 @@
         {{#each events}}
             <dd class="search-result">
                 <a href="/games/{{this._id}}">{{this.gameName}}</a>
+                {{#ifEquals this.visibility "private"}}
+                    <span class="visibility-badge">Private</span>
+                {{else}}
+                    <span class="visibility-badge">Public</span>
+                {{/ifEquals}}
             </dd>
         {{/each}}
     </dl>
@@ -28,4 +33,4 @@
     <h3 class="list-header">Picture Bar</h3>
 {{/if}}
 
-{{> showSlideshow}}
+{{> partials/pictureSlider}}

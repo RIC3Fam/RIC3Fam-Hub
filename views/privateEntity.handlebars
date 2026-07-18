@@ -1,0 +1,24 @@
+<main>
+    <div class="private-entity">
+        <h1>This {{entityType}} is private.</h1>
+        {{#if entityName}}
+            <p>{{entityName}}</p>
+        {{/if}}
+
+        {{#if canJoin}}
+            {{#if joinUrl}}
+                <form action="{{joinUrl}}" method="POST">
+                    <button type="submit" class="join-button">Join</button>
+                </form>
+            {{/if}}
+        {{/if}}
+
+        {{#ifEquals entityType "profile"}}
+            {{#if currentUser}}
+                <p><a href="/">Back to home</a></p>
+            {{else}}
+                <p>Please <a href="/login">login</a> to continue.</p>
+            {{/if}}
+        {{/ifEquals}}
+    </div>
+</main>

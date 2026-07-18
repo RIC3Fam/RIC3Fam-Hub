@@ -126,6 +126,9 @@ if (slideshowForm) {
         isEventPage = false;
     }
 
+    let groupSlideshowId = document.getElementById('group-slideshow-id');
+    let groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+
     slideshowForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         try {
@@ -155,7 +158,7 @@ if (slideshowForm) {
 
             console.log('Getting signed urls');
 
-            const signedUrls = await getSlideshowUrls(filenames, isEventPage);
+            const signedUrls = await getSlideshowUrls(filenames, isEventPage, groupId);
 
             console.log('Uploading');
 
@@ -212,11 +215,12 @@ async function getGroupUrl(filename) {
  * Gets the signed url(s) for new slideshow image(s)
  * @param {[string]} filenames
  */
-async function getSlideshowUrls(filenames, isEventPage = false) {
+async function getSlideshowUrls(filenames, isEventPage = false, groupId = null) {
     const options = {
         filenames: filenames,
         isEventPage: isEventPage,
     };
+    if (groupId) options.groupId = groupId;
 
     const signedUrls = await getUrls(options, 'slideshow');
 

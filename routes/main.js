@@ -96,7 +96,7 @@ router
                 let userId = req.session.user._id;
                 allGroupsData = await groupsData.getAllGroupsbyUserID(userId);
             }
-            return res.render('createGame', {title:"Create game", groups: allGroupsData, states: helpers.states});
+            return res.render('createGame', {title:"Create Event", groups: allGroupsData, states: helpers.states});
         } catch (e) {
             return res.status(400).render('error', {title: "Error", error: e});
         }

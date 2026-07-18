@@ -1,0 +1,31 @@
+{{#if slideshowImages.length}}
+<div class="picture-slider" data-slider>
+    <button type="button" class="picture-slider-btn picture-slider-prev" aria-label="Previous image">&lsaquo;</button>
+    <div class="picture-slider-viewport">
+        {{#each slideshowImages}}
+            <figure class="picture-slider-slide{{#if @first}} is-active{{/if}}">
+                <img src="{{this}}" alt="Slideshow image" loading="lazy">
+                {{#if ../isOwner}}
+                    <button type="button" class="gallery-delete-button slider-delete-button">Delete</button>
+                {{/if}}
+                {{#unless ../isOwner}}
+                    {{#if ../currentUser.isAdmin}}
+                        <button type="button" class="gallery-delete-button slider-delete-button">Delete</button>
+                    {{/if}}
+                {{/unless}}
+            </figure>
+        {{/each}}
+    </div>
+    <button type="button" class="picture-slider-btn picture-slider-next" aria-label="Next image">&rsaquo;</button>
+    <div class="picture-slider-dots" aria-hidden="true">
+        {{#each slideshowImages}}
+            <button type="button" class="picture-slider-dot{{#if @first}} is-active{{/if}}" data-index="{{@index}}" aria-label="Go to slide {{@index}}"></button>
+        {{/each}}
+    </div>
+</div>
+{{/if}}
+<p id="error-label" hidden></p>
+<p id="message-label" hidden></p>
+<script src="/public/js/pictureSlider.js"></script>
+<script src="/public/js/slideshow.js"></script>
+<script src="/public/js/pictures.js"></script>

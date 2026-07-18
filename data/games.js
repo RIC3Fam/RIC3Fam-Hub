@@ -5,9 +5,9 @@ import { ObjectId } from 'mongodb';
 import xss from 'xss';
 
 const formatAndValidateGame = function (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer = undefined, link, linkdesc) {
-    gameName = helpers.stringHelper(gameName, 'Game name', 5, null);
-    gameDescription = helpers.stringHelper(gameDescription, 'Game description', 1, null);
-    gameDate = helpers.stringHelper(gameDate, 'Game date', 1, null);
+    gameName = helpers.stringHelper(gameName, 'Event name', 5, null);
+    gameDescription = helpers.stringHelper(gameDescription, 'Event description', 1, null);
+    gameDate = helpers.stringHelper(gameDate, 'Event date', 1, null);
     startTime = helpers.stringHelper(startTime, 'Start time', 1, null);
     endTime = helpers.stringHelper(endTime, 'End time', 1, null);
 
@@ -30,13 +30,40 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
 
-const create = async (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, group, organizer, link, linkdesc) => {
-    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc );
+const filterPrivateGames = (gameList, viewerId = null) => {
+    return gameList.filter((g) => {
+        const vis = g.visibility === 'private' ? 'private' : 'public';
+        if (vis !== 'private') return true;
+        if (!viewerId) return false;
+        if (g.organizer === viewerId) return true;
+        return Array.isArray(g.players) && g.players.includes(viewerId);
+    });
+};
+
+const create = async (
+    gameName,
+    gameDescription,
+    gameLocation,
+    maxCapacity,
+    gameDate,
+    startTime,
+    endTime,
+    group,
+    organizer,
+    link,
+    linkdesc,
+    visibility = 'public',
+    privateDescription = ''
+) => {
+    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc);
 
     // Group is optional
     if (group !== 'N/A') helpers.isValidId(group);
 
     helpers.isValidId(organizer);
+
+    visibility = helpers.normalizeVisibility(visibility);
+    privateDescription = helpers.optionalString(privateDescription, 'Private description');
 
     // Add game to database
     let newgame = {
@@ -58,6 +85,8 @@ const create = async (gameName, gameDescription, gameLocation, maxCapacity, game
         expired: false,
         link: gameData.link,
         linkdesc: gameData.linkdesc,
+        visibility,
+        privateDescription,
     };
 
     const gameCollection = await games();
@@ -88,12 +117,12 @@ const get = async (gameId) => {
     const game = await gameCollection.findOne({ _id: new ObjectId(gameId) });
     if (game === null) throw 'No game with that id';
     game._id = game._id.toString();
-    return game;
+    return helpers.withVisibilityDefaults(game);
 };
 
 // Only gets all games in the future
 // Set includeExpired to true to get all previous games
-const getAll = async (includeExpired = false) => {
+const getAll = async (includeExpired = false, viewerId = null) => {
     const query = includeExpired ? {} : { expired: false };
 
     const gameCollection = await games();
@@ -101,8 +130,10 @@ const getAll = async (includeExpired = false) => {
 
     if (!gameList) throw 'Could not get all games';
 
+    gameList = filterPrivateGames(gameList, viewerId);
     gameList = gameList.map((element) => {
         element._id = element._id.toString();
+        if (element.visibility !== 'private') element.visibility = 'public';
         return element;
     });
     return gameList;
@@ -110,8 +141,8 @@ const getAll = async (includeExpired = false) => {
 
 // Get all games of given group
 // Set includeExpired to false to get only future games
-const getAllByGroup = async (groupId, includeExpired = true) => {
-    const gameList = await getAll(includeExpired);
+const getAllByGroup = async (groupId, includeExpired = true, viewerId = null) => {
+    const gameList = await getAll(includeExpired, viewerId);
     let groupGames = [];
 
     for (const game of gameList) {
@@ -205,7 +236,7 @@ const addUser = async (userId, gameId) => {
     return { updateUser, updateGame };
 };
 
-const searchGames = async (search) => {
+const searchGames = async (search, viewerId = null) => {
     //Returns the first 10 users that start with a search query
     let resultSize = 10;
     if (!search) {
@@ -224,7 +255,12 @@ const searchGames = async (search) => {
     if (!gameList || gameList.length === 0) {
         throw "Couldn't find any games with that name";
     }
-    //Returns the entire gamelist right now
+    gameList = filterPrivateGames(gameList, viewerId);
+    gameList = gameList.map((element) => {
+        element._id = element._id.toString();
+        if (element.visibility !== 'private') element.visibility = 'public';
+        return element;
+    });
     return gameList;
 };
 
@@ -273,7 +309,9 @@ const update = async (
     map,
     directions,
     link,
-    linkdesc
+    linkdesc,
+    visibility,
+    privateDescription
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
@@ -298,7 +336,12 @@ const update = async (
         map: map ?? oldGame.map,
         directions: directions ?? oldGame.directions,
         link: gameData.link,
-        linkdesc: gameData.linkdesc
+        linkdesc: gameData.linkdesc,
+        visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGame.visibility || 'public',
+        privateDescription:
+            privateDescription != null
+                ? helpers.optionalString(privateDescription, 'Private description')
+                : oldGame.privateDescription || '',
     };
 
     const gameCollection = await games();
@@ -329,9 +372,10 @@ const getIDName = async (gameIds) => {
 };
 
 // Goes through all (future) games to make sure they haven't passed and updates them if they are old
+// Bypasses getAll visibility filtering so private events still expire
 const keepStatusUpdated = async () => {
-    const gamesList = await getAll();
     const gameCollection = await games();
+    const gamesList = await gameCollection.find({ expired: false }).toArray();
 
     //console.log('Checking for expired games');
 
@@ -394,8 +438,12 @@ const editGameImage = async (gameId, imagePath) => {
         game.endTime,
         game.group,
         url,
+        game.map,
+        game.directions,
         game.link,
-        game.linkdesc
+        game.linkdesc,
+        game.visibility,
+        game.privateDescription
     );
 };
 

@@ -11,20 +11,38 @@
             <label class="form-label" for="email">Email:</label>
                 <input class="form-input" type="email" id="email" name="email" value="{{currentUser.emailAddress}}">
                 <br>
-            <label class="form-label" for="description">Bio:</label>
+            <label class="form-label" for="statement">Personal / artist statement:</label>
+                <textarea class="form-input" id="statement" name="statement">{{currentUser.statement}}</textarea>
+                <br>
+            <label class="form-label" for="description">Description:</label>
                 <textarea class="form-input" id="description" name="description">{{currentUser.description}}</textarea>
                 <br>
-            <label class="form-label" for="link1">Link 1:</label>
+            <label class="form-label" for="link1">Website URL:</label>
                 <input class="form-input" type="url" id="link1" name="link1" value="{{currentUser.link1}}">
                 <br>
-            <label class="form-label" for="link1desc">Link 1 description:</label>
+            <label class="form-label" for="link1desc">Website label:</label>
                 <input class="form-input" id="link1desc" name="link1desc" value="{{currentUser.link1desc}}">
                 <br>
-            <label class="form-label" for="link2">Link 2:</label>
+            <label class="form-label" for="link2">Social media URL:</label>
                 <input class="form-input" type="url" id="link2" name="link2" value="{{currentUser.link2}}">
                 <br>
-            <label class="form-label" for="link2desc">Link 2 description:</label>
+            <label class="form-label" for="link2desc">Social label:</label>
                 <input class="form-input" id="link2desc" name="link2desc" value="{{currentUser.link2desc}}">
+                <br>
+            <label class="form-label" for="additionalDescription">Additional description:</label>
+                <textarea class="form-input" id="additionalDescription" name="additionalDescription">{{currentUser.additionalDescription}}</textarea>
+                <br>
+            <label class="form-label" for="slideshowDescription">Picture Bar description:</label>
+                <textarea class="form-input" id="slideshowDescription" name="slideshowDescription">{{currentUser.slideshowDescription}}</textarea>
+                <br>
+            <label class="form-label" for="visibility">Visibility:</label>
+                <select class="form-input" id="visibility" name="visibility">
+                    <option value="public" {{#elseEquals currentUser.visibility "private"}}selected{{/elseEquals}}>Public</option>
+                    <option value="private" {{#ifEquals currentUser.visibility "private"}}selected{{/ifEquals}}>Private</option>
+                </select>
+                <br>
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input" id="privateDescription" name="privateDescription">{{currentUser.privateDescription}}</textarea>
                 <br>
             
             <!-- Skills -->

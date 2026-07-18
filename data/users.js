@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import { picturesData } from './index.js';
 
-const searchUsers = async (search) => {
+const searchUsers = async (search, viewer = null) => {
     //Returns the first 10 users that start with a search query
     let resultSize = 10;
     if (!search) {
@@ -23,6 +23,16 @@ const searchUsers = async (search) => {
     if (!userList || userList.length === 0) {
         throw "Couldn't find any users with that name";
     }
+    // Exclude private users unless viewer may access (owner, family, or admin)
+    // Support legacy callers that passed viewerId string
+    const viewerObj = typeof viewer === 'string' ? { _id: viewer } : viewer;
+    userList = userList.filter((u) => {
+        const normalized = helpers.withVisibilityDefaults({
+            ...u,
+            _id: u._id.toString(),
+        });
+        return helpers.viewerCanAccessUser(viewerObj, normalized);
+    });
     //Returns everything besides password, feel free to change
     userList = userList.map(
         (user) =>
@@ -35,6 +45,7 @@ const searchUsers = async (search) => {
                 friends: user.friends,
                 games: user.games,
                 groups: user.groups,
+                visibility: user.visibility === 'private' ? 'private' : 'public',
             })
     );
     return userList;
@@ -86,7 +97,29 @@ export function formatAndValidateUser(userData, ignorePassword) {
 
     let profilePicture = helpers.stringHelper(userData.profilePicture, 'Profile picture', null, 2048);
     let description = helpers.stringHelper(userData.description, 'Description', null, null);
-    return { username, emailAddress, password, profilePicture, description, skills: userData.skills, name, link1, link1desc, link2, link2desc };
+    let statement = helpers.optionalString(userData.statement, 'Statement');
+    let additionalDescription = helpers.optionalString(userData.additionalDescription, 'Additional description');
+    let slideshowDescription = helpers.optionalString(userData.slideshowDescription, 'Slideshow description');
+    let visibility = helpers.normalizeVisibility(userData.visibility);
+    let privateDescription = helpers.optionalString(userData.privateDescription, 'Private description');
+    return {
+        username,
+        emailAddress,
+        password,
+        profilePicture,
+        description,
+        skills: userData.skills,
+        name,
+        link1,
+        link1desc,
+        link2,
+        link2desc,
+        statement,
+        additionalDescription,
+        slideshowDescription,
+        visibility,
+        privateDescription,
+    };
 }
 
 const createUser = async (username, emailAddress, password, pfp, description, name) => {
@@ -136,6 +169,11 @@ const createUser = async (username, emailAddress, password, pfp, description, na
         friendRequests: [],
         skills: skills,
         slideshowImages: [],
+        statement: '',
+        additionalDescription: '',
+        slideshowDescription: '',
+        visibility: 'public',
+        privateDescription: '',
     };
 
     // Update the user
@@ -164,14 +202,48 @@ const getIDName = async (userIds) => {
     return ret;
 };
 
-const editUser = async (userId, username, emailAddress, profilePicture, description, skills, name, link1, link1desc, link2, link2desc) => {
+const editUser = async (
+    userId,
+    username,
+    emailAddress,
+    profilePicture,
+    description,
+    skills,
+    name,
+    link1,
+    link1desc,
+    link2,
+    link2desc,
+    statement,
+    additionalDescription,
+    slideshowDescription,
+    visibility,
+    privateDescription
+) => {
     if (!userId) throw 'User Id not given';
     if (typeof userId !== 'string') throw 'User Id is not a string';
     userId = userId.trim();
     if (!ObjectId.isValid(userId)) throw 'User Id is not valid';
     if (typeof skills !== 'object') throw 'Skills is not an object';
 
-    let userData = { username, emailAddress, password: '', profilePicture, description, skills, name, link1, link1desc, link2, link2desc };
+    let userData = {
+        username,
+        emailAddress,
+        password: '',
+        profilePicture,
+        description,
+        skills,
+        name,
+        link1,
+        link1desc,
+        link2,
+        link2desc,
+        statement,
+        additionalDescription,
+        slideshowDescription,
+        visibility,
+        privateDescription,
+    };
     userData = formatAndValidateUser(userData, true);
 
     const userCollection = await users();
@@ -198,7 +270,11 @@ const editUser = async (userId, username, emailAddress, profilePicture, descript
                 link1desc: userData.link1desc,
                 link2: userData.link2,
                 link2desc: userData.link2desc,
-                
+                statement: userData.statement,
+                additionalDescription: userData.additionalDescription,
+                slideshowDescription: userData.slideshowDescription,
+                visibility: userData.visibility,
+                privateDescription: userData.privateDescription,
             },
         }
     );
@@ -213,7 +289,24 @@ const editPfp = async (userId, imagePath) => {
     const base = 'https://storage.googleapis.com';
 
     const url = `${base}/${bucketName}/${userId}/${imagePath}`;
-    await editUser(userId, user.username, user.emailAddress, url, user.description, user.skills, user.name, user.link1, user.link1desc, user.link2, user.link2desc);
+    await editUser(
+        userId,
+        user.username,
+        user.emailAddress,
+        url,
+        user.description,
+        user.skills,
+        user.name,
+        user.link1,
+        user.link1desc,
+        user.link2,
+        user.link2desc,
+        user.statement || '',
+        user.additionalDescription || '',
+        user.slideshowDescription || '',
+        user.visibility || 'public',
+        user.privateDescription || ''
+    );
 };
 
 const getAllUsers = async () => {
@@ -241,7 +334,10 @@ const getUser = async (userId) => {
         throw 'Could not find user';
     }
     user._id = user._id.toString();
-    return user;
+    if (user.statement == null) user.statement = '';
+    if (user.additionalDescription == null) user.additionalDescription = '';
+    if (user.slideshowDescription == null) user.slideshowDescription = '';
+    return helpers.withVisibilityDefaults(user);
 };
 
 const deleteUser = async (userId) => {
@@ -349,7 +445,7 @@ export const loginUser = async (username, password) => {
         groups: user.groups,
         friendRequests: user.friendRequests,
         skills: user.skills,
-        isAdmin: (user.isAdmin ??= false),
+        isAdmin: !!(user.isAdmin || user.admin),
     };
 };
 
@@ -474,7 +570,7 @@ const isUserLeader = async (userId) => {
 const isUserAdmin = async (userId) => {
     helpers.isValidId(userId);
     const user = await getUser(userId);
-    if (user.admin) {
+    if (user.admin || user.isAdmin) {
         return true;
     }
 

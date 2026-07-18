@@ -13,6 +13,15 @@ router
             let userId = req.params.userId;
             let notFriend = true;
             let userObj = await usersData.getUser(userId);
+
+            if (!helpers.viewerCanAccessUser(req.session.user, userObj)) {
+                return res.status(403).render('privateEntity', {
+                    title: 'Private Profile',
+                    entityType: 'profile',
+                    entityName: userObj.name || userObj.username
+                });
+            }
+
             if(req.session.user){
                 if(req.session.user.friends.includes(userId) || userObj.friendRequests.includes(req.session.user._id)){
                     notFriend = false;
@@ -36,7 +45,9 @@ router
                 requests: requests,
                 isOwner: isOwner,
                 notFriend: notFriend,
-                slideshowImages: userObj.slideshowImages
+                slideshowImages: userObj.slideshowImages,
+                canSeePrivateBox: helpers.viewerCanSeePrivateBox(req.session.user, userObj, 'user'),
+                isPublic: userObj.visibility !== 'private'
             }
             return res.render('user', ret);
         } catch (e) {  
@@ -171,15 +182,35 @@ router
             let link1desc = req.body.link1desc;
             let link2 = req.body.link2;
             let link2desc = req.body.link2desc;
-
-            
+            let statement = req.body.statement;
+            let additionalDescription = req.body.additionalDescription;
+            let slideshowDescription = req.body.slideshowDescription;
+            let visibility = req.body.visibility;
+            let privateDescription = req.body.privateDescription;
 
             //console.log(skills);
             if (currentUser._id !== userId) {
                 throw Error("not allowed");
             }
 
-            req.session.user = await usersData.editUser(currentUser._id, username, email, currentUser.profilePicture, description, skills, name, link1, link1desc, link2, link2desc);
+            req.session.user = await usersData.editUser(
+                currentUser._id,
+                username,
+                email,
+                currentUser.profilePicture,
+                description,
+                skills,
+                name,
+                link1,
+                link1desc,
+                link2,
+                link2desc,
+                statement,
+                additionalDescription,
+                slideshowDescription,
+                visibility,
+                privateDescription
+            );
             return res.redirect("/users/" + currentUser._id);
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });

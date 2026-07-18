@@ -6,3 +6,6 @@ node_modules/
 package-lock.json
 .env
 elevated-apex-410118-485eb9012726.json
+test-results/
+playwright-report/
+playwright/.cache/
