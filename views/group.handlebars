@@ -9,6 +9,22 @@
                 {{/ifEquals}}
             </h1>
             <p>About Us: {{group.description}}</p>
+
+            {{#if group.link1}}
+                <p class="group-links">
+                    <a href="{{group.link1}}" target="_blank" rel="noopener noreferrer">{{#if group.link1desc}}{{group.link1desc}}{{else}}Website{{/if}}</a>
+                    {{#if group.link2}}
+                        <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
+                    {{/if}}
+                </p>
+            {{else}}
+                {{#if group.link2}}
+                    <p class="group-links">
+                        <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
+                    </p>
+                {{/if}}
+            {{/if}}
+
             {{#if canSeePrivateBox}}
                 <section class="private-box">
                     <h3>Private Description</h3>
@@ -29,6 +45,20 @@
             {{> partials/pictureSlider}}
             {{#if isOwner}}
                 {{> addToSlideshow groupId=group._id}}
+            {{/if}}
+
+            {{#if projectFramers.length}}
+                <section class="event-leaders profile-section">
+                    <h3>Project Framers</h3>
+                    <dl class="event-leaders-list">
+                        {{#each projectFramers}}
+                            <div class="event-leader-row">
+                                <dt>{{this.title}}</dt>
+                                <dd><a href="/users/{{this._id}}">{{this.name}}</a></dd>
+                            </div>
+                        {{/each}}
+                    </dl>
+                </section>
             {{/if}}
 
             {{#if owner}}

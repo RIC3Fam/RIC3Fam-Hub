@@ -4,6 +4,45 @@ import { ObjectId } from 'mongodb';
 import { usersData, gamesData, picturesData } from './index.js';
 import xss from 'xss';
 
+const normalizeSectionTitle = (value, fallback) => {
+    return value && String(value).trim() ? xss(String(value).trim()) : fallback;
+};
+
+const normalizeOptionalLink = (url, desc, urlName, descName) => {
+    if (url != null && String(url).trim() !== '') {
+        const link = helpers.stringHelper(String(url), urlName);
+        const linkdesc =
+            desc != null && String(desc).trim() !== ''
+                ? helpers.stringHelper(String(desc), descName, 1, 100)
+                : '';
+        return { link, linkdesc };
+    }
+    return { link: '', linkdesc: '' };
+};
+
+const normalizeProjectFramers = (framersInput) => {
+    if (!framersInput) return [];
+    let rows = framersInput;
+    if (!Array.isArray(rows) && typeof rows === 'object') {
+        rows = Object.keys(rows)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((k) => rows[k]);
+    }
+    if (!Array.isArray(rows)) return [];
+
+    const framers = [];
+    for (const row of rows) {
+        if (!row || typeof row !== 'object') continue;
+        const title = helpers.optionalString(row.title, 'Project framer title', 80);
+        const userId = row.userId != null ? String(row.userId).trim() : '';
+        if (!title && !userId) continue;
+        if (!title) throw 'Each project framer needs a title';
+        helpers.isValidId(userId);
+        framers.push({ title, userId });
+    }
+    return framers;
+};
+
 const create = async (
     groupName,
     groupDescription,
@@ -12,7 +51,12 @@ const create = async (
     lowercaseTitle,
     numericTitle,
     visibility = 'public',
-    privateDescription = ''
+    privateDescription = '',
+    link1 = '',
+    link1desc = '',
+    link2 = '',
+    link2desc = '',
+    projectFramers = []
 ) => {
     // Input Validation
     helpers.validateGroup(groupName, groupDescription, groupLeader);
@@ -21,11 +65,14 @@ const create = async (
     groupDescription = groupDescription.trim();
 
     // Default fallback values if fields were left blank in the form
-    uppercaseTitle = uppercaseTitle && uppercaseTitle.trim() ? xss(uppercaseTitle.trim()) : 'All Caps Members';
-    lowercaseTitle = lowercaseTitle && lowercaseTitle.trim() ? xss(lowercaseTitle.trim()) : 'Lowercase Members';
-    numericTitle = numericTitle && numericTitle.trim() ? xss(numericTitle.trim()) : 'Numbered Members';
+    uppercaseTitle = normalizeSectionTitle(uppercaseTitle, 'All Caps Members');
+    lowercaseTitle = normalizeSectionTitle(lowercaseTitle, 'Lowercase Members');
+    numericTitle = normalizeSectionTitle(numericTitle, 'Numbered Members');
     visibility = helpers.normalizeVisibility(visibility);
     privateDescription = helpers.optionalString(privateDescription, 'Private description');
+    const website = normalizeOptionalLink(link1, link1desc, 'Website URL', 'Website label');
+    const social = normalizeOptionalLink(link2, link2desc, 'Social media URL', 'Social label');
+    const framers = normalizeProjectFramers(projectFramers);
 
     // Add group to database
     let newgroup = {
@@ -41,6 +88,11 @@ const create = async (
         groupImage: 'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
         visibility,
         privateDescription,
+        link1: website.link,
+        link1desc: website.linkdesc,
+        link2: social.link,
+        link2desc: social.linkdesc,
+        projectFramers: framers,
         slideshowImages: [],
         slideshowDescription: '',
     };
@@ -133,6 +185,11 @@ const get = async (groupId) => {
     group._id = group._id.toString();
     if (!Array.isArray(group.slideshowImages)) group.slideshowImages = [];
     if (group.slideshowDescription == null) group.slideshowDescription = '';
+    if (!Array.isArray(group.projectFramers)) group.projectFramers = [];
+    if (group.link1 == null) group.link1 = '';
+    if (group.link1desc == null) group.link1desc = '';
+    if (group.link2 == null) group.link2 = '';
+    if (group.link2desc == null) group.link2desc = '';
     return helpers.withVisibilityDefaults(group);
 };
 
@@ -172,7 +229,23 @@ const remove = async (groupId) => {
     return res;
 };
 
-const update = async (groupId, groupName, groupDescription, groupLeader, groupImage, visibility, privateDescription) => {
+const update = async (
+    groupId,
+    groupName,
+    groupDescription,
+    groupLeader,
+    groupImage,
+    visibility,
+    privateDescription,
+    uppercaseTitle,
+    lowercaseTitle,
+    numericTitle,
+    link1,
+    link1desc,
+    link2,
+    link2desc,
+    projectFramers
+) => {
     // Input Validation
     helpers.isValidId(groupId);
     groupId = groupId.trim();
@@ -184,14 +257,32 @@ const update = async (groupId, groupName, groupDescription, groupLeader, groupIm
 
     const oldGroup = await get(groupId); // Check if group exists
 
+    const website =
+        link1 !== undefined
+            ? normalizeOptionalLink(link1, link1desc, 'Website URL', 'Website label')
+            : { link: oldGroup.link1 || '', linkdesc: oldGroup.link1desc || '' };
+    const social =
+        link2 !== undefined
+            ? normalizeOptionalLink(link2, link2desc, 'Social media URL', 'Social label')
+            : { link: oldGroup.link2 || '', linkdesc: oldGroup.link2desc || '' };
+
     // Update record
     const updatedgroup = {
         groupName: xss(groupName),
         description: xss(groupDescription),
         groupLeader,
-        uppercaseTitle: oldGroup.uppercaseTitle,
-        lowercaseTitle: oldGroup.lowercaseTitle,
-        numericTitle: oldGroup.numericTitle,
+        uppercaseTitle:
+            uppercaseTitle !== undefined
+                ? normalizeSectionTitle(uppercaseTitle, oldGroup.uppercaseTitle || 'All Caps Members')
+                : oldGroup.uppercaseTitle,
+        lowercaseTitle:
+            lowercaseTitle !== undefined
+                ? normalizeSectionTitle(lowercaseTitle, oldGroup.lowercaseTitle || 'Lowercase Members')
+                : oldGroup.lowercaseTitle,
+        numericTitle:
+            numericTitle !== undefined
+                ? normalizeSectionTitle(numericTitle, oldGroup.numericTitle || 'Numbered Members')
+                : oldGroup.numericTitle,
         comments: oldGroup.comments,
         players: oldGroup.players,
         totalNumberOfPlayers: oldGroup.totalNumberOfPlayers,
@@ -203,6 +294,12 @@ const update = async (groupId, groupName, groupDescription, groupLeader, groupIm
             privateDescription != null
                 ? helpers.optionalString(privateDescription, 'Private description')
                 : oldGroup.privateDescription || '',
+        link1: website.link,
+        link1desc: website.linkdesc,
+        link2: social.link,
+        link2desc: social.linkdesc,
+        projectFramers:
+            projectFramers !== undefined ? normalizeProjectFramers(projectFramers) : oldGroup.projectFramers || [],
     };
 
     const groupCollection = await groups();
@@ -376,7 +473,15 @@ const editGroupImage = async (groupId, imagePath) => {
         group.groupLeader,
         url,
         group.visibility,
-        group.privateDescription
+        group.privateDescription,
+        group.uppercaseTitle,
+        group.lowercaseTitle,
+        group.numericTitle,
+        group.link1,
+        group.link1desc,
+        group.link2,
+        group.link2desc,
+        group.projectFramers
     );
 };
 

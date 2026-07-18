@@ -25,7 +25,12 @@ const createResult = await groupsData.create(
                 lowercaseTitle,
                 numericTitle,
                 req.body.visibility,
-                req.body.privateDescription
+                req.body.privateDescription,
+                req.body.link1,
+                req.body.link1desc,
+                req.body.link2,
+                req.body.link2desc,
+                req.body.projectFramers
             );
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
@@ -94,6 +99,21 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         let isMember = currentUser && groupObj.players.includes(currentUser._id);
         let isOwner = currentUser && owner && owner._id == currentUser._id;
 
+        const projectFramers = [];
+        for (const row of groupObj.projectFramers || []) {
+            try {
+                const person = await usersData.getUser(row.userId);
+                projectFramers.push({
+                    title: row.title,
+                    _id: person._id,
+                    name: person.name || person.username,
+                    username: person.username,
+                });
+            } catch (e) {
+                continue;
+            }
+        }
+
         groupObj.comments.forEach(async comment => {
             try{
                 comment.sender = (await usersData.getIDName([comment.userId]))[0]
@@ -120,6 +140,7 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         owner: owner,
         isMember: isMember,
         isOwner: isOwner,
+        projectFramers,
         canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, groupObj, 'group'),
         isPublic: groupObj.visibility !== 'private',
         slideshowImages: groupObj.slideshowImages || []
@@ -172,7 +193,25 @@ router
             helpers.isValidId(groupId);
             const groupObj = await groupsData.get(groupId);
 
-            return res.render("editGroup", {title:"Edit group", groupObj});
+            const projectFramers = [];
+            for (const row of groupObj.projectFramers || []) {
+                try {
+                    const person = await usersData.getUser(row.userId);
+                    projectFramers.push({
+                        title: row.title,
+                        userId: person._id,
+                        label: `${person.name || person.username} (@${person.username})`,
+                    });
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            return res.render("editGroup", {
+                title: "Edit group",
+                groupObj,
+                projectFramers,
+            });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
         }
@@ -200,7 +239,15 @@ router
                 currentUser._id,
                 null,
                 req.body.visibility,
-                req.body.privateDescription
+                req.body.privateDescription,
+                req.body.uppercaseTitle,
+                req.body.lowercaseTitle,
+                req.body.numericTitle,
+                req.body.link1,
+                req.body.link1desc,
+                req.body.link2,
+                req.body.link2desc,
+                req.body.projectFramers || []
             );
             return res.redirect("/groups/" + groupId);
         } catch (e) {

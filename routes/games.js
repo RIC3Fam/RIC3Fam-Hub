@@ -107,17 +107,39 @@ router.route('/:gameId').get(async (req, res) => {
         gameObj.endTime = helpers.convertTo12Hour(gameObj.endTime);
         gameObj.gameDate = helpers.convertToMMDDYYYY(gameObj.gameDate);
 
-        let players = gameObj.players;
-        // players = players.filter(player => player !== gameObj.organizer)
+        let players = (gameObj.players || []).filter((id) => id !== gameObj.organizer);
         let playersArr = await usersData.getIDName(players);
 
         let currentUser = req.session.user;
         let isOwner = currentUser && gameObj.organizer == currentUser._id;
         let isMember = currentUser && gameObj.players.includes(currentUser._id);
-        let organizerArr = [null];
-
+        let organizerDisplay = null;
         if (gameObj.organizer !== null) {
-            organizerArr = await usersData.getIDName([gameObj.organizer]);
+            try {
+                const org = await usersData.getUser(gameObj.organizer);
+                organizerDisplay = {
+                    _id: org._id,
+                    name: org.name || org.username,
+                    username: org.username,
+                };
+            } catch (e) {
+                organizerDisplay = null;
+            }
+        }
+
+        const leaders = [];
+        for (const row of gameObj.leaders || []) {
+            try {
+                const person = await usersData.getUser(row.userId);
+                leaders.push({
+                    title: row.title,
+                    _id: person._id,
+                    name: person.name || person.username,
+                    username: person.username,
+                });
+            } catch (e) {
+                continue;
+            }
         }
 
         //const weather = await weatherData.getWeather(gameObj.gameLocation.zip);
@@ -136,10 +158,12 @@ router.route('/:gameId').get(async (req, res) => {
             title: 'Event: ' + gameObj.gameName,
             game: gameObj,
             players: playersArr,
-            organizer: organizerArr[0],
+            organizer: organizerDisplay,
+            leaders,
             hostGroup: hostGroup,
             isOwner: isOwner,
             isMember: isMember,
+            slideshowImages: gameObj.slideshowImages || [],
             canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, gameObj, 'game'),
             isPublic: gameObj.visibility !== 'private',
             //weather: weather,
@@ -163,7 +187,28 @@ router
                 allGroupsData = await groupsData.getAllGroupsbyUserID(userId);
             }
 
-            return res.render('editGame', { title: 'Edit Event', user: req.session.user, gameObj, states: helpers.states, groups: allGroupsData });
+            const leadersForEdit = [];
+            for (const row of gameObj.leaders || []) {
+                try {
+                    const person = await usersData.getUser(row.userId);
+                    leadersForEdit.push({
+                        title: row.title,
+                        userId: person._id,
+                        label: `${person.name || person.username} (@${person.username})`,
+                    });
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            return res.render('editGame', {
+                title: 'Edit Event',
+                user: req.session.user,
+                gameObj,
+                states: helpers.states,
+                groups: allGroupsData,
+                leaders: leadersForEdit,
+            });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
         }
@@ -230,7 +275,8 @@ router
                 link,
                 linkdesc,
                 req.body.visibility,
-                req.body.privateDescription
+                req.body.privateDescription,
+                req.body.leaders
             );
 
             return res.redirect('/games/' + gameId);

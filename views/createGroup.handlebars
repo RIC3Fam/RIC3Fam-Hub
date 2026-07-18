@@ -9,6 +9,25 @@
         <textarea class="form-input" id="description" name="groupDescription"></textarea>
         <br>
 
+        <label class="form-label" for="link1">Website URL:</label>
+        <input class="form-input" type="url" id="link1" name="link1" placeholder="https://">
+        <br>
+        <label class="form-label" for="link1desc">Website label:</label>
+        <input class="form-input" type="text" id="link1desc" name="link1desc" placeholder="e.g., Website">
+        <br>
+        <label class="form-label" for="link2">Social media URL:</label>
+        <input class="form-input" type="url" id="link2" name="link2" placeholder="https://">
+        <br>
+        <label class="form-label" for="link2desc">Social label:</label>
+        <input class="form-input" type="text" id="link2desc" name="link2desc" placeholder="e.g., Social Media">
+        <br>
+
+        <h4>Project Framers</h4>
+        <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
+        <div id="group-framers-editor"></div>
+        <button type="button" id="add-framer-row" class="form-submit-button">Add project framer</button>
+        <br>
+
         <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
         <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" placeholder="e.g., Gold Tier Members">
         <br>
@@ -36,7 +55,8 @@
             
         </form>
     </div>
-    <a class="message-label" hidden></a>
-    <a class="error-label" hidden></a>
+    <p id="message-label" hidden></p>
+    <p id="error-label" hidden></p>
     <script src='/public/js/groupValidation.js'></script>
+    <script src="/public/js/eventLeaders.js"></script>
 </main>

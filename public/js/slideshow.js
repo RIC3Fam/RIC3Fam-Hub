@@ -90,12 +90,15 @@ async function handleDeletion(fullImagePath) {
     const isEventPage = document.getElementById('is-event-page') != null;
     const groupSlideshowId = document.getElementById('group-slideshow-id');
     const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+    const gameSlideshowId = document.getElementById('game-slideshow-id');
+    const gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
 
     const body = {
         filename: filename,
         isEventPage: isEventPage,
     };
     if (groupId) body.groupId = groupId;
+    if (gameId) body.gameId = gameId;
 
     const response = await fetch('/pictures/slideshow', {
         mode: 'cors',

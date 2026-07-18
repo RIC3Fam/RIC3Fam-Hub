@@ -17,6 +17,7 @@ router
         const filenames = req.body.filenames;
         const isEventPage = req.body.isEventPage;
         const groupId = req.body.groupId;
+        const gameId = req.body.gameId;
         let urls = [];
         let id = '';
 
@@ -28,6 +29,18 @@ router
                     throw 'You are not the leader of this group';
                 }
                 id = groupId;
+            } catch (err) {
+                console.log(err);
+                return res.status(500).render('error', { title: 'Error', error: err });
+            }
+        } else if (gameId) {
+            try {
+                helpers.isValidId(gameId);
+                const game = await gamesData.get(gameId);
+                if (game.organizer !== req.session.user._id) {
+                    throw 'You are not the admin of this event';
+                }
+                id = gameId;
             } catch (err) {
                 console.log(err);
                 return res.status(500).render('error', { title: 'Error', error: err });
@@ -62,6 +75,7 @@ router
             for (let i = 0; i < urls.length; i++) {
                 const imagePath = `slideshow/${filenames[i]}`;
                 if (groupId) await groupsData.addSlideshowImage(groupId, imagePath);
+                else if (gameId) await gamesData.addSlideshowImage(gameId, imagePath);
                 else if (isEventPage) await mediaData.addEventPageSlideshowImage(imagePath);
                 else await usersData.addSlideshowImage(req.session.user._id, imagePath);
             }
@@ -77,6 +91,7 @@ router
         // Updates image urls in the relevant collection
         const isEventPage = req.body.isEventPage;
         const groupId = req.body.groupId;
+        const gameId = req.body.gameId;
 
         try {
             const filename = req.body.filename;
@@ -90,6 +105,13 @@ router
                     throw 'You are not the leader of this group';
                 }
                 id = groupId;
+            } else if (gameId) {
+                helpers.isValidId(gameId);
+                const game = await gamesData.get(gameId);
+                if (game.organizer !== req.session.user._id) {
+                    throw 'You are not the admin of this event';
+                }
+                id = gameId;
             } else if (isEventPage) {
                 id = 'eventPage';
             } else {
@@ -99,6 +121,7 @@ router
 
             console.log('Removing from slideshow');
             if (groupId) await groupsData.removeSlideshowImage(groupId, imagePath);
+            else if (gameId) await gamesData.removeSlideshowImage(gameId, imagePath);
             else if (isEventPage) await mediaData.removeEventPageSlideshowImage(imagePath);
             else await usersData.removeSlideshowImage(req.session.user._id, imagePath);
 
@@ -111,6 +134,7 @@ router
 
         req.method = 'GET';
         if (groupId) return res.redirect(303, '/groups/' + groupId);
+        if (gameId) return res.redirect(303, '/games/' + gameId);
         if (isEventPage) return res.redirect(303, '/games');
         return res.redirect(303, '/users/' + req.session.user._id);
     });
