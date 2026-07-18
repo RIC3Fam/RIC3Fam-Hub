@@ -3,22 +3,13 @@
         <div class="event-content">
             <h1>{{game.gameName}}
                 {{#ifEquals game.visibility "private"}}
-                    <span class="visibility-badge">Private</span>
+                    <span class="visibility-badge visibility-private">Private</span>
                 {{else}}
-                    <span class="visibility-badge">Public</span>
+                    <span class="visibility-badge visibility-public">Public</span>
                 {{/ifEquals}}
             </h1>
             <p>Event Info: {{game.description}}</p>
-            {{#if canSeePrivateBox}}
-                <section class="private-box">
-                    <h3>Private Description</h3>
-                    {{#if game.privateDescription}}
-                        <div class="description-box">{{game.privateDescription}}</div>
-                    {{else}}
-                        <p class="muted">No private description yet.</p>
-                    {{/if}}
-                </section>
-            {{/if}}
+
             <h3>Registered Members:</h3>
             <ul>
                 {{#each players}}
@@ -26,18 +17,14 @@
                 {{/each}}
             </ul>
 
-            {{#if organizer}}
-                <p>Organizer: <a href="/users/{{organizer._id}}">{{organizer.name}}</a></p>
-            {{/if}}
-
             {{#if hostGroup}}
-                <p>Host Group: <a href="/groups/{{hostGroup._id}}">{{hostGroup.groupName}}</a></p>   
+                <p>Host Group: <a href="/groups/{{hostGroup._id}}">{{hostGroup.groupName}}</a></p>
             {{/if}}
 
             <p>Date: {{game.gameDate}} {{ game.startTime }} - {{ game.endTime }}</p>
 
             <a href="{{game.link}}">{{game.linkdesc}}</a>
-            
+
             <p>Location: {{ game.gameLocation.streetAddress}}, {{ game.gameLocation.city }}, {{ game.gameLocation.state }}, {{ game.gameLocation.zip }}</p>
 
             {{#if game.directions}}
@@ -53,9 +40,7 @@
                     <form action="/games/join/{{game._id}}" method="POST">
                         <button type="submit" class="join-button">Join Event</button>
                     </form>
-                    
-                    {{else}}
-
+                {{else}}
                     <h3>Chat</h3>
                     <form action="/games/{{game._id}}/comments" id="message-form" method="POST">
                         <label for="comment"></label>
@@ -83,12 +68,9 @@
                         </div>
                     {{/if}}
                 {{/unless}}
-                    
-                {{ else }}
+            {{else}}
                 <p>To join this event, please <a href="/login">login</a>.</p>
             {{/if}}
-
-            <!--{{> weather}}-->
 
             {{#if isMember}}
                 {{#unless isOwner}}
@@ -105,6 +87,43 @@
                 <form action="/games/delete/{{game._id}}" method="POST" onsubmit="return confirmDelete('event');">
                     <button class="delete-button">Delete Event</button>
                 </form>
+            {{/if}}
+
+            {{#if slideshowImages.length}}
+                <h3>Picture Bar</h3>
+            {{/if}}
+            {{> partials/pictureSlider}}
+            {{#if isOwner}}
+                {{> addToSlideshow gameId=game._id}}
+            {{/if}}
+
+            {{#if leaders.length}}
+                <section class="event-leaders profile-section">
+                    <h3>Leaders</h3>
+                    <dl class="event-leaders-list">
+                        {{#each leaders}}
+                            <div class="event-leader-row">
+                                <dt>{{this.title}}</dt>
+                                <dd><a href="/users/{{this._id}}">{{this.name}}</a></dd>
+                            </div>
+                        {{/each}}
+                    </dl>
+                </section>
+            {{/if}}
+
+            {{#if organizer}}
+                <p class="event-admin-line">Admin: <a href="/users/{{organizer._id}}">{{organizer.name}}</a></p>
+            {{/if}}
+
+            {{#if canSeePrivateBox}}
+                <section class="private-box">
+                    <h3>Private Description</h3>
+                    {{#if game.privateDescription}}
+                        <div class="description-box">{{game.privateDescription}}</div>
+                    {{else}}
+                        <p class="muted">No private description yet.</p>
+                    {{/if}}
+                </section>
             {{/if}}
         </div>
         <div class="event-image-container">

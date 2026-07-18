@@ -1,13 +1,60 @@
-<!-- STILL NEED TO AUTO FILL WITH USERS CURRENT CONTENT -->
 <main>
     <div class="form-wrapper">
         <form id="create-group-form" class="create-form" method="POST" action="/groups/edit/{{groupObj._id}}">
+            <h3>Edit group</h3>
             <label class="form-label" for="group-name">Group Name:</label>
                 <input class="form-input" type="text" id="group-name" name="groupName" value="{{groupObj.groupName}}">
                 <br>
             <label class="form-label" for="description">Description</label>
                 <textarea class="form-input" id="description" name="groupDescription">{{groupObj.description}}</textarea>
                 <br>
+
+            <label class="form-label" for="link1">Website URL:</label>
+                <input class="form-input" type="url" id="link1" name="link1" value="{{groupObj.link1}}" placeholder="https://">
+                <br>
+            <label class="form-label" for="link1desc">Website label:</label>
+                <input class="form-input" type="text" id="link1desc" name="link1desc" value="{{groupObj.link1desc}}" placeholder="e.g., Website">
+                <br>
+            <label class="form-label" for="link2">Social media URL:</label>
+                <input class="form-input" type="url" id="link2" name="link2" value="{{groupObj.link2}}" placeholder="https://">
+                <br>
+            <label class="form-label" for="link2desc">Social label:</label>
+                <input class="form-input" type="text" id="link2desc" name="link2desc" value="{{groupObj.link2desc}}" placeholder="e.g., Social Media">
+                <br>
+
+            <h4>Project Framers</h4>
+            <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
+            <div id="group-framers-editor">
+                {{#each projectFramers}}
+                    <div class="leader-row" data-leader-row>
+                        <label class="form-label">Title
+                            <input class="form-input leader-title" type="text" name="projectFramers[{{@index}}][title]" value="{{this.title}}" maxlength="80" placeholder="e.g. Project Framer">
+                        </label>
+                        <label class="form-label">Person
+                            <input class="form-input leader-search" type="text" value="{{this.label}}" placeholder="Type a name or username" autocomplete="off">
+                            <input type="hidden" class="leader-user-id" name="projectFramers[{{@index}}][userId]" value="{{this.userId}}">
+                            <ul class="leader-suggestions" hidden></ul>
+                            <span class="muted leader-selected-note">Selected profile linked</span>
+                        </label>
+                        <button type="button" class="reject-button remove-leader-row">Remove</button>
+                    </div>
+                {{/each}}
+            </div>
+            <button type="button" id="add-framer-row" class="form-submit-button">Add project framer</button>
+            <br>
+
+            <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
+                <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" value="{{groupObj.uppercaseTitle}}" placeholder="e.g., Gold Tier Members">
+                <br>
+
+            <label class="form-label" for="lowercaseTitle">Lowercase Section Title:</label>
+                <input class="form-input" type="text" id="lowercaseTitle" name="lowercaseTitle" value="{{groupObj.lowercaseTitle}}" placeholder="e.g., Standard Members">
+                <br>
+
+            <label class="form-label" for="numericTitle">Numbered Section Title:</label>
+                <input class="form-input" type="text" id="numericTitle" name="numericTitle" value="{{groupObj.numericTitle}}" placeholder="e.g., Digit Accounts">
+                <br>
+
             <label class="form-label" for="visibility">Visibility:</label>
                 <select class="form-input" id="visibility" name="visibility">
                     <option value="public" {{#elseEquals groupObj.visibility "private"}}selected{{/elseEquals}}>Public</option>
@@ -28,8 +75,9 @@
 
     {{> updateGroupImage }}
     
-    <p id="error-label" hidden></a>
-    <p id="message-label" hidden></a>
+    <p id="error-label" hidden></p>
+    <p id="message-label" hidden></p>
     <script src='/public/js/groupValidation.js'></script>
+    <script src="/public/js/eventLeaders.js"></script>
     <script src="/public/js/pictures.js"></script>
 </main>

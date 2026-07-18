@@ -87,6 +87,8 @@ const create = async (
         linkdesc: gameData.linkdesc,
         visibility,
         privateDescription,
+        slideshowImages: [],
+        leaders: [],
     };
 
     const gameCollection = await games();
@@ -117,6 +119,8 @@ const get = async (gameId) => {
     const game = await gameCollection.findOne({ _id: new ObjectId(gameId) });
     if (game === null) throw 'No game with that id';
     game._id = game._id.toString();
+    if (!Array.isArray(game.slideshowImages)) game.slideshowImages = [];
+    if (!Array.isArray(game.leaders)) game.leaders = [];
     return helpers.withVisibilityDefaults(game);
 };
 
@@ -294,6 +298,29 @@ const remove = async (gameId) => {
     return res;
 };
 
+const normalizeLeaders = (leadersInput) => {
+    if (!leadersInput) return [];
+    let rows = leadersInput;
+    if (!Array.isArray(rows) && typeof rows === 'object') {
+        rows = Object.keys(rows)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((k) => rows[k]);
+    }
+    if (!Array.isArray(rows)) return [];
+
+    const leaders = [];
+    for (const row of rows) {
+        if (!row || typeof row !== 'object') continue;
+        const title = helpers.optionalString(row.title, 'Leader title', 80);
+        const userId = row.userId != null ? String(row.userId).trim() : '';
+        if (!title && !userId) continue;
+        if (!title) throw 'Each leader needs a title';
+        helpers.isValidId(userId);
+        leaders.push({ title, userId });
+    }
+    return leaders;
+};
+
 const update = async (
     gameId,
     userId,
@@ -311,11 +338,13 @@ const update = async (
     link,
     linkdesc,
     visibility,
-    privateDescription
+    privateDescription,
+    leaders
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
     const oldGame = await get(gameId); // Check if game exists
+    const nextLeaders = leaders !== undefined ? normalizeLeaders(leaders) : oldGame.leaders || [];
 
     // Update record
     const updatedgame = {
@@ -342,6 +371,8 @@ const update = async (
             privateDescription != null
                 ? helpers.optionalString(privateDescription, 'Private description')
                 : oldGame.privateDescription || '',
+        slideshowImages: oldGame.slideshowImages || [],
+        leaders: nextLeaders,
     };
 
     const gameCollection = await games();
@@ -349,8 +380,7 @@ const update = async (
     if (!updatedInfo) {
         throw 'could not update game successfully';
     }
-    updatedInfo._id = updatedInfo._id.toString();
-    return updatedInfo;
+    return await get(gameId);
 };
 
 const getIDName = async (gameIds) => {
@@ -443,8 +473,43 @@ const editGameImage = async (gameId, imagePath) => {
         game.link,
         game.linkdesc,
         game.visibility,
-        game.privateDescription
+        game.privateDescription,
+        game.leaders
     );
+};
+
+const addSlideshowImage = async (gameId, imagePath) => {
+    helpers.isValidId(gameId);
+    helpers.stringHelper(imagePath, 'Image Path', 1, 100);
+
+    const bucketName = process.env.BUCKET_NAME;
+    const base = 'https://storage.googleapis.com';
+    const url = `${base}/${bucketName}/${gameId}/${imagePath}`;
+
+    const gameCollection = await games();
+    const updatedInfo = await gameCollection.updateOne(
+        { _id: new ObjectId(gameId) },
+        { $push: { slideshowImages: url } }
+    );
+    if (!updatedInfo) throw 'Could not update game successfully';
+    return updatedInfo;
+};
+
+const removeSlideshowImage = async (gameId, imagePath) => {
+    helpers.isValidId(gameId);
+    helpers.stringHelper(imagePath, 'Image Path', 1, 100);
+
+    const bucketName = process.env.BUCKET_NAME;
+    const base = 'https://storage.googleapis.com';
+    const url = `${base}/${bucketName}/${gameId}/${imagePath}`;
+
+    const gameCollection = await games();
+    const updatedInfo = await gameCollection.updateOne(
+        { _id: new ObjectId(gameId) },
+        { $pull: { slideshowImages: url } }
+    );
+    if (!updatedInfo) throw 'Could not update game successfully';
+    return updatedInfo;
 };
 
 export default {
@@ -463,4 +528,7 @@ export default {
     leaveGame,
     formatAndValidateGame,
     editGameImage,
+    addSlideshowImage,
+    removeSlideshowImage,
+    normalizeLeaders,
 };

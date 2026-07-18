@@ -68,13 +68,37 @@
         <label class="form-label" for="privateDescription">Private Description:</label>
             <textarea class="form-input" id="privateDescription" name="privateDescription">{{gameObj.privateDescription}}</textarea>
             <br>
+
+        <h4>Leaders</h4>
+        <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
+        <div id="event-leaders-editor">
+            {{#each leaders}}
+                <div class="leader-row" data-leader-row>
+                    <label class="form-label">Title
+                        <input class="form-input leader-title" type="text" name="leaders[{{@index}}][title]" value="{{this.title}}" maxlength="80" placeholder="e.g. Primary Cook">
+                    </label>
+                    <label class="form-label">Person
+                        <input class="form-input leader-search" type="text" value="{{this.label}}" placeholder="Type a name or username" autocomplete="off">
+                        <input type="hidden" class="leader-user-id" name="leaders[{{@index}}][userId]" value="{{this.userId}}">
+                        <ul class="leader-suggestions" hidden></ul>
+                        <span class="muted leader-selected-note">Selected profile linked</span>
+                    </label>
+                    <button type="button" class="reject-button remove-leader-row">Remove</button>
+                </div>
+            {{/each}}
+        </div>
+        <button type="button" id="add-leader-row" class="form-submit-button">Add leader</button>
+        <br>
+
         <button type="submit"  id="game-submit-button" class="form-submit-button">Submit</button>
     </form>
 
     {{> updateGameImage}}
+    {{> addToSlideshow gameId=gameObj._id}}
     
     <p id="error-label" hidden></a>
     <p id="message-label" hidden></a>
     <script src='/public/js/gameValidation.js'></script>
+    <script src="/public/js/eventLeaders.js"></script>
     <script src="/public/js/pictures.js"></script>
 </div>

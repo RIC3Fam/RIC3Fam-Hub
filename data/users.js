@@ -19,7 +19,10 @@ const searchUsers = async (search, viewer = null) => {
     }
     const userCollection = await users();
     const reg = new RegExp(`${search}`, 'i'); // 'i' for case-insensitive
-    let userList = await userCollection.find({ username: reg }).limit(resultSize).toArray();
+    let userList = await userCollection
+        .find({ $or: [{ username: reg }, { name: reg }] })
+        .limit(resultSize)
+        .toArray();
     if (!userList || userList.length === 0) {
         throw "Couldn't find any users with that name";
     }
@@ -39,6 +42,7 @@ const searchUsers = async (search, viewer = null) => {
             (user = {
                 _id: user._id.toString(),
                 username: user.username,
+                name: user.name,
                 emailAddress: user.emailAddress,
                 description: user.description,
                 profilePicture: user.profilePicture,

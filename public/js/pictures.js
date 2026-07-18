@@ -128,13 +128,15 @@ if (slideshowForm) {
 
     let groupSlideshowId = document.getElementById('group-slideshow-id');
     let groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+    let gameSlideshowId = document.getElementById('game-slideshow-id');
+    let gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
 
     slideshowForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         try {
             let files = slideshowInput.files;
 
-            if (!files) {
+            if (!files || files.length === 0) {
                 console.log('No files selected');
                 throw Error('Please select a file!');
             }
@@ -158,7 +160,7 @@ if (slideshowForm) {
 
             console.log('Getting signed urls');
 
-            const signedUrls = await getSlideshowUrls(filenames, isEventPage, groupId);
+            const signedUrls = await getSlideshowUrls(filenames, isEventPage, groupId, gameId);
 
             console.log('Uploading');
 
@@ -215,12 +217,13 @@ async function getGroupUrl(filename) {
  * Gets the signed url(s) for new slideshow image(s)
  * @param {[string]} filenames
  */
-async function getSlideshowUrls(filenames, isEventPage = false, groupId = null) {
+async function getSlideshowUrls(filenames, isEventPage = false, groupId = null, gameId = null) {
     const options = {
         filenames: filenames,
         isEventPage: isEventPage,
     };
     if (groupId) options.groupId = groupId;
+    if (gameId) options.gameId = gameId;
 
     const signedUrls = await getUrls(options, 'slideshow');
 

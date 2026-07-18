@@ -125,6 +125,78 @@ test.describe('RIC3Fam Hub e2e', () => {
         await expect(page.locator('#group-slideshow-id')).toHaveCount(1);
     });
 
+    test('group links, project framer, section titles, and circular image', async ({ page }) => {
+        const owner = userCreds('gown');
+        const framer = userCreds('fram');
+        await register(page, framer);
+        await register(page, owner);
+        await login(page, owner);
+
+        const groupName = `Framer Group ${unique}`;
+        await page.goto('/create-group');
+        await expect(page.locator('#group-framers-editor')).toBeAttached();
+        await expect(page.locator('#add-framer-row')).toBeVisible();
+        await expect(page.locator('#uppercaseTitle')).toBeVisible();
+        await expect(page.locator('#lowercaseTitle')).toBeVisible();
+        await expect(page.locator('#numericTitle')).toBeVisible();
+
+        await page.fill('#group-name', groupName);
+        await page.fill('#description', 'Community service network group');
+        await page.fill('#link1', 'https://example.com/website');
+        await page.fill('#link1desc', 'Website');
+        await page.fill('#link2', 'https://example.com/social');
+        await page.fill('#link2desc', 'Social Media');
+        await page.fill('#uppercaseTitle', 'ALL CAPS');
+        await page.fill('#lowercaseTitle', 'LOWER CASE');
+        await page.fill('#numericTitle', 'NUMBERED SECTION');
+        await page.selectOption('#visibility', 'public');
+        await page.click('#group-submit-button');
+
+        await expect(page).toHaveURL(/\/groups\//);
+        const groupUrl = page.url();
+        await expect(page.getByRole('heading', { level: 1 })).toContainText(groupName);
+        await expect(page.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://example.com/website');
+        await expect(page.getByRole('link', { name: 'Social Media' })).toHaveAttribute('href', 'https://example.com/social');
+        await expect(page.locator('.group-image')).toBeVisible();
+        await expect
+            .poll(async () => page.locator('.group-image').evaluate((img) => getComputedStyle(img).borderRadius))
+            .toBe('50%');
+
+        await page.click('button.edit-button');
+        await expect(page).toHaveURL(/\/groups\/edit\//);
+        await expect(page.locator('#uppercaseTitle')).toHaveValue('ALL CAPS');
+        await expect(page.locator('#lowercaseTitle')).toHaveValue('LOWER CASE');
+        await expect(page.locator('#numericTitle')).toHaveValue('NUMBERED SECTION');
+        await expect(page.locator('#link1')).toHaveValue('https://example.com/website');
+        await expect(page.locator('#link2')).toHaveValue('https://example.com/social');
+
+        await page.fill('#uppercaseTitle', 'GOLD TIER');
+        await page.fill('#lowercaseTitle', 'STANDARD');
+        await page.fill('#numericTitle', 'DIGIT ACCOUNTS');
+
+        await page.click('#add-framer-row');
+        const framerRow = page.locator('#group-framers-editor [data-leader-row]').last();
+        await framerRow.locator('.leader-title').fill('Project Framer');
+        await framerRow.locator('.leader-search').fill(framer.username);
+        await expect(framerRow.locator('.leader-suggestions')).toBeVisible();
+        await framerRow.locator('.leader-suggestion-btn').first().click();
+        await expect(framerRow.locator('.leader-user-id')).not.toHaveValue('');
+        await page.click('#group-submit-button');
+
+        await expect(page).toHaveURL(groupUrl);
+        await expect(page.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://example.com/website');
+        await expect(page.locator('.event-leaders h3')).toHaveText('Project Framers');
+        await expect(page.locator('.event-leader-row dt')).toHaveText('Project Framer');
+        await expect(page.locator('.event-leader-row dd a')).toContainText(framer.name);
+
+        await page.click('button.edit-button');
+        await expect(page.locator('#uppercaseTitle')).toHaveValue('GOLD TIER');
+        await expect(page.locator('#lowercaseTitle')).toHaveValue('STANDARD');
+        await expect(page.locator('#numericTitle')).toHaveValue('DIGIT ACCOUNTS');
+        await expect(page.locator('.leader-title')).toHaveValue('Project Framer');
+        await expect(page.locator('.leader-user-id')).not.toHaveValue('');
+    });
+
     test('private group shows gate to strangers with join option when logged in', async ({ page, browser }) => {
         const owner = userCreds('pg');
         await register(page, owner);
