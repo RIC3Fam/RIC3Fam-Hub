@@ -1,0 +1,62 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      PROJECT_ID: elevated-apex-410118
+      REGION: us-central1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve Cloud Run service
+        id: target
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "service=familyfrisbee" >> "$GITHUB_OUTPUT"
+          else
+            echo "service=familyfrisbee-dev" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Deploying branch ${{ github.ref_name }} → service will be set from outputs"
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying to ${{ steps.target.outputs.service }} (${REGION})"
+          gcloud run deploy "${{ steps.target.outputs.service }}" \
+            --source . \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --allow-unauthenticated \
+            --quiet
+
+      - name: Print service URL
+        run: |
+          gcloud run services describe "${{ steps.target.outputs.service }}" \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --format='value(status.url)'
