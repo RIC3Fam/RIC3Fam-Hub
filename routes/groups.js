@@ -143,7 +143,7 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         projectFramers,
         canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, groupObj, 'group'),
         isPublic: groupObj.visibility !== 'private',
-        slideshowImages: groupObj.slideshowImages || []
+        slideshowImages: helpers.normalizeSlideshowSlides(groupObj.slideshowImages || [])
       });
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });

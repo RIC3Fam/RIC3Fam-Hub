@@ -24,7 +24,8 @@ const createEventPageSlideshow = async () => {
 };
 
 /**
- * Gets the default event page slideshow object
+ * Gets the default event page slideshow object.
+ * Also purges blank/invalid URLs that render as empty slides.
  * @returns
  */
 const getEventPageSlideshow = async () => {
@@ -32,6 +33,17 @@ const getEventPageSlideshow = async () => {
 
     const slideshow = await mediaCollection.findOne({ title: 'Event Page Slideshow' });
     if (!slideshow) throw 'Could not find event page slideshow';
+
+    const raw = Array.isArray(slideshow.slideshowImages) ? slideshow.slideshowImages : [];
+    // Drop blank / invalid entries that caused empty "ghost" slides.
+    const cleanedUrls = raw
+        .map((img) => (typeof img === 'string' ? img.trim() : img && img.url ? String(img.url).trim() : ''))
+        .filter((url) => url && url !== 'undefined' && url !== 'null' && /^https?:\/\//i.test(url));
+
+    if (cleanedUrls.length !== raw.length) {
+        await mediaCollection.updateOne({ title: 'Event Page Slideshow' }, { $set: { slideshowImages: cleanedUrls } });
+        slideshow.slideshowImages = cleanedUrls;
+    }
 
     return slideshow;
 };

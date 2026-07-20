@@ -1,36 +1,54 @@
 <!-- Events List -->
-<div class="list-wrapper">
-    <h3 class="list-header">Events</h3>
+<div class="events-page">
+    <div class="events-page-header">
+        <img
+            class="events-page-logo"
+            src="https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg"
+            alt="RIC3 Fam"
+        >
+        <h1 class="events-page-title">EVENTS</h1>
+    </div>
+
+    <div class="list-wrapper">
+        {{#if currentUser.isAdmin}}
+            <a href="/create-event">Create New Event</a>
+        {{/if}}
+        <h3 class="list-header">UPCOMING EVENTS</h3>
+        <dl id="game-list" class="list-of-all">
+            {{#each events}}
+                <dd class="search-result">
+                    <a href="/events/{{this._id}}">{{this.gameName}}</a>
+                    {{#ifEquals this.visibility "private"}}
+                        <span class="visibility-badge">Private</span>
+                    {{else}}
+                        <span class="visibility-badge">Public</span>
+                    {{/ifEquals}}
+                </dd>
+            {{/each}}
+        </dl>
+    </div>
+
     {{#if currentUser.isAdmin}}
-        <a href="/create-event">Create New Event</a>
+        {{> addToSlideshow route='events' isEventPage=true}}
     {{/if}}
-    <dl id="game-list" class="list-of-all">
-        {{#each events}}
-            <dd class="search-result">
-                <a href="/games/{{this._id}}">{{this.gameName}}</a>
-                {{#ifEquals this.visibility "private"}}
-                    <span class="visibility-badge">Private</span>
-                {{else}}
-                    <span class="visibility-badge">Public</span>
-                {{/ifEquals}}
-            </dd>
-        {{/each}}
-    </dl>
+
+    {{> partials/pictureSlider}}
+
+    <div class="list-wrapper past-events-section">
+        <h3 class="list-header">PAST EVENTS</h3>
+        <dl id="past-game-list" class="list-of-all">
+            {{#each pastEvents}}
+                <dd class="search-result">
+                    <a href="/events/{{this._id}}">{{this.gameName}}</a>
+                    {{#ifEquals this.visibility "private"}}
+                        <span class="visibility-badge">Private</span>
+                    {{else}}
+                        <span class="visibility-badge">Public</span>
+                    {{/ifEquals}}
+                </dd>
+            {{else}}
+                <dd class="muted">No past events yet.</dd>
+            {{/each}}
+        </dl>
+    </div>
 </div>
-
-<!--
-<div class="event-image-container">
-    <img src="https://storage.googleapis.com/family-frisbee-media/icons/eventHub.jpg" class="event-image" alt="Event flyer">
-</div>
-
--->
-
-{{#if currentUser.isAdmin}}
-    {{> addToSlideshow route='events' isEventPage=true}}
-{{/if}}
-
-{{#if slideshowImages.length}}
-    <h3 class="list-header">Picture Bar</h3>
-{{/if}}
-
-{{> partials/pictureSlider}}

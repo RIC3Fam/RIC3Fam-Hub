@@ -14,7 +14,7 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     //if (link != ""){ linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300); }
 
     if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
-    if (helpers.isDateInFuture(gameDate)) throw 'Event Date has to be in the future';
+    // Past dates are allowed (they show under Past Events once expired).
     if (!helpers.isValidTime(startTime) || !helpers.isValidTime(endTime)) throw 'Start and/or end time is not valid';
     if (!helpers.compareTimes(startTime, endTime)) throw 'Start time has to be 30min before end time';
 
@@ -53,17 +53,27 @@ const create = async (
     link,
     linkdesc,
     visibility = 'public',
-    privateDescription = ''
+    privateDescription = '',
+    link2 = '',
+    link2desc = '',
+    group2 = '',
+    group3 = ''
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc);
 
-    // Group is optional
-    if (group !== 'N/A') helpers.isValidId(group);
+    const groups = helpers.normalizeHostGroups(group, group2, group3);
+    // Keep legacy single `group` field for older callers/templates
+    const primaryGroup = groups[0] || 'N/A';
 
     helpers.isValidId(organizer);
 
     visibility = helpers.normalizeVisibility(visibility);
     privateDescription = helpers.optionalString(privateDescription, 'Private description');
+    const website = helpers.normalizeOptionalLinkPair(link, linkdesc, 'Link', 'Link Description');
+    const social = helpers.normalizeOptionalLinkPair(link2, link2desc, 'Link 2', 'Link 2 Description');
+
+    // Past-dated events are created already expired so they appear under Past Events
+    const expired = helpers.isDateInFuture(gameData.gameDate);
 
     // Add game to database
     let newgame = {
@@ -76,15 +86,18 @@ const create = async (
         endTime: gameData.endTime,
         players: [organizer],
         totalNumberOfPlayers: 1,
-        group,
+        group: primaryGroup,
+        groups,
         organizer,
         comments: [],
         gameImage: 'https://storage.googleapis.com/family-frisbee-media/icons/Full_court.png',
         map: '',
         directions: '',
-        expired: false,
-        link: gameData.link,
-        linkdesc: gameData.linkdesc,
+        expired,
+        link: website.link || gameData.link || '',
+        linkdesc: website.linkdesc || gameData.linkdesc || '',
+        link2: social.link,
+        link2desc: social.linkdesc,
         visibility,
         privateDescription,
         slideshowImages: [],
@@ -105,7 +118,6 @@ const create = async (
     if (!updateUser) {
         throw 'Could not update the organizer';
     }
-    //await closeConnection(); // For testing purposes
     return game;
 };
 
@@ -121,6 +133,11 @@ const get = async (gameId) => {
     game._id = game._id.toString();
     if (!Array.isArray(game.slideshowImages)) game.slideshowImages = [];
     if (!Array.isArray(game.leaders)) game.leaders = [];
+    if (!Array.isArray(game.groups)) {
+        game.groups = game.group && game.group !== 'N/A' ? [game.group] : [];
+    }
+    if (game.link2 == null) game.link2 = '';
+    if (game.link2desc == null) game.link2desc = '';
     return helpers.withVisibilityDefaults(game);
 };
 
@@ -143,6 +160,19 @@ const getAll = async (includeExpired = false, viewerId = null) => {
     return gameList;
 };
 
+const getPast = async (viewerId = null) => {
+    const gameCollection = await games();
+    let gameList = await gameCollection.find({ expired: true }).toArray();
+    if (!gameList) throw 'Could not get past games';
+    gameList = filterPrivateGames(gameList, viewerId);
+    gameList = gameList.map((element) => {
+        element._id = element._id.toString();
+        if (element.visibility !== 'private') element.visibility = 'public';
+        return element;
+    });
+    return gameList;
+};
+
 // Get all games of given group
 // Set includeExpired to false to get only future games
 const getAllByGroup = async (groupId, includeExpired = true, viewerId = null) => {
@@ -150,7 +180,12 @@ const getAllByGroup = async (groupId, includeExpired = true, viewerId = null) =>
     let groupGames = [];
 
     for (const game of gameList) {
-        if (game.group === groupId) groupGames.push(game);
+        const ids = Array.isArray(game.groups) && game.groups.length
+            ? game.groups
+            : game.group && game.group !== 'N/A'
+              ? [game.group]
+              : [];
+        if (ids.includes(groupId) || game.group === groupId) groupGames.push(game);
     }
 
     return groupGames;
@@ -339,12 +374,33 @@ const update = async (
     linkdesc,
     visibility,
     privateDescription,
-    leaders
+    leaders,
+    link2,
+    link2desc,
+    group2,
+    group3
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
     const oldGame = await get(gameId); // Check if game exists
     const nextLeaders = leaders !== undefined ? normalizeLeaders(leaders) : oldGame.leaders || [];
+    const groups =
+        group !== undefined || group2 !== undefined || group3 !== undefined
+            ? helpers.normalizeHostGroups(group, group2, group3)
+            : oldGame.groups || (oldGame.group && oldGame.group !== 'N/A' ? [oldGame.group] : []);
+    const primaryGroup = groups[0] || 'N/A';
+
+    const website =
+        link !== undefined
+            ? helpers.normalizeOptionalLinkPair(link, linkdesc, 'Link', 'Link Description')
+            : { link: oldGame.link || '', linkdesc: oldGame.linkdesc || '' };
+    const social =
+        link2 !== undefined
+            ? helpers.normalizeOptionalLinkPair(link2, link2desc, 'Link 2', 'Link 2 Description')
+            : { link: oldGame.link2 || '', linkdesc: oldGame.link2desc || '' };
+
+    // Recompute expired from the (possibly new) date
+    const expired = helpers.isDateInFuture(gameData.gameDate);
 
     // Update record
     const updatedgame = {
@@ -359,13 +415,16 @@ const update = async (
         players: oldGame.players,
         totalNumberOfPlayers: oldGame.totalNumberOfPlayers,
         comments: oldGame.comments,
-        group,
+        group: primaryGroup,
+        groups,
         gameImage: gameImage ? gameImage : oldGame.gameImage,
-        expired: oldGame.expired,
+        expired,
         map: map ?? oldGame.map,
         directions: directions ?? oldGame.directions,
-        link: gameData.link,
-        linkdesc: gameData.linkdesc,
+        link: website.link,
+        linkdesc: website.linkdesc,
+        link2: social.link,
+        link2desc: social.linkdesc,
         visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGame.visibility || 'public',
         privateDescription:
             privateDescription != null
@@ -474,7 +533,11 @@ const editGameImage = async (gameId, imagePath) => {
         game.linkdesc,
         game.visibility,
         game.privateDescription,
-        game.leaders
+        game.leaders,
+        game.link2,
+        game.link2desc,
+        (game.groups && game.groups[1]) || '',
+        (game.groups && game.groups[2]) || ''
     );
 };
 
@@ -515,6 +578,7 @@ const removeSlideshowImage = async (gameId, imagePath) => {
 export default {
     create,
     getAll,
+    getPast,
     get,
     getAllByGroup,
     addComment,

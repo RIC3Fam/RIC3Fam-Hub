@@ -1,6 +1,6 @@
 <!-- STILL NEED TO AUTO FILL WITH USERS CURRENT CONTENT -->
 <div class="form-wrapper">
-    <form method="POST" id="create-game-form" class="create-form" action="/games/edit/{{gameObj._id}}">
+    <form method="POST" id="create-game-form" class="create-form" action="/events/edit/{{gameObj._id}}">
         <label class="form-label" for="game-name">Event Name:</label>
             <input class="form-input" type="text" id="game-name" name="gameName" value="{{gameObj.gameName}}">
             <br>
@@ -42,14 +42,33 @@
         <label class="form-label" for="max-players">Max attendees:</label>
             <input class="form-input" type="text" id="max-players" name="maxPlayers" value="{{gameObj.maxCapacity}}">
             <br>
-            <label class="form-label" for="group">Group:</label>
-                <select class="form-input" id="group" name="group" required>
+            <label class="form-label" for="group">Group 1:</label>
+                <select class="form-input" id="group" name="group">
+                    <option value="N/A" {{#ifEquals selectedGroup1 "N/A"}}selected{{/ifEquals}}>N/A</option>
                        {{#if groups.length}}
                             {{#each groups}}
-                                <option value="{{this._id}}">{{this.groupName}}</option>
+                                <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup1}}selected{{/ifEquals}}>{{this.groupName}}</option>
                             {{/each}}
-                        {{else}}
-                            <option value="N/A">N/A</option>
+                        {{/if}}
+                </select>
+                <br>
+            <label class="form-label" for="group2">Group 2:</label>
+                <select class="form-input" id="group2" name="group2">
+                    <option value="N/A" {{#ifEquals selectedGroup2 "N/A"}}selected{{/ifEquals}}>N/A</option>
+                       {{#if groups.length}}
+                            {{#each groups}}
+                                <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup2}}selected{{/ifEquals}}>{{this.groupName}}</option>
+                            {{/each}}
+                        {{/if}}
+                </select>
+                <br>
+            <label class="form-label" for="group3">Group 3:</label>
+                <select class="form-input" id="group3" name="group3">
+                    <option value="N/A" {{#ifEquals selectedGroup3 "N/A"}}selected{{/ifEquals}}>N/A</option>
+                       {{#if groups.length}}
+                            {{#each groups}}
+                                <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup3}}selected{{/ifEquals}}>{{this.groupName}}</option>
+                            {{/each}}
                         {{/if}}
                 </select>
                 <br>
@@ -58,6 +77,12 @@
             <br>
         <label class="form-label" for="linkdesc">Link Description:</label>
             <input class="form-input" type="text" id="linkdesc" name="linkdesc" value="{{gameObj.linkdesc}}">
+            <br>
+        <label class="form-label" for="link2">Link 2:</label>
+            <input class="form-input" type="url" id="link2" name="link2" value="{{gameObj.link2}}">
+            <br>
+        <label class="form-label" for="link2desc">Link 2 Description:</label>
+            <input class="form-input" type="text" id="link2desc" name="link2desc" value="{{gameObj.link2desc}}">
             <br>
         <label class="form-label" for="visibility">Visibility:</label>
             <select class="form-input" id="visibility" name="visibility">

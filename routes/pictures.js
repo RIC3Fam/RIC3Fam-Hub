@@ -134,8 +134,8 @@ router
 
         req.method = 'GET';
         if (groupId) return res.redirect(303, '/groups/' + groupId);
-        if (gameId) return res.redirect(303, '/games/' + gameId);
-        if (isEventPage) return res.redirect(303, '/games');
+        if (gameId) return res.redirect(303, '/events/' + gameId);
+        if (isEventPage) return res.redirect(303, '/events');
         return res.redirect(303, '/users/' + req.session.user._id);
     });
 
