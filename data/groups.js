@@ -497,37 +497,67 @@ const addSlideshowImage = async (groupId, imagePath) => {
 
     const bucketName = process.env.BUCKET_NAME;
     const base = 'https://storage.googleapis.com';
-
     const url = `${base}/${bucketName}/${groupId}/${imagePath}`;
+    const slide = { url, caption: helpers.captionFromImageUrl(url) };
 
     const groupCollection = await groups();
-    const updatedInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $push: { slideshowImages: url } });
+    const updatedInfo = await groupCollection.updateOne(
+        { _id: new ObjectId(groupId) },
+        { $push: { slideshowImages: slide } }
+    );
 
     if (!updatedInfo) throw 'Could not update group successfully';
 
     return updatedInfo;
 };
 
-/**
- *
- * @param {string} groupId
- * @param {string} imagePath - /type/imageName/imageNum
- * @returns {object}
- */
 const removeSlideshowImage = async (groupId, imagePath) => {
     helpers.isValidId(groupId);
     helpers.stringHelper(imagePath, 'Image Path', 1, 100);
 
     const bucketName = process.env.BUCKET_NAME;
     const base = 'https://storage.googleapis.com';
-
     const url = `${base}/${bucketName}/${groupId}/${imagePath}`;
 
+    const group = await get(groupId);
+    const next = helpers
+        .normalizeSlideshowSlides(group.slideshowImages || [])
+        .filter((slide) => slide.url !== url);
+
     const groupCollection = await groups();
-    const updatedInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $pull: { slideshowImages: url } });
+    const updatedInfo = await groupCollection.updateOne(
+        { _id: new ObjectId(groupId) },
+        { $set: { slideshowImages: next } }
+    );
 
     if (!updatedInfo) throw 'Could not update group successfully';
 
+    return updatedInfo;
+};
+
+const updateSlideshowCaption = async (groupId, imageUrl, caption) => {
+    helpers.isValidId(groupId);
+    helpers.stringHelper(imageUrl, 'Image URL', 1, 2048);
+    const nextCaption = helpers.optionalString(caption, 'Caption', 200);
+
+    const group = await get(groupId);
+    const slides = helpers.normalizeSlideshowSlides(group.slideshowImages || []);
+    let found = false;
+    const next = slides.map((slide) => {
+        if (slide.url === imageUrl) {
+            found = true;
+            return { url: slide.url, caption: nextCaption };
+        }
+        return slide;
+    });
+    if (!found) throw 'Slideshow image not found';
+
+    const groupCollection = await groups();
+    const updatedInfo = await groupCollection.updateOne(
+        { _id: new ObjectId(groupId) },
+        { $set: { slideshowImages: next } }
+    );
+    if (!updatedInfo) throw 'Could not update caption';
     return updatedInfo;
 };
 
@@ -547,4 +577,5 @@ export default {
     editGroupImage,
     addSlideshowImage,
     removeSlideshowImage,
+    updateSlideshowCaption,
 };

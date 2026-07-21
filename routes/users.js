@@ -36,6 +36,11 @@ router
             let requests = await usersData.getIDName(userObj.friendRequests)
 
 
+            const isAdmin = req.session.user ? await usersData.isUserAdmin(req.session.user._id) : false;
+            const shortDescription = (userObj.statement && userObj.statement.trim())
+                || (userObj.description && userObj.description.trim())
+                || '';
+
             const ret = {
                 title: "User", 
                 user: userObj,
@@ -45,8 +50,11 @@ router
                 requests: requests,
                 isOwner: isOwner,
                 notFriend: notFriend,
-                slideshowImages: userObj.slideshowImages,
-                canSeePrivateBox: helpers.viewerCanSeePrivateBox(req.session.user, userObj, 'user'),
+                slideshowImages: helpers.normalizeSlideshowSlides(userObj.slideshowImages || []),
+                shortDescription,
+                canSeePrivateCommunications: isAdmin || isOwner,
+                canSeeConnections: isAdmin,
+                canSeeAdminNotes: isAdmin,
                 isPublic: userObj.visibility !== 'private'
             }
             return res.render('user', ret);
@@ -177,6 +185,9 @@ router
             let description = req.body.description;
             
             let skills = req.body.skills;
+            if (!skills || typeof skills !== 'object') {
+                skills = currentUser.skills || {};
+            }
 
             let link1 = req.body.link1;
             let link1desc = req.body.link1desc;
@@ -187,6 +198,11 @@ router
             let slideshowDescription = req.body.slideshowDescription;
             let visibility = req.body.visibility;
             let privateDescription = req.body.privateDescription;
+            let preferredEmail = req.body.preferredEmail;
+            let preferredPhone = req.body.preferredPhone;
+            let optInCreativeRealEstate = req.body.optInCreativeRealEstate;
+            let optInFrisbeeNotices = req.body.optInFrisbeeNotices;
+            let optInCcsnUpdates = req.body.optInCcsnUpdates;
 
             //console.log(skills);
             if (currentUser._id !== userId) {
@@ -209,9 +225,29 @@ router
                 additionalDescription,
                 slideshowDescription,
                 visibility,
-                privateDescription
+                privateDescription,
+                preferredEmail,
+                preferredPhone,
+                optInCreativeRealEstate,
+                optInFrisbeeNotices,
+                optInCcsnUpdates
             );
             return res.redirect("/users/" + currentUser._id);
+        } catch (e) {
+            return res.status(400).render('error', { title: 'Error', error: e });
+        }
+    });
+
+router
+    .route('/:userId/admin-notes')
+    .post(async (req, res) => {
+        try {
+            if (!req.session.user) throw 'Must be logged in';
+            const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+            if (!isAdmin) throw 'Admin only';
+            const userId = req.params.userId;
+            await usersData.updateAdminNotes(userId, req.body.adminNotes);
+            return res.redirect('/users/' + userId);
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
         }

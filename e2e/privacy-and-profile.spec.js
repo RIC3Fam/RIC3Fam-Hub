@@ -57,7 +57,7 @@ test.describe('RIC3Fam Hub e2e', () => {
         await login(page, user);
 
         const profileUrl = await openOwnProfile(page);
-        await expect(page.locator('.profile-name')).toHaveText(user.name);
+        await expect(page.locator('.profile-name-top')).toHaveText(user.name);
         await expect(page.locator('.visibility-badge')).toContainText('Public');
 
         await page.click('button.edit-button');
@@ -72,18 +72,24 @@ test.describe('RIC3Fam Hub e2e', () => {
         await page.fill('#additionalDescription', 'More about me');
         await page.fill('#slideshowDescription', 'Picture bar note');
         await page.fill('#privateDescription', 'Family-only secrets');
+        await page.fill('#preferredEmail', 'pref@example.com');
+        await page.fill('#preferredPhone', '555-0100');
+        await page.check('#optInFrisbeeNotices');
         await page.selectOption('#visibility', 'public');
         await page.click('button.form-submit-button[type="submit"]');
 
         await expect(page).toHaveURL(profileUrl);
         await expect(page.locator('.profile-statement')).toContainText('Artist statement for e2e');
-        await expect(page.locator('.description-box').first()).toContainText('Public description box');
+        await expect(page.locator('.description-box').first()).toContainText('More about me');
         await expect(page.getByRole('link', { name: 'My Website' })).toHaveAttribute('href', 'https://example.com');
         await expect(page.getByRole('link', { name: 'Social' })).toHaveAttribute('href', 'https://social.example.com/me');
         await expect(page.locator('.private-box .description-box')).toContainText('Family-only secrets');
+        await expect(page.locator('h3', { hasText: 'Private Communications' })).toBeVisible();
         await expect(page.locator('h3', { hasText: 'Events' })).toBeVisible();
         await expect(page.locator('h3', { hasText: 'Family' })).toBeVisible();
         await expect(page.locator('h3', { hasText: 'Groups' })).toBeVisible();
+        await expect(page.locator('h3', { hasText: 'Picture Bar' })).toHaveCount(0);
+        await expect(page.locator('h3', { hasText: 'Skills' })).toHaveCount(0);
     });
 
     test('private profile is gated for strangers and visible to owner', async ({ page, browser }) => {
@@ -155,14 +161,16 @@ test.describe('RIC3Fam Hub e2e', () => {
 
         await expect(page).toHaveURL(/\/groups\//);
         const groupUrl = page.url();
-        await expect(page.getByRole('heading', { level: 1 })).toContainText(groupName);
+        await expect(page.locator('.group-page-name')).toContainText(groupName);
+        await expect(page.locator('.group-short-desc')).toContainText('Community service network group');
         await expect(page.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://example.com/website');
         await expect(page.getByRole('link', { name: 'Social Media' })).toHaveAttribute('href', 'https://example.com/social');
         await expect(page.locator('.group-image')).toBeVisible();
         await expect
             .poll(async () => page.locator('.group-image').evaluate((img) => getComputedStyle(img).borderRadius))
             .toBe('50%');
-
+        await expect(page.locator('h3', { hasText: 'Picture Bar' })).toHaveCount(0);
+        await expect(page.locator('h3', { hasText: 'About Us' })).toHaveCount(0);
         await page.click('button.edit-button');
         await expect(page).toHaveURL(/\/groups\/edit\//);
         await expect(page.locator('#uppercaseTitle')).toHaveValue('ALL CAPS');
@@ -187,8 +195,8 @@ test.describe('RIC3Fam Hub e2e', () => {
         await expect(page).toHaveURL(groupUrl);
         await expect(page.getByRole('link', { name: 'Website' })).toHaveAttribute('href', 'https://example.com/website');
         await expect(page.locator('.event-leaders h3')).toHaveText('Project Framers');
-        await expect(page.locator('.event-leader-row dt')).toHaveText('Project Framer');
-        await expect(page.locator('.event-leader-row dd a')).toContainText(framer.name);
+        await expect(page.locator('.group-framers-inline li')).toContainText('Project Framer');
+        await expect(page.locator('.group-framers-inline li a')).toContainText(framer.name);
 
         await page.click('button.edit-button');
         await expect(page.locator('#uppercaseTitle')).toHaveValue('GOLD TIER');
