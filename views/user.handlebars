@@ -1,53 +1,59 @@
-<main>
+<main class="profile-page">
     {{#if isPublic}}
         <span class="visibility-badge visibility-public">Public</span>
     {{else}}
         <span class="visibility-badge visibility-private">Private</span>
     {{/if}}
 
+    <h1 class="profile-name-top">{{user.name}}</h1>
+
     <div class="profile-layout">
         <div class="profile-left">
-            <h1 class="profile-name">{{user.name}}</h1>
-            <img src="{{user.profilePicture}}" class="profile-picture" alt="{{user.name}}'s profile picture">
+            <img src="{{user.profilePicture}}" class="profile-picture profile-picture-square" alt="{{user.name}}'s profile picture">
             <p class="profile-username">@{{user.username}}</p>
+            {{#if user.link1}}
+                <p class="profile-link profile-link-col">
+                    <a href="{{user.link1}}" target="_blank" rel="noopener noreferrer">{{#if user.link1desc}}{{user.link1desc}}{{else}}Website{{/if}}</a>
+                </p>
+            {{/if}}
         </div>
         <div class="profile-right">
-            {{#if user.statement}}
-                <h3>Personal / Artist Statement</h3>
-                <p class="profile-statement">{{user.statement}}</p>
-            {{/if}}
-            {{#if user.link1}}
-                <p class="profile-link">
-                    <span class="profile-link-label">Website:</span>
-                    <a href="{{user.link1}}" target="_blank" rel="noopener noreferrer">{{#if user.link1desc}}{{user.link1desc}}{{else}}{{user.link1}}{{/if}}</a>
-                </p>
+            {{#if shortDescription}}
+                <p class="profile-statement profile-short-desc">{{shortDescription}}</p>
             {{/if}}
             {{#if user.link2}}
-                <p class="profile-link">
-                    <span class="profile-link-label">Social:</span>
-                    <a href="{{user.link2}}" target="_blank" rel="noopener noreferrer">{{#if user.link2desc}}{{user.link2desc}}{{else}}{{user.link2}}{{/if}}</a>
+                <p class="profile-link profile-link-col">
+                    <a href="{{user.link2}}" target="_blank" rel="noopener noreferrer">{{#if user.link2desc}}{{user.link2desc}}{{else}}Social Media{{/if}}</a>
                 </p>
-            {{/if}}
-            {{#if user.description}}
-                <h3>Description</h3>
-                <div class="description-box">{{user.description}}</div>
             {{/if}}
         </div>
     </div>
 
-    {{#if user.slideshowImages.length}}
+    {{#if slideshowImages.length}}
         <section class="profile-section">
-            <h3>Picture Bar</h3>
             {{#if user.slideshowDescription}}
                 <p class="picture-bar-description">{{user.slideshowDescription}}</p>
             {{/if}}
             {{> showSlideshow}}
         </section>
+    {{else}}
+        {{#if isOwner}}
+            <section class="profile-section">
+                {{> addToSlideshow route=user._id}}
+            </section>
+        {{/if}}
+    {{/if}}
+
+    {{#if isOwner}}
+        {{#if slideshowImages.length}}
+            <section class="profile-section">
+                {{> addToSlideshow route=user._id}}
+            </section>
+        {{/if}}
     {{/if}}
 
     {{#if user.additionalDescription}}
         <section class="profile-section">
-            <h3>Additional Description</h3>
             <div class="description-box">{{user.additionalDescription}}</div>
         </section>
     {{/if}}
@@ -70,14 +76,25 @@
         </ul>
     </section>
 
-    {{#if canSeePrivateBox}}
+    {{#if canSeePrivateCommunications}}
         <section class="profile-section private-box">
-            <h3>Private Description</h3>
+            <h3>Private Communications – Admin only View</h3>
             {{#if user.privateDescription}}
                 <div class="description-box">{{user.privateDescription}}</div>
-            {{else}}
-                <p class="muted">No private description yet.</p>
             {{/if}}
+            {{#if user.preferredEmail}}
+                <p>Email: <a href="mailto:{{user.preferredEmail}}">{{user.preferredEmail}}</a></p>
+            {{/if}}
+            {{#if user.preferredPhone}}
+                <p>Phone: <a href="tel:{{user.preferredPhone}}">{{user.preferredPhone}}</a></p>
+            {{/if}}
+            {{#unless user.privateDescription}}
+                {{#unless user.preferredEmail}}
+                    {{#unless user.preferredPhone}}
+                        <p class="muted">No private communications yet.</p>
+                    {{/unless}}
+                {{/unless}}
+            {{/unless}}
         </section>
     {{/if}}
 
@@ -90,28 +107,55 @@
         </ul>
     </section>
 
-    <div id="skill-wrapper" class="profile-section">
-        <h3>Skills</h3>
-        <ul>
-            {{#each user.skills}}
-                {{#ifEquals this.type "checkbox"}}
-                    {{#if this.value}}
-                        <li>{{this.desc}}: &#x2713;</li>
-                    {{/if}}
-                {{/ifEquals}}
-                {{#ifEquals this.type "text"}}
-                    {{#elseEquals this.value ''}}
-                        <li>{{this.desc}}: {{this.value}}</li>
-                    {{/elseEquals}}
-                {{/ifEquals}}
-                {{#ifEquals this.type "number"}}
-                    {{#elseEquals this.value 0}}
-                        <li>{{this.desc}}: {{this.value}}</li>
-                    {{/elseEquals}}
-                {{/ifEquals}}
-            {{/each}}
-        </ul>
-    </div>
+    {{#if canSeeConnections}}
+        <div id="skill-wrapper" class="profile-section private-box">
+            <h3>RIC3 Fam Connections – Admin only view</h3>
+            <ul>
+                {{#each user.skills}}
+                    {{#ifEquals this.type "checkbox"}}
+                        {{#if this.value}}
+                            <li>{{this.desc}}: &#x2713;</li>
+                        {{/if}}
+                    {{/ifEquals}}
+                    {{#ifEquals this.type "text"}}
+                        {{#elseEquals this.value ''}}
+                            <li>{{this.desc}}: {{this.value}}</li>
+                        {{/elseEquals}}
+                    {{/ifEquals}}
+                    {{#ifEquals this.type "number"}}
+                        {{#elseEquals this.value 0}}
+                            <li>{{this.desc}}: {{this.value}}</li>
+                        {{/elseEquals}}
+                    {{/ifEquals}}
+                {{/each}}
+            </ul>
+            {{#if user.optInCreativeRealEstate}}
+                <p>✓ Opted into Creative Real Estate &amp; Artists in Residence(s) updates</p>
+            {{/if}}
+            {{#if user.optInFrisbeeNotices}}
+                <p>✓ Opted into RIC3 Fam Frisbee event notices</p>
+            {{/if}}
+            {{#if user.optInCcsnUpdates}}
+                <p>✓ Opted into CCSN updates and volunteer opportunities</p>
+            {{/if}}
+        </div>
+    {{/if}}
+
+    {{#if canSeeAdminNotes}}
+        <section class="profile-section private-box admin-notes-box">
+            <h3>Admin Notes</h3>
+            {{#if user.adminNotes}}
+                <div class="description-box">{{user.adminNotes}}</div>
+            {{else}}
+                <p class="muted">No admin notes yet.</p>
+            {{/if}}
+            <form method="POST" action="/users/{{user._id}}/admin-notes" class="admin-notes-form">
+                <label class="form-label" for="adminNotes">Edit admin notes</label>
+                <textarea class="form-input" id="adminNotes" name="adminNotes" rows="4">{{user.adminNotes}}</textarea>
+                <button type="submit" class="form-submit-button">Save admin notes</button>
+            </form>
+        </section>
+    {{/if}}
 
     {{#if isOwner}}
         {{#if requests}}

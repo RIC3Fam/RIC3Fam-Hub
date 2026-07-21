@@ -100,12 +100,34 @@ export function formatAndValidateUser(userData, ignorePassword) {
     }
 
     let profilePicture = helpers.stringHelper(userData.profilePicture, 'Profile picture', null, 2048);
-    let description = helpers.stringHelper(userData.description, 'Description', null, null);
-    let statement = helpers.optionalString(userData.statement, 'Statement');
+    let description =
+        userData.description == null || userData.description === ''
+            ? ''
+            : helpers.stringHelper(userData.description, 'Description', null, null);
+    let statement = helpers.optionalString(userData.statement, 'Short description');
     let additionalDescription = helpers.optionalString(userData.additionalDescription, 'Additional description');
     let slideshowDescription = helpers.optionalString(userData.slideshowDescription, 'Slideshow description');
     let visibility = helpers.normalizeVisibility(userData.visibility);
-    let privateDescription = helpers.optionalString(userData.privateDescription, 'Private description');
+    let privateDescription = helpers.optionalString(userData.privateDescription, 'Private communications');
+    let preferredEmail = helpers.optionalString(userData.preferredEmail, 'Preferred email', 120);
+    if (preferredEmail) helpers.isValidEmail(preferredEmail);
+    let preferredPhone = helpers.optionalString(userData.preferredPhone, 'Preferred phone', 40);
+    const optInCreativeRealEstate = !!(
+        userData.optInCreativeRealEstate === true ||
+        userData.optInCreativeRealEstate === 'true' ||
+        userData.optInCreativeRealEstate === 'on'
+    );
+    const optInFrisbeeNotices = !!(
+        userData.optInFrisbeeNotices === true ||
+        userData.optInFrisbeeNotices === 'true' ||
+        userData.optInFrisbeeNotices === 'on'
+    );
+    const optInCcsnUpdates = !!(
+        userData.optInCcsnUpdates === true ||
+        userData.optInCcsnUpdates === 'true' ||
+        userData.optInCcsnUpdates === 'on'
+    );
+    let adminNotes = helpers.optionalString(userData.adminNotes, 'Admin notes');
     return {
         username,
         emailAddress,
@@ -123,6 +145,12 @@ export function formatAndValidateUser(userData, ignorePassword) {
         slideshowDescription,
         visibility,
         privateDescription,
+        preferredEmail,
+        preferredPhone,
+        optInCreativeRealEstate,
+        optInFrisbeeNotices,
+        optInCcsnUpdates,
+        adminNotes,
     };
 }
 
@@ -178,6 +206,12 @@ const createUser = async (username, emailAddress, password, pfp, description, na
         slideshowDescription: '',
         visibility: 'public',
         privateDescription: '',
+        preferredEmail: '',
+        preferredPhone: '',
+        optInCreativeRealEstate: false,
+        optInFrisbeeNotices: false,
+        optInCcsnUpdates: false,
+        adminNotes: '',
     };
 
     // Update the user
@@ -222,13 +256,21 @@ const editUser = async (
     additionalDescription,
     slideshowDescription,
     visibility,
-    privateDescription
+    privateDescription,
+    preferredEmail = '',
+    preferredPhone = '',
+    optInCreativeRealEstate = false,
+    optInFrisbeeNotices = false,
+    optInCcsnUpdates = false,
+    adminNotes = null
 ) => {
     if (!userId) throw 'User Id not given';
     if (typeof userId !== 'string') throw 'User Id is not a string';
     userId = userId.trim();
     if (!ObjectId.isValid(userId)) throw 'User Id is not valid';
     if (typeof skills !== 'object') throw 'Skills is not an object';
+
+    const existing = await getUser(userId);
 
     let userData = {
         username,
@@ -247,6 +289,12 @@ const editUser = async (
         slideshowDescription,
         visibility,
         privateDescription,
+        preferredEmail,
+        preferredPhone,
+        optInCreativeRealEstate,
+        optInFrisbeeNotices,
+        optInCcsnUpdates,
+        adminNotes: adminNotes != null ? adminNotes : existing.adminNotes || '',
     };
     userData = formatAndValidateUser(userData, true);
 
@@ -279,11 +327,26 @@ const editUser = async (
                 slideshowDescription: userData.slideshowDescription,
                 visibility: userData.visibility,
                 privateDescription: userData.privateDescription,
+                preferredEmail: userData.preferredEmail,
+                preferredPhone: userData.preferredPhone,
+                optInCreativeRealEstate: userData.optInCreativeRealEstate,
+                optInFrisbeeNotices: userData.optInFrisbeeNotices,
+                optInCcsnUpdates: userData.optInCcsnUpdates,
+                adminNotes: userData.adminNotes,
             },
         }
     );
     const user = await getUser(userId);
     return user;
+};
+
+const updateAdminNotes = async (userId, adminNotes) => {
+    helpers.isValidId(userId);
+    const notes = helpers.optionalString(adminNotes, 'Admin notes');
+    const userCollection = await users();
+    const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { adminNotes: notes } });
+    if (!result.matchedCount) throw 'Could not update admin notes';
+    return getUser(userId);
 };
 
 const editPfp = async (userId, imagePath) => {
@@ -309,7 +372,13 @@ const editPfp = async (userId, imagePath) => {
         user.additionalDescription || '',
         user.slideshowDescription || '',
         user.visibility || 'public',
-        user.privateDescription || ''
+        user.privateDescription || '',
+        user.preferredEmail || '',
+        user.preferredPhone || '',
+        !!user.optInCreativeRealEstate,
+        !!user.optInFrisbeeNotices,
+        !!user.optInCcsnUpdates,
+        user.adminNotes || ''
     );
 };
 
@@ -588,46 +657,72 @@ const isUserAdmin = async (userId) => {
  * @returns {object}
  */
 const addSlideshowImage = async (userId, imagePath) => {
-    // Input Validation
     helpers.isValidId(userId);
     helpers.stringHelper(imagePath, 'Image Path', 1, 100);
 
     const bucketName = process.env.BUCKET_NAME;
     const base = 'https://storage.googleapis.com';
-
     const url = `${base}/${bucketName}/${userId}/${imagePath}`;
+    const slide = { url, caption: helpers.captionFromImageUrl(url) };
 
-    // Update user info
     const userCollection = await users();
-    const updatedInfo = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $push: { slideshowImages: url } });
+    const updatedInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $push: { slideshowImages: slide } }
+    );
 
     if (!updatedInfo) throw 'Could not update user successfully';
 
     return updatedInfo;
 };
 
-/**
- *
- * @param {string} userId
- * @param {string} imagePath - /type/imageName/imageNum
- * @returns {object}
- */
 const removeSlideshowImage = async (userId, imagePath) => {
-    // Input Validation
     helpers.isValidId(userId);
     helpers.stringHelper(imagePath, 'Image Path', 1, 100);
 
     const bucketName = process.env.BUCKET_NAME;
     const base = 'https://storage.googleapis.com';
-
     const url = `${base}/${bucketName}/${userId}/${imagePath}`;
 
-    // Update user info
+    const user = await getUser(userId);
+    const next = helpers
+        .normalizeSlideshowSlides(user.slideshowImages || [])
+        .filter((slide) => slide.url !== url);
+
     const userCollection = await users();
-    const updatedInfo = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $pull: { slideshowImages: url } });
+    const updatedInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { slideshowImages: next } }
+    );
 
     if (!updatedInfo) throw 'Could not update user successfully';
 
+    return updatedInfo;
+};
+
+const updateSlideshowCaption = async (userId, imageUrl, caption) => {
+    helpers.isValidId(userId);
+    helpers.stringHelper(imageUrl, 'Image URL', 1, 2048);
+    const nextCaption = helpers.optionalString(caption, 'Caption', 200);
+
+    const user = await getUser(userId);
+    const slides = helpers.normalizeSlideshowSlides(user.slideshowImages || []);
+    let found = false;
+    const next = slides.map((slide) => {
+        if (slide.url === imageUrl) {
+            found = true;
+            return { url: slide.url, caption: nextCaption };
+        }
+        return slide;
+    });
+    if (!found) throw 'Slideshow image not found';
+
+    const userCollection = await users();
+    const updatedInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { slideshowImages: next } }
+    );
+    if (!updatedInfo) throw 'Could not update caption';
     return updatedInfo;
 };
 
@@ -638,6 +733,7 @@ export default {
     deleteUser,
     editUser,
     editPfp,
+    updateAdminNotes,
     loginUser,
     searchUsers,
     sendFriendRequest,
@@ -648,5 +744,6 @@ export default {
     isUserLeader,
     addSlideshowImage,
     removeSlideshowImage,
+    updateSlideshowCaption,
     isUserAdmin,
 };

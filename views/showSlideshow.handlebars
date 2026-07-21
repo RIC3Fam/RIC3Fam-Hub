@@ -1,12 +1,24 @@
 {{#if slideshowImages.length}}
 <div class="gallery-wrapper">
-    <div class="gallery-grid">
+    <div class="gallery-grid gallery-masonry">
         {{#each slideshowImages}}
-            <figure class="gallery-item">
-              <img src="{{this}}" class="gallery-image" alt="Gallery image" loading="lazy">
-                <figcaption class="gallery-caption"></figcaption>
+            <figure class="gallery-item" data-image-url="{{this.url}}">
+                <img src="{{this.url}}" class="gallery-image" alt="{{#if this.caption}}{{this.caption}}{{else}}Gallery image{{/if}}" loading="lazy">
+                <figcaption class="gallery-caption">{{#if this.caption}}{{this.caption}}{{else}}&nbsp;{{/if}}</figcaption>
                 {{#if ../isOwner}}
                     <button type="button" class="gallery-delete-button">Delete</button>
+                    <div class="gallery-caption-edit">
+                        <label class="visually-hidden" for="caption-{{@index}}">Caption</label>
+                        <input
+                            type="text"
+                            id="caption-{{@index}}"
+                            class="gallery-caption-input"
+                            value="{{this.caption}}"
+                            placeholder="Add caption"
+                            maxlength="200"
+                        >
+                        <button type="button" class="gallery-caption-save form-submit-button">Save</button>
+                    </div>
                 {{/if}}
                 {{#unless ../isOwner}}
                     {{#if ../currentUser.isAdmin}}

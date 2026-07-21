@@ -1,162 +1,162 @@
-<main>
+<main class="group-page">
+    <div class="group-page-header">
+        <h1 class="group-page-name">{{group.groupName}}
+            {{#ifEquals group.visibility "private"}}
+                <span class="visibility-badge">Private</span>
+            {{else}}
+                <span class="visibility-badge">Public</span>
+            {{/ifEquals}}
+        </h1>
+    </div>
+
     <div class="group-container">
-        <div class="group-content">
-            <h1>{{group.groupName}}
-                {{#ifEquals group.visibility "private"}}
-                    <span class="visibility-badge">Private</span>
-                {{else}}
-                    <span class="visibility-badge">Public</span>
-                {{/ifEquals}}
-            </h1>
-            <p>About Us: {{group.description}}</p>
+        <div class="group-image-container">
+            <img src="{{group.groupImage}}" alt="Group Image" class="group-image">
+        </div>
+        <div class="group-content group-content-col2">
+            {{#if group.description}}
+                <p class="group-short-desc">{{group.description}}</p>
+            {{/if}}
 
             {{#if group.link1}}
                 <p class="group-links">
                     <a href="{{group.link1}}" target="_blank" rel="noopener noreferrer">{{#if group.link1desc}}{{group.link1desc}}{{else}}Website{{/if}}</a>
-                    {{#if group.link2}}
-                        <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
-                    {{/if}}
                 </p>
+            {{/if}}
+            {{#if group.link2}}
+                <p class="group-links">
+                    <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
+                </p>
+            {{/if}}
+        </div>
+    </div>
+
+    {{#if canSeePrivateBox}}
+        <section class="private-box group-full-width">
+            <h3>Private Description</h3>
+            {{#if group.privateDescription}}
+                <div class="description-box">{{group.privateDescription}}</div>
             {{else}}
-                {{#if group.link2}}
-                    <p class="group-links">
-                        <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
-                    </p>
-                {{/if}}
+                <p class="muted">No private description yet.</p>
             {{/if}}
+        </section>
+    {{/if}}
 
-            {{#if canSeePrivateBox}}
-                <section class="private-box">
-                    <h3>Private Description</h3>
-                    {{#if group.privateDescription}}
-                        <div class="description-box">{{group.privateDescription}}</div>
-                    {{else}}
-                        <p class="muted">No private description yet.</p>
-                    {{/if}}
-                </section>
-            {{/if}}
+    <section class="group-slideshow-section group-full-width">
+        {{#if group.slideshowDescription}}
+            <p class="picture-bar-description">{{group.slideshowDescription}}</p>
+        {{/if}}
+        {{> partials/pictureSlider}}
+        {{#if isOwner}}
+            {{> addToSlideshow groupId=group._id}}
+        {{/if}}
+    </section>
 
-            {{#if group.slideshowDescription}}
-                <p class="picture-bar-description">{{group.slideshowDescription}}</p>
-            {{/if}}
-            {{#if slideshowImages.length}}
-                <h3>Picture Bar</h3>
-            {{/if}}
-            {{> partials/pictureSlider}}
-            {{#if isOwner}}
-                {{> addToSlideshow groupId=group._id}}
-            {{/if}}
-
-            {{#if projectFramers.length}}
-                <section class="event-leaders profile-section">
-                    <h3>Project Framers</h3>
-                    <dl class="event-leaders-list">
-                        {{#each projectFramers}}
-                            <div class="event-leader-row">
-                                <dt>{{this.title}}</dt>
-                                <dd><a href="/users/{{this._id}}">{{this.name}}</a></dd>
-                            </div>
-                        {{/each}}
-                    </dl>
-                </section>
-            {{/if}}
-
-            {{#if owner}}
-            <p>Group Leader: <a href="/users/{{owner._id}}">{{owner.username}}</a></p>
-            {{/if}}
-          {{#if uppercaseMembers}}
-  <p><strong>{{uppercaseTitle}}</strong></p>
-  <ul>
-    {{#each uppercaseMembers}}
-      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
-    {{/each}}
-  </ul>
-{{/if}}
-
-{{#if lowercaseMembers}}
-  <p><strong>{{lowercaseTitle}}</strong></p>
-  <ul>
-    {{#each lowercaseMembers}}
-      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
-    {{/each}}
-  </ul>
-{{/if}}
-
-{{#if numericMembers}}
-  <p><strong>{{numericTitle}}</strong></p>
-  <ul>
-    {{#each numericMembers}}
-      <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
-    {{/each}}
-  </ul>
-{{/if}}
-            <a>Upcoming Events:</a>
-            <ul>
-                {{#each games}}
-                    <li><a href="/events/{{this._id}}">{{this.name}}</a></li>
+    {{#if projectFramers.length}}
+        <section class="event-leaders profile-section group-full-width">
+            <h3>Project Framers</h3>
+            <ul class="event-leaders-inline group-framers-inline">
+                {{#each projectFramers}}
+                    <li>
+                        {{#if this.title}}<span class="leader-title-text">{{this.title}}</span> — {{/if}}
+                        <a href="/users/{{this._id}}">{{this.name}}</a>
+                    </li>
                 {{/each}}
             </ul>
+        </section>
+    {{/if}}
 
-            {{#if currentUser }}
-                {{#unless isMember}}
-                    <form action="/groups/join/{{group._id}}" method="POST">
-                        <button class="join-button">Join Group</button>
-                    </form>
-                    
-                {{else}}
+    <div class="group-full-width">
+        {{#if owner}}
+            <p>Group Leader: <a href="/users/{{owner._id}}">{{owner.username}}</a></p>
+        {{/if}}
 
-                    <h3>Chat</h3>
-                    <form action="/groups/{{group._id}}/comments" id="message-form" method="POST">
-                        <label for="comment"></label>
-                            <input type="text" id="comment" name="comment">
-                        <button type="Submit" class="message-send">Send</button>
-                    </form>
+        {{#if uppercaseMembers}}
+            <p><strong>{{uppercaseTitle}}</strong></p>
+            <ul>
+                {{#each uppercaseMembers}}
+                    <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        {{/if}}
 
-                    {{#if group.comments}}
-                        <div id="messages-wrapper">
-                            <div class="messages-container">
-                                {{#each group.comments}}
-                                    <div class="message">
-                                        <a class="message-text">{{this.commentText}}</a>
-                                        <a class="message-sender">-{{this.sender.name}} {{this.timestamp}}</a>
+        {{#if lowercaseMembers}}
+            <p><strong>{{lowercaseTitle}}</strong></p>
+            <ul>
+                {{#each lowercaseMembers}}
+                    <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        {{/if}}
 
-                                        {{#if this.isSender}}
-                                            <form action="/groups/{{../group._id}}/comments/delete" method="post" class="button-wrapper">
-                                                <input type="hidden" name="commentId" value="{{this._id}}">
-                                                <button type="submit" class="delete-comment-button">Delete</button>
-                                            </form>
-                                        {{/if}}
-                                    </div>
-                                {{/each}}
-                            </div>
+        {{#if numericMembers}}
+            <p><strong>{{numericTitle}}</strong></p>
+            <ul>
+                {{#each numericMembers}}
+                    <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        {{/if}}
+
+        <a>Upcoming Events:</a>
+        <ul>
+            {{#each games}}
+                <li><a href="/events/{{this._id}}">{{this.name}}</a></li>
+            {{/each}}
+        </ul>
+
+        {{#if currentUser }}
+            {{#unless isMember}}
+                <form action="/groups/join/{{group._id}}" method="POST">
+                    <button class="join-button">Join Group</button>
+                </form>
+            {{else}}
+                <h3>Chat</h3>
+                <form action="/groups/{{group._id}}/comments" id="message-form" method="POST">
+                    <label for="comment"></label>
+                    <input type="text" id="comment" name="comment">
+                    <button type="Submit" class="message-send">Send</button>
+                </form>
+
+                {{#if group.comments}}
+                    <div id="messages-wrapper">
+                        <div class="messages-container">
+                            {{#each group.comments}}
+                                <div class="message">
+                                    <a class="message-text">{{this.commentText}}</a>
+                                    <a class="message-sender">-{{this.sender.name}} {{this.timestamp}}</a>
+
+                                    {{#if this.isSender}}
+                                        <form action="/groups/{{../group._id}}/comments/delete" method="post" class="button-wrapper">
+                                            <input type="hidden" name="commentId" value="{{this._id}}">
+                                            <button type="submit" class="delete-comment-button">Delete</button>
+                                        </form>
+                                    {{/if}}
+                                </div>
+                            {{/each}}
                         </div>
-                    {{/if}}
-                {{/unless}}
-                
-                {{ else }}
-                <p>To join this group, please <a href="/login">login</a>.</p>
-            {{/if}}
-            
-            {{#if isMember}}
-                {{#unless isOwner}}
-                    <form action="/groups/leave/{{group._id}}" method="POST" onsubmit="return confirmLeave('group');">
-                        <button class='leave-button' type="submit">Leave Group</button>
-                    </form>
-                {{/unless}}
-            {{/if}}
+                    </div>
+                {{/if}}
+            {{/unless}}
+        {{else}}
+            <p>To join this group, please <a href="/login">login</a>.</p>
+        {{/if}}
 
-            {{#if isOwner}}
-                <form action="/groups/edit/{{group._id}}">
-                    <button class="edit-button">Edit Group</button>
+        {{#if isMember}}
+            {{#unless isOwner}}
+                <form action="/groups/leave/{{group._id}}" method="POST" onsubmit="return confirmLeave('group');">
+                    <button class='leave-button' type="submit">Leave Group</button>
                 </form>
-                <form action="/groups/delete/{{group._id}}" method="POST" onsubmit="return confirmDelete('group');">
-                    <button class="delete-button">Delete Group</button>
-                </form>
-            {{/if}}
-        </div>
+            {{/unless}}
+        {{/if}}
 
-        <div class="group-image-container">
-            <img src="{{group.groupImage}}" alt="Group Image" class="group-image">
-        </div>
+        {{#if isOwner}}
+            <form action="/groups/edit/{{group._id}}">
+                <button class="edit-button">Edit Group</button>
+            </form>
+            <form action="/groups/delete/{{group._id}}" method="POST" onsubmit="return confirmDelete('group');">
+                <button class="delete-button">Delete Group</button>
+            </form>
+        {{/if}}
     </div>
 </main>

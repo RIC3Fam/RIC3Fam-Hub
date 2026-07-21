@@ -282,6 +282,136 @@ footer {
   margin-bottom: 10px;
 }
 
+.profile-picture-square {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.profile-name-top {
+  text-align: center;
+  margin: 8px 0 20px;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #222;
+}
+
+.profile-page .profile-layout {
+  align-items: stretch;
+}
+
+.profile-page .profile-left {
+  flex: 0 0 200px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-page .profile-right {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 180px;
+}
+
+.profile-short-desc {
+  margin: 0;
+  max-width: 28rem;
+}
+
+.profile-link-col {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.opt-in-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: normal;
+  background: transparent;
+  color: inherit;
+  margin: 8px 0;
+}
+
+.opt-in-label input[type="checkbox"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.admin-notes-form {
+  margin-top: 12px;
+}
+
+.gallery-masonry {
+  column-count: 2;
+  column-gap: 12px;
+  display: block;
+}
+
+.gallery-masonry .gallery-item {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin: 0 0 12px 0;
+  display: inline-block;
+  width: 100%;
+}
+
+.gallery-caption-edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.gallery-caption-input {
+  flex: 1 1 140px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  background: #efefef;
+  color: #159dd8;
+}
+
+.slider-caption-editor {
+  max-width: 900px;
+  width: 90%;
+  margin: 12px auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .profile-name-top {
+    font-size: 1.55rem;
+  }
+
+  .profile-picture-square {
+    width: 140px;
+    height: 140px;
+  }
+
+  .profile-page .profile-left {
+    flex-basis: 100%;
+  }
+
+  .profile-page .profile-right {
+    min-height: 0;
+    padding-top: 4px;
+  }
+
+  .gallery-masonry {
+    column-count: 1;
+  }
+}
+
 /* END USER */
 
 /* PHOTO GALLERY STUFF */
@@ -842,19 +972,50 @@ p.index {
 
 /* Group Page */
 
+.group-page-header {
+  text-align: center;
+  margin: 12px 0 20px;
+}
+
+.group-page-name {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
 .group-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+  max-width: 720px;
+  margin: 0 auto 24px;
 }
 
 .group-content {
   flex: 1;
 }
 
+.group-content-col2 {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.group-short-desc {
+  margin: 0;
+  white-space: pre-wrap;
+  color: #444;
+}
+
 .group-image-container {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   width: auto;
-  margin: 5%;
+  margin: 0;
 }
 
 .group-image {
@@ -869,11 +1030,47 @@ p.index {
   display: flex;
   flex-wrap: wrap;
   gap: 12px 24px;
-  margin: 12px 0;
+  margin: 0;
 }
 
 .group-links a {
   font-weight: 600;
+}
+
+.group-full-width {
+  max-width: 720px;
+  margin: 0 auto 20px;
+  padding: 0 12px;
+}
+
+.group-slideshow-section {
+  margin: 24px auto;
+}
+
+.group-framers-inline {
+  list-style: none;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .group-page-name {
+    font-size: 1.55rem;
+  }
+
+  .group-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .group-content-col2 {
+    text-align: center;
+    align-items: center;
+  }
+
+  .group-image {
+    width: 160px;
+    height: 160px;
+  }
 }
 /* End Group Page */
 
@@ -1048,6 +1245,7 @@ p.index {
   gap: 28px;
   align-items: flex-start;
   margin-bottom: 28px;
+  justify-content: center;
 }
 
 .profile-left {

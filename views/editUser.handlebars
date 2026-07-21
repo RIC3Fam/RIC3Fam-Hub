@@ -11,7 +11,7 @@
             <label class="form-label" for="email">Email:</label>
                 <input class="form-input" type="email" id="email" name="email" value="{{currentUser.emailAddress}}">
                 <br>
-            <label class="form-label" for="statement">Personal / artist statement:</label>
+            <label class="form-label" for="statement">Short Description:</label>
                 <textarea class="form-input" id="statement" name="statement">{{currentUser.statement}}</textarea>
                 <br>
             <label class="form-label" for="description">Description:</label>
@@ -32,7 +32,7 @@
             <label class="form-label" for="additionalDescription">Additional description:</label>
                 <textarea class="form-input" id="additionalDescription" name="additionalDescription">{{currentUser.additionalDescription}}</textarea>
                 <br>
-            <label class="form-label" for="slideshowDescription">Picture Bar description:</label>
+            <label class="form-label" for="slideshowDescription">Picture gallery note:</label>
                 <textarea class="form-input" id="slideshowDescription" name="slideshowDescription">{{currentUser.slideshowDescription}}</textarea>
                 <br>
             <label class="form-label" for="visibility">Visibility:</label>
@@ -41,11 +41,36 @@
                     <option value="private" {{#ifEquals currentUser.visibility "private"}}selected{{/ifEquals}}>Private</option>
                 </select>
                 <br>
-            <label class="form-label" for="privateDescription">Private Description:</label>
+
+            <h4>Private Communications</h4>
+            <label class="form-label" for="privateDescription">Private communications:</label>
                 <textarea class="form-input" id="privateDescription" name="privateDescription">{{currentUser.privateDescription}}</textarea>
                 <br>
-            
-            <!-- Skills -->
+            <label class="form-label" for="preferredEmail">Preferred Communication (private) – Email:</label>
+                <input class="form-input" type="email" id="preferredEmail" name="preferredEmail" value="{{currentUser.preferredEmail}}" placeholder="name@example.com" autocomplete="email">
+                <br>
+            <label class="form-label" for="preferredPhone">Preferred Communication (private) – Phone:</label>
+                <input class="form-input" type="tel" id="preferredPhone" name="preferredPhone" value="{{currentUser.preferredPhone}}" placeholder="(555) 555-5555" autocomplete="tel">
+                <br>
+
+            <h4>Updates &amp; notices</h4>
+            <label class="form-label opt-in-label" for="optInCreativeRealEstate">
+                <input type="checkbox" id="optInCreativeRealEstate" name="optInCreativeRealEstate" value="true" {{#if currentUser.optInCreativeRealEstate}}checked{{/if}}>
+                Opt-into Creative Real Estate &amp; Artists in Residence(s) updates
+            </label>
+            <br>
+            <label class="form-label opt-in-label" for="optInFrisbeeNotices">
+                <input type="checkbox" id="optInFrisbeeNotices" name="optInFrisbeeNotices" value="true" {{#if currentUser.optInFrisbeeNotices}}checked{{/if}}>
+                Opt into RIC3 Fam Frisbee event notices
+            </label>
+            <br>
+            <label class="form-label opt-in-label" for="optInCcsnUpdates">
+                <input type="checkbox" id="optInCcsnUpdates" name="optInCcsnUpdates" value="true" {{#if currentUser.optInCcsnUpdates}}checked{{/if}}>
+                Opt into CCSN updates and volunteer opportunities
+            </label>
+            <br>
+
+            <h4>RIC3 Fam Connections</h4>
             {{#each currentUser.skills}}
                 <label class="form-label" for="{{@key}}">{{this.desc}}:</label>
                     <input class="form-input" type="hidden" id="{{@key}}-desc" name="skills[{{@key}}][desc]" value="{{this.desc}}">
@@ -59,7 +84,7 @@
                     {{/elseEquals}}
                     <br>
             {{/each}}
-                
+
             <button type="button" class="form-submit-button" onclick="window.history.back();">Cancel</button>
             <button type="submit" class="form-submit-button">Submit</button>
         </form>
@@ -68,8 +93,8 @@
     {{> updatePfp}}
     {{> addToSlideshow route=currentUser._id}}
 
-    <p id="error-label" hidden></a>
-    <p id="message-label" hidden></a>
-    
+    <p id="error-label" hidden></p>
+    <p id="message-label" hidden></p>
+
     <script src="/public/js/pictures.js"></script>
 </main>

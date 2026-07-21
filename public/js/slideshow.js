@@ -1,12 +1,10 @@
 // Photo gallery behaviour:
-//   - each picture gets a caption (derived from its filename for now),
-//   - click a caption to expand/collapse it at the bottom of the picture,
-//   - double-click a picture to enlarge it in a lightbox with the caption below,
+//   - captions come from the server (stored) with filename fallback,
+//   - click a caption to expand/collapse it,
+//   - double-click a picture to enlarge it in a lightbox,
+//   - owners can edit captions via the caption inputs,
 //   - owner/admin delete (unchanged).
-// Uploads are handled by the existing upload form (addToSlideshow + pictures.js).
 
-// Turn an image URL into a human-ish caption: drop the path/extension and
-// replace separators with spaces. (Placeholder until captions are stored.)
 function captionFromUrl(url) {
     try {
         const file = decodeURIComponent(url.split('/').pop().split('?')[0]);
@@ -15,6 +13,20 @@ function captionFromUrl(url) {
     } catch (e) {
         return 'Untitled';
     }
+}
+
+function setError(err) {
+    const errorLabel = document.getElementById('error-label');
+    if (!errorLabel) return;
+    errorLabel.hidden = false;
+    errorLabel.textContent = String(err && err.message ? err.message : err);
+}
+
+function setMessage(msg) {
+    const messageLabel = document.getElementById('message-label');
+    if (!messageLabel) return;
+    messageLabel.hidden = false;
+    messageLabel.textContent = msg;
 }
 
 const lightbox = document.getElementById('gallery-lightbox');
@@ -38,7 +50,7 @@ function closeLightbox() {
 if (lightbox) {
     lightboxClose.addEventListener('click', closeLightbox);
     lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox(); // click outside the image
+        if (e.target === lightbox) closeLightbox();
     });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeLightbox();
@@ -50,21 +62,65 @@ document.querySelectorAll('.gallery-item').forEach((item) => {
     const caption = item.querySelector('.gallery-caption');
     if (!img) return;
 
-    const text = captionFromUrl(img.src);
+    const text = (caption && caption.textContent.trim()) || captionFromUrl(img.src);
+    if (caption && !caption.textContent.trim()) caption.textContent = text;
+
     if (caption) {
-        caption.textContent = text;
-        // Click the caption -> expand/collapse it at the bottom of the picture.
         caption.addEventListener('click', (e) => {
             e.stopPropagation();
             item.classList.toggle('caption-open');
         });
     }
 
-    // Double-click the picture -> enlarge it with the caption on the bottom.
-    img.addEventListener('dblclick', () => openLightbox(img.src, text));
+    img.addEventListener('dblclick', () =>
+        openLightbox(img.src, (caption && caption.textContent.trim()) || captionFromUrl(img.src))
+    );
 });
 
-// --- Image deletion (masonry gallery + picture slider) ---
+document.querySelectorAll('.gallery-caption-save').forEach((button) => {
+    button.addEventListener('click', async () => {
+        const wrap = button.closest('[data-image-url]') || button.closest('.gallery-item');
+        const input = wrap ? wrap.querySelector('.gallery-caption-input') : null;
+        const imageUrl = wrap ? wrap.getAttribute('data-image-url') : null;
+        if (!wrap || !input || !imageUrl) return;
+
+        try {
+            const groupSlideshowId = document.getElementById('group-slideshow-id');
+            const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+            const gameSlideshowId = document.getElementById('game-slideshow-id');
+            const gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
+
+            const body = { imageUrl, caption: input.value };
+            if (groupId) body.groupId = groupId;
+            if (gameId) body.gameId = gameId;
+
+            const response = await fetch('/pictures/slideshow', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || 'Could not save caption');
+            }
+
+            const figure = document.querySelector(`.gallery-item[data-image-url="${CSS.escape(imageUrl)}"]`);
+            const figcaption = figure ? figure.querySelector('.gallery-caption') : null;
+            if (figcaption) figcaption.textContent = input.value.trim() || '\u00a0';
+
+            const slide = document.querySelector(`.picture-slider-slide img[src="${CSS.escape(imageUrl)}"]`);
+            if (slide) {
+                const slideCap = slide.closest('figure')?.querySelector('.picture-slider-caption');
+                if (slideCap) slideCap.textContent = input.value.trim() || '\u00a0';
+            }
+
+            setMessage('Caption saved');
+        } catch (err) {
+            setError(err);
+        }
+    });
+});
+
 document.querySelectorAll('.gallery-delete-button').forEach((button) => {
     button.addEventListener('click', async () => {
         const item = button.closest('.gallery-item') || button.closest('.picture-slider-slide');
@@ -86,7 +142,6 @@ document.querySelectorAll('.gallery-delete-button').forEach((button) => {
 async function handleDeletion(fullImagePath) {
     const filename = fullImagePath.split('/').pop();
 
-    // Presence of the hidden #is-event-page marker means we're on the event page.
     const isEventPage = document.getElementById('is-event-page') != null;
     const groupSlideshowId = document.getElementById('group-slideshow-id');
     const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;

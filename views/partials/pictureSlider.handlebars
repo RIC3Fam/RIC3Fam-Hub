@@ -24,6 +24,24 @@
         {{/each}}
     </div>
 </div>
+{{#if isOwner}}
+    <div class="slider-caption-editor">
+        {{#each slideshowImages}}
+            <div class="gallery-caption-edit" data-image-url="{{this.url}}">
+                <label class="form-label" for="slide-caption-{{@index}}">Caption</label>
+                <input
+                    type="text"
+                    id="slide-caption-{{@index}}"
+                    class="gallery-caption-input form-input"
+                    value="{{this.caption}}"
+                    placeholder="Add caption"
+                    maxlength="200"
+                >
+                <button type="button" class="gallery-caption-save form-submit-button">Save</button>
+            </div>
+        {{/each}}
+    </div>
+{{/if}}
 {{/if}}
 <p id="error-label" hidden></p>
 <p id="message-label" hidden></p>

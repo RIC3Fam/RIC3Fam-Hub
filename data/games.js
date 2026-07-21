@@ -548,11 +548,12 @@ const addSlideshowImage = async (gameId, imagePath) => {
     const bucketName = process.env.BUCKET_NAME;
     const base = 'https://storage.googleapis.com';
     const url = `${base}/${bucketName}/${gameId}/${imagePath}`;
+    const slide = { url, caption: helpers.captionFromImageUrl(url) };
 
     const gameCollection = await games();
     const updatedInfo = await gameCollection.updateOne(
         { _id: new ObjectId(gameId) },
-        { $push: { slideshowImages: url } }
+        { $push: { slideshowImages: slide } }
     );
     if (!updatedInfo) throw 'Could not update game successfully';
     return updatedInfo;
@@ -566,12 +567,43 @@ const removeSlideshowImage = async (gameId, imagePath) => {
     const base = 'https://storage.googleapis.com';
     const url = `${base}/${bucketName}/${gameId}/${imagePath}`;
 
+    const game = await get(gameId);
+    const next = helpers
+        .normalizeSlideshowSlides(game.slideshowImages || [])
+        .filter((slide) => slide.url !== url);
+
     const gameCollection = await games();
     const updatedInfo = await gameCollection.updateOne(
         { _id: new ObjectId(gameId) },
-        { $pull: { slideshowImages: url } }
+        { $set: { slideshowImages: next } }
     );
     if (!updatedInfo) throw 'Could not update game successfully';
+    return updatedInfo;
+};
+
+const updateSlideshowCaption = async (gameId, imageUrl, caption) => {
+    helpers.isValidId(gameId);
+    helpers.stringHelper(imageUrl, 'Image URL', 1, 2048);
+    const nextCaption = helpers.optionalString(caption, 'Caption', 200);
+
+    const game = await get(gameId);
+    const slides = helpers.normalizeSlideshowSlides(game.slideshowImages || []);
+    let found = false;
+    const next = slides.map((slide) => {
+        if (slide.url === imageUrl) {
+            found = true;
+            return { url: slide.url, caption: nextCaption };
+        }
+        return slide;
+    });
+    if (!found) throw 'Slideshow image not found';
+
+    const gameCollection = await games();
+    const updatedInfo = await gameCollection.updateOne(
+        { _id: new ObjectId(gameId) },
+        { $set: { slideshowImages: next } }
+    );
+    if (!updatedInfo) throw 'Could not update caption';
     return updatedInfo;
 };
 
@@ -594,5 +626,6 @@ export default {
     editGameImage,
     addSlideshowImage,
     removeSlideshowImage,
+    updateSlideshowCaption,
     normalizeLeaders,
 };

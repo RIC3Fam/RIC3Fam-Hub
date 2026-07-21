@@ -87,6 +87,37 @@ router
         // Send array of valid urls
         return res.json(urls);
     })
+    .patch(async function (req, res) {
+        try {
+            if (!req.session.user) throw 'Must be logged in';
+            const imageUrl = helpers.stringHelper(req.body.imageUrl, 'Image URL', 1, 2048);
+            const caption = helpers.optionalString(req.body.caption, 'Caption', 200);
+            const groupId = req.body.groupId;
+            const gameId = req.body.gameId;
+
+            if (groupId) {
+                helpers.isValidId(groupId);
+                const group = await groupsData.get(groupId);
+                if (group.groupLeader !== req.session.user._id) throw 'You are not the leader of this group';
+                await groupsData.updateSlideshowCaption(groupId, imageUrl, caption);
+            } else if (gameId) {
+                helpers.isValidId(gameId);
+                const game = await gamesData.get(gameId);
+                if (game.organizer !== req.session.user._id) throw 'You are not the admin of this event';
+                if (typeof gamesData.updateSlideshowCaption === 'function') {
+                    await gamesData.updateSlideshowCaption(gameId, imageUrl, caption);
+                } else {
+                    throw 'Event captions are not supported yet';
+                }
+            } else {
+                await usersData.updateSlideshowCaption(req.session.user._id, imageUrl, caption);
+            }
+            return res.json({ ok: true, caption });
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ error: String(err) });
+        }
+    })
     .delete(async function (req, res) {
         // Updates image urls in the relevant collection
         const isEventPage = req.body.isEventPage;
