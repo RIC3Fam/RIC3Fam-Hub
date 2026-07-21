@@ -45,8 +45,9 @@ test.describe('RIC3Fam Hub e2e', () => {
         await page.goto('/');
         await expect(page.locator('header')).toContainText('Events');
 
-        await page.goto('/games');
-        await expect(page.locator('.list-header').first()).toHaveText('Events');
+        await page.goto('/events');
+        await expect(page.locator('.events-page-title')).toHaveText('EVENTS');
+        await expect(page.locator('.list-header').first()).toHaveText('UPCOMING EVENTS');
         await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(1);
     });
 

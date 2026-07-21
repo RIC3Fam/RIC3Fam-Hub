@@ -1,133 +1,152 @@
 <main>
-    <div class="event-container">
-        <div class="event-content">
-            <h1>{{game.gameName}}
+    <div class="event-page">
+        <div class="event-page-header">
+            <h1 class="event-page-name">{{game.gameName}}
                 {{#ifEquals game.visibility "private"}}
                     <span class="visibility-badge visibility-private">Private</span>
                 {{else}}
                     <span class="visibility-badge visibility-public">Public</span>
                 {{/ifEquals}}
             </h1>
-            <p>Event Info: {{game.description}}</p>
-
-            <h3>Registered Members:</h3>
-            <ul>
-                {{#each players}}
-                    <li><a href="/users/{{this._id}}">{{ this.name }}</a></li>
-                {{/each}}
-            </ul>
-
-            {{#if hostGroup}}
-                <p>Host Group: <a href="/groups/{{hostGroup._id}}">{{hostGroup.groupName}}</a></p>
+            {{#if eventSchedule}}
+                <p class="event-page-schedule">{{eventSchedule}}</p>
             {{/if}}
+        </div>
 
-            <p>Date: {{game.gameDate}} {{ game.startTime }} - {{ game.endTime }}</p>
+        <div class="event-container">
+            <div class="event-content">
+                {{#if game.description}}
+                    <div class="event-info-box">{{game.description}}</div>
+                {{/if}}
 
-            <a href="{{game.link}}">{{game.linkdesc}}</a>
+                {{#if players.length}}
+                    <ul class="event-members-grid">
+                        {{#each players}}
+                            <li><a href="/users/{{this._id}}">{{ this.name }}</a></li>
+                        {{/each}}
+                    </ul>
+                {{/if}}
 
-            <p>Location: {{ game.gameLocation.streetAddress}}, {{ game.gameLocation.city }}, {{ game.gameLocation.state }}, {{ game.gameLocation.zip }}</p>
+                {{#if leaders.length}}
+                    <ul class="event-leaders-inline">
+                        {{#each leaders}}
+                            <li>
+                                {{#if this.title}}<span class="leader-title-text">{{this.title}}</span> — {{/if}}
+                                <a href="/users/{{this._id}}">{{this.name}}</a>
+                            </li>
+                        {{/each}}
+                    </ul>
+                {{/if}}
 
-            {{#if game.directions}}
-                <p>Directions: {{game.directions}}</p>
-            {{/if}}
+                {{#if hostGroups.length}}
+                    <div class="event-groups-line">
+                        {{#each hostGroups}}
+                            <p><a href="/groups/{{this._id}}">{{this.groupName}}</a></p>
+                        {{/each}}
+                    </div>
+                {{/if}}
 
-            {{#if game.map}}
-                <a href="{{game.map}}">Google Map directions Link</a>
-            {{/if}}
+                {{#if game.link}}
+                    <p class="event-links">
+                        <a href="{{game.link}}" target="_blank" rel="noopener noreferrer">{{#if game.linkdesc}}{{game.linkdesc}}{{else}}{{game.link}}{{/if}}</a>
+                    </p>
+                {{/if}}
+                {{#if game.link2}}
+                    <p class="event-links">
+                        <a href="{{game.link2}}" target="_blank" rel="noopener noreferrer">{{#if game.link2desc}}{{game.link2desc}}{{else}}{{game.link2}}{{/if}}</a>
+                    </p>
+                {{/if}}
 
-            {{#if currentUser}}
-                {{#unless isMember}}
-                    <form action="/games/join/{{game._id}}" method="POST">
-                        <button type="submit" class="join-button">Join Event</button>
-                    </form>
-                {{else}}
-                    <h3>Chat</h3>
-                    <form action="/games/{{game._id}}/comments" id="message-form" method="POST">
-                        <label for="comment"></label>
-                            <input type="text" id="comment" name="comment">
-                        <button type="Submit" class="message-send">Send</button>
-                    </form>
+                {{#if currentUser}}
+                    {{#unless isMember}}
+                        <form action="/events/join/{{game._id}}" method="POST">
+                            <button type="submit" class="join-button">Join Event</button>
+                        </form>
+                    {{else}}
+                        <h3>Chat</h3>
+                        <form action="/events/{{game._id}}/comments" id="message-form" method="POST">
+                            <label for="comment"></label>
+                                <input type="text" id="comment" name="comment">
+                            <button type="Submit" class="message-send">Send</button>
+                        </form>
 
-                    {{#if game.comments}}
-                        <div id="messages-wrapper">
-                            <div class="messages-container">
-                                {{#each game.comments}}
-                                    <div class="message">
-                                        <a class="message-text">{{this.commentText}}</a>
-                                        <a class="message-sender">-{{this.sender.name}} {{this.timestamp}}</a>
+                        {{#if game.comments}}
+                            <div id="messages-wrapper">
+                                <div class="messages-container">
+                                    {{#each game.comments}}
+                                        <div class="message">
+                                            <a class="message-text">{{this.commentText}}</a>
+                                            <a class="message-sender">-{{this.sender.name}} {{this.timestamp}}</a>
 
-                                        {{#if this.isSender}}
-                                            <form action="/games/{{../game._id}}/comments/delete" method="post" class="button-wrapper">
-                                                <input type="hidden" name="commentId" value="{{this._id}}">
-                                                <button type="submit" class="delete-comment-button">Delete</button>
-                                            </form>
-                                        {{/if}}
-                                    </div>
-                                {{/each}}
+                                            {{#if this.isSender}}
+                                                <form action="/events/{{../game._id}}/comments/delete" method="post" class="button-wrapper">
+                                                    <input type="hidden" name="commentId" value="{{this._id}}">
+                                                    <button type="submit" class="delete-comment-button">Delete</button>
+                                                </form>
+                                            {{/if}}
+                                        </div>
+                                    {{/each}}
+                                </div>
                             </div>
-                        </div>
-                    {{/if}}
-                {{/unless}}
-            {{else}}
-                <p>To join this event, please <a href="/login">login</a>.</p>
-            {{/if}}
+                        {{/if}}
+                    {{/unless}}
+                {{else}}
+                    <p>To join this event, please <a href="/login">login</a>.</p>
+                {{/if}}
 
-            {{#if isMember}}
-                {{#unless isOwner}}
-                    <form action="/games/leave/{{game._id}}" method="POST" onsubmit="return confirmLeave('event');">
-                        <button class="leave-button" type="submit">Leave Event</button>
+                {{#if isMember}}
+                    {{#unless isOwner}}
+                        <form action="/events/leave/{{game._id}}" method="POST" onsubmit="return confirmLeave('event');">
+                            <button class="leave-button" type="submit">Leave Event</button>
+                        </form>
+                    {{/unless}}
+                {{/if}}
+
+                {{#if isOwner}}
+                    <form action="/events/edit/{{game._id}}">
+                        <button class="edit-button">Edit Event</button>
                     </form>
-                {{/unless}}
-            {{/if}}
+                    <form action="/events/delete/{{game._id}}" method="POST" onsubmit="return confirmDelete('event');">
+                        <button class="delete-button">Delete Event</button>
+                    </form>
+                {{/if}}
+            </div>
 
-            {{#if isOwner}}
-                <form action="/games/edit/{{game._id}}">
-                    <button class="edit-button">Edit Event</button>
-                </form>
-                <form action="/games/delete/{{game._id}}" method="POST" onsubmit="return confirmDelete('event');">
-                    <button class="delete-button">Delete Event</button>
-                </form>
-            {{/if}}
+            <div class="event-image-container">
+                <img src="{{game.gameImage}}" alt="Event flyer" class="event-image">
+            </div>
+        </div>
 
-            {{#if slideshowImages.length}}
-                <h3>Picture Bar</h3>
-            {{/if}}
+        <section class="event-slideshow-section">
             {{> partials/pictureSlider}}
             {{#if isOwner}}
                 {{> addToSlideshow gameId=game._id}}
             {{/if}}
+        </section>
 
-            {{#if leaders.length}}
-                <section class="event-leaders profile-section">
-                    <h3>Leaders</h3>
-                    <dl class="event-leaders-list">
-                        {{#each leaders}}
-                            <div class="event-leader-row">
-                                <dt>{{this.title}}</dt>
-                                <dd><a href="/users/{{this._id}}">{{this.name}}</a></dd>
-                            </div>
-                        {{/each}}
-                    </dl>
-                </section>
+        {{#if canSeePrivateBox}}
+            <section class="private-box event-full-width">
+                <h3>Private Description</h3>
+                {{#if game.privateDescription}}
+                    <div class="description-box">{{game.privateDescription}}</div>
+                {{else}}
+                    <p class="muted">No private description yet.</p>
+                {{/if}}
+            </section>
+        {{/if}}
+
+        <section class="event-location-section event-full-width">
+            <h3 class="location-heading">LOCATION INFORMATION</h3>
+            <p>{{ game.gameLocation.streetAddress}}, {{ game.gameLocation.city }}, {{ game.gameLocation.state }}, {{ game.gameLocation.zip }}</p>
+            {{#if game.map}}
+                <p><a href="{{game.map}}" target="_blank" rel="noopener noreferrer">Google Maps Link</a></p>
             {{/if}}
-
+            {{#if game.directions}}
+                <p>Directions: {{game.directions}}</p>
+            {{/if}}
             {{#if organizer}}
                 <p class="event-admin-line">Admin: <a href="/users/{{organizer._id}}">{{organizer.name}}</a></p>
             {{/if}}
-
-            {{#if canSeePrivateBox}}
-                <section class="private-box">
-                    <h3>Private Description</h3>
-                    {{#if game.privateDescription}}
-                        <div class="description-box">{{game.privateDescription}}</div>
-                    {{else}}
-                        <p class="muted">No private description yet.</p>
-                    {{/if}}
-                </section>
-            {{/if}}
-        </div>
-        <div class="event-image-container">
-            <img src="{{game.gameImage}}" alt="Event Image" class="event-image">
-        </div>
+        </section>
     </div>
 </main>

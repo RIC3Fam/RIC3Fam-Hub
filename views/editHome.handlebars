@@ -1,0 +1,106 @@
+<main>
+    <div class="form-wrapper home-edit-wrapper">
+        <h3>Edit Home Page</h3>
+        <p class="muted">Admins can set billboard video/poster, towel images + links, and hotspot URLs over the building.</p>
+
+        <form method="POST" action="/edit-home" id="edit-home-form" class="create-form">
+            <h4>Billboard</h4>
+            <label class="form-label" for="billboardVideoUrl">Billboard video URL (mp4 or leave blank if uploading below)</label>
+            <input class="form-input" type="url" id="billboardVideoUrl" name="billboardVideoUrl" value="{{home.billboardVideoUrl}}" placeholder="https://.../video.mp4">
+            <br>
+            <label class="form-label" for="billboardPosterUrl">Billboard poster image URL (shown when stopped)</label>
+            <input class="form-input" type="url" id="billboardPosterUrl" name="billboardPosterUrl" value="{{home.billboardPosterUrl}}" placeholder="https://.../poster.jpg">
+            <br>
+            <div class="home-hotspot-coords">
+                <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="billboardTop" value="{{home.billboard.top}}"></label>
+                <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="billboardLeft" value="{{home.billboard.left}}"></label>
+                <label>Width % <input class="form-input" type="number" min="1" max="100" step="0.1" name="billboardWidth" value="{{home.billboard.width}}"></label>
+                <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="billboardHeight" value="{{home.billboard.height}}"></label>
+            </div>
+
+            <h4>Towels</h4>
+            <fieldset class="home-hotspot-edit">
+                <legend>Towel 1</legend>
+                <label class="form-label" for="towel1LinkUrl">Link URL</label>
+                <input class="form-input" type="url" id="towel1LinkUrl" name="towel1LinkUrl" value="{{home.towel1.linkUrl}}">
+                <input type="hidden" name="towel1ImageUrl" value="{{home.towel1.imageUrl}}">
+                <div class="home-hotspot-coords">
+                    <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Top" value="{{home.towel1.top}}"></label>
+                    <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Left" value="{{home.towel1.left}}"></label>
+                    <label>Width % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel1Width" value="{{home.towel1.width}}"></label>
+                    <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel1Height" value="{{home.towel1.height}}"></label>
+                </div>
+            </fieldset>
+            <fieldset class="home-hotspot-edit">
+                <legend>Towel 2</legend>
+                <label class="form-label" for="towel2LinkUrl">Link URL</label>
+                <input class="form-input" type="url" id="towel2LinkUrl" name="towel2LinkUrl" value="{{home.towel2.linkUrl}}">
+                <input type="hidden" name="towel2ImageUrl" value="{{home.towel2.imageUrl}}">
+                <div class="home-hotspot-coords">
+                    <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Top" value="{{home.towel2.top}}"></label>
+                    <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Left" value="{{home.towel2.left}}"></label>
+                    <label>Width % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel2Width" value="{{home.towel2.width}}"></label>
+                    <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel2Height" value="{{home.towel2.height}}"></label>
+                </div>
+            </fieldset>
+
+            <h4>Link hotspots</h4>
+            <p class="muted">Each hotspot is a clickable region on the building. Adjust position (%) if needed.</p>
+            {{#each home.hotspots}}
+                <fieldset class="home-hotspot-edit">
+                    <legend>{{this.label}}</legend>
+                    <input type="hidden" name="hotspots[{{@index}}][id]" value="{{this.id}}">
+                    <input type="hidden" name="hotspots[{{@index}}][label]" value="{{this.label}}">
+                    <label class="form-label">URL
+                        <input class="form-input" type="url" name="hotspots[{{@index}}][url]" value="{{this.url}}" placeholder="https://">
+                    </label>
+                    <div class="home-hotspot-coords">
+                        <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="hotspots[{{@index}}][top]" value="{{this.top}}"></label>
+                        <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="hotspots[{{@index}}][left]" value="{{this.left}}"></label>
+                        <label>Width % <input class="form-input" type="number" min="1" max="100" step="0.1" name="hotspots[{{@index}}][width]" value="{{this.width}}"></label>
+                        <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="hotspots[{{@index}}][height]" value="{{this.height}}"></label>
+                    </div>
+                </fieldset>
+            {{/each}}
+
+            <button type="submit" class="form-submit-button">Save home settings</button>
+            <a href="/">Cancel</a>
+        </form>
+
+        <hr class="my-5">
+
+        <h4>Upload billboard poster (JPEG)</h4>
+        <form id="home-poster-form" class="create-form">
+            <input type="file" id="home-poster-upload" accept="image/jpeg">
+            <button type="submit" class="form-submit-button">Upload poster</button>
+        </form>
+
+        <h4>Upload billboard video (MP4)</h4>
+        <form id="home-video-form" class="create-form">
+            <input type="file" id="home-video-upload" accept="video/mp4">
+            <button type="submit" class="form-submit-button">Upload video</button>
+        </form>
+
+        <h4>Upload towel 1 image (JPEG)</h4>
+        {{#if home.towel1.imageUrl}}
+            <p class="muted">Current: <img src="{{home.towel1.imageUrl}}" alt="Towel 1" class="home-edit-thumb"></p>
+        {{/if}}
+        <form id="home-towel1-form" class="create-form">
+            <input type="file" id="home-towel1-upload" accept="image/jpeg">
+            <button type="submit" class="form-submit-button">Upload towel 1</button>
+        </form>
+
+        <h4>Upload towel 2 image (JPEG)</h4>
+        {{#if home.towel2.imageUrl}}
+            <p class="muted">Current: <img src="{{home.towel2.imageUrl}}" alt="Towel 2" class="home-edit-thumb"></p>
+        {{/if}}
+        <form id="home-towel2-form" class="create-form">
+            <input type="file" id="home-towel2-upload" accept="image/jpeg">
+            <button type="submit" class="form-submit-button">Upload towel 2</button>
+        </form>
+
+        <p id="error-label" hidden></p>
+        <p id="message-label" hidden></p>
+    </div>
+    <script src="/public/js/homeEdit.js"></script>
+</main>

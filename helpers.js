@@ -285,6 +285,90 @@ export function convertToMMDDYYYY(dateString) {
     return `${month}/${day}/${year}`;
 }
 
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/** e.g. "Friday, 08/01/2026 from 5:00 PM to 8:00 PM" from YYYY-MM-DD + 12h times */
+export function formatEventSchedule(dateString, startTime12h, endTime12h) {
+    if (!isValidDayBritainEdition(dateString)) throw 'Not in correct format';
+    const [year, month, day] = dateString.split('-').map(Number);
+    const weekday = WEEKDAYS[new Date(year, month - 1, day).getDay()];
+    const mmddyyyy = convertToMMDDYYYY(dateString);
+    return `${weekday}, ${mmddyyyy} from ${startTime12h} to ${endTime12h}`;
+}
+
+/** Caption from image URL filename; used for slideshow footers. */
+export function captionFromImageUrl(url) {
+    try {
+        const file = decodeURIComponent(String(url).split('/').pop().split('?')[0]);
+        const base = file.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+        return base || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+/**
+ * Normalize slideshow image entries to { url, caption }.
+ * Drops empty / invalid URLs (fixes blank-slide glitches).
+ */
+export function normalizeSlideshowSlides(images) {
+    if (!Array.isArray(images)) return [];
+    return images
+        .map((img) => {
+            if (typeof img === 'string') {
+                const url = img.trim();
+                if (!url || url === 'undefined' || url === 'null') return null;
+                return { url, caption: captionFromImageUrl(url) };
+            }
+            if (img && typeof img === 'object' && img.url) {
+                const url = String(img.url).trim();
+                if (!url || url === 'undefined' || url === 'null') return null;
+                const caption =
+                    img.caption != null && String(img.caption).trim()
+                        ? String(img.caption).trim()
+                        : captionFromImageUrl(url);
+                return { url, caption };
+            }
+            return null;
+        })
+        .filter(Boolean);
+}
+
+/** Collect up to 3 group ids from form fields (group / group2 / group3 or groups[]). */
+export function normalizeHostGroups(group, group2, group3, groupsArr) {
+    const ids = [];
+    const pushId = (value) => {
+        if (value == null) return;
+        const id = String(value).trim();
+        if (!id || id === 'N/A' || ids.includes(id)) return;
+        isValidId(id);
+        ids.push(id);
+    };
+    if (Array.isArray(groupsArr)) {
+        groupsArr.forEach(pushId);
+    } else if (groupsArr && typeof groupsArr === 'object') {
+        Object.keys(groupsArr)
+            .sort((a, b) => Number(a) - Number(b))
+            .forEach((k) => pushId(groupsArr[k]));
+    }
+    pushId(group);
+    pushId(group2);
+    pushId(group3);
+    return ids.slice(0, 3);
+}
+
+export function normalizeOptionalLinkPair(url, desc, urlName, descName) {
+    if (url != null && String(url).trim() !== '') {
+        const link = stringHelper(String(url), urlName);
+        const linkdesc =
+            desc != null && String(desc).trim() !== ''
+                ? stringHelper(String(desc), descName, 1, 300)
+                : '';
+        return { link, linkdesc };
+    }
+    return { link: '', linkdesc: '' };
+}
+
 export function isValidNum(string) {
     if (!string) {
         throw 'String expected';

@@ -1,10 +1,10 @@
 {{#if slideshowImages.length}}
-<div class="picture-slider" data-slider>
+<div class="picture-slider{{#if portraitSlideshow}} picture-slider-portrait{{/if}}" data-slider>
     <button type="button" class="picture-slider-btn picture-slider-prev" aria-label="Previous image">&lsaquo;</button>
     <div class="picture-slider-viewport">
         {{#each slideshowImages}}
             <figure class="picture-slider-slide{{#if @first}} is-active{{/if}}">
-                <img src="{{this}}" alt="Slideshow image" loading="lazy">
+                <img src="{{this.url}}" alt="{{#if this.caption}}{{this.caption}}{{else}}Slideshow image{{/if}}" loading="lazy">
                 {{#if ../isOwner}}
                     <button type="button" class="gallery-delete-button slider-delete-button">Delete</button>
                 {{/if}}
@@ -13,6 +13,7 @@
                         <button type="button" class="gallery-delete-button slider-delete-button">Delete</button>
                     {{/if}}
                 {{/unless}}
+                <figcaption class="picture-slider-caption">{{#if this.caption}}{{this.caption}}{{else}}&nbsp;{{/if}}</figcaption>
             </figure>
         {{/each}}
     </div>

@@ -7,7 +7,12 @@ import picturesRoutes from './pictures.js';
 
 const configRoutesFunction = (app) => {
     app.use('/users', usersRoutes);
-    app.use('/games', gamesRoutes);
+    app.use('/events', gamesRoutes);
+    // Keep old /games URLs working by redirecting to /events
+    app.use('/games', (req, res) => {
+        const suffix = req.url === '/' ? '' : req.url;
+        return res.redirect(301, '/events' + suffix);
+    });
     app.use('/groups', groupsRoutes);
     app.use('/search', searchRoutes);
     app.use('/pictures', picturesRoutes);

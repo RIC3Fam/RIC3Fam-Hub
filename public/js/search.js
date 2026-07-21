@@ -58,7 +58,7 @@ function stringsAllCaps (string1, string2) {
             }
             //addHeader(gamesUL, 'Events:');
             // for (let i = 0; i < gamesList.length; i++) {
-            //     addRow(gamesUL, gamesList[i].gameName, '/games/' + gamesList[i]._id);
+            //     addRow(gamesUL, gamesList[i].gameName, '/events/' + gamesList[i]._id);
             // }
         });
     };

@@ -1,104 +1,142 @@
 <!-- STILL NEED TO AUTO FILL WITH USERS CURRENT CONTENT -->
-<div class="form-wrapper">
-    <form method="POST" id="create-game-form" class="create-form" action="/games/edit/{{gameObj._id}}">
-        <label class="form-label" for="game-name">Event Name:</label>
-            <input class="form-input" type="text" id="game-name" name="gameName" value="{{gameObj.gameName}}">
-            <br>
-        <!-- NEED TO ADD LOCATION INFO -->
-        <label class="form-label" for="street-address">Street Address:</label>
-                <input class="form-input" type="text" id="street-address" name="streetAddress" value="{{gameObj.gameLocation.streetAddress}}">
+<div class="edit-game-page">
+    <div class="form-wrapper edit-game-form-wrap">
+        <form method="POST" id="create-game-form" class="create-form" action="/events/edit/{{gameObj._id}}">
+            <label class="form-label" for="game-name">Event Name:</label>
+                <input class="form-input" type="text" id="game-name" name="gameName" value="{{gameObj.gameName}}">
                 <br>
-            <label class="form-label" for="city">City:</label>
-                <input class="form-input" type="text" id="city" name="city" value="{{gameObj.gameLocation.city}}">
+            <!-- NEED TO ADD LOCATION INFO -->
+            <label class="form-label" for="street-address">Street Address:</label>
+                    <input class="form-input" type="text" id="street-address" name="streetAddress" value="{{gameObj.gameLocation.streetAddress}}">
+                    <br>
+                <label class="form-label" for="city">City:</label>
+                    <input class="form-input" type="text" id="city" name="city" value="{{gameObj.gameLocation.city}}">
+                    <br>
+                <label class="form-label" for="state">State:</label>
+                    <select class="form-input" type="text" id="state" name="state" required>
+                    {{#each states}}
+                         <option value="{{this}}" {{#ifEquals this ../gameObj.gameLocation.state}} selected {{/ifEquals}}>{{this}}</option>
+                    {{/each}}
+                    </select>
+                    <br>
+                <label class="form-label" for="zip">Zipcode:</label>
+                    <input class="form-input" type="text" id="zip" name="zip" value="{{gameObj.gameLocation.zip}}">
+                    <br>
+            <label class="form-label" for="map">Maps Link:</label>
+                <input class="form-input" type="url" id="map" name="map" value="{{gameObj.map}}">
                 <br>
-            <label class="form-label" for="state">State:</label>
-                <select class="form-input" type="text" id="state" name="state" required>
-                {{#each states}}
-                     <option value="{{this}}" {{#ifEquals this ../gameObj.gameLocation.state}} selected {{/ifEquals}}>{{this}}</option>
+            <label class="form-label" for="directions">Directions:</label>
+                <input class="form-input" type="text" id="directions" name="directions" value="{{gameObj.directions}}">
+                <br>
+            <label class="form-label" for="description">Description:</label>
+                <textarea class="form-input" id="description" name="gameDescription" >{{gameObj.description}}</textarea>
+                <br>
+            <label class="form-label" for="date">Date:</label>
+                <input class="form-input" type="date" id="date" name="date" value="{{gameObj.gameDate}}" >
+                <br>
+            <label class="form-label" for="start-time">Start Time:</label>
+                <input class="form-input" type="time" id="start-time" name="startTime" value="{{gameObj.startTime}}">
+                <br>
+            <label class="form-label" for="end-time">End Time:</label>
+                <input class="form-input" type="time" id="end-time" name="endTime" value="{{gameObj.endTime}}">
+                <br>
+            <label class="form-label" for="max-players">Max attendees:</label>
+                <input class="form-input" type="text" id="max-players" name="maxPlayers" value="{{gameObj.maxCapacity}}">
+                <br>
+                <label class="form-label" for="group">Group 1:</label>
+                    <select class="form-input" id="group" name="group">
+                        <option value="N/A" {{#ifEquals selectedGroup1 "N/A"}}selected{{/ifEquals}}>N/A</option>
+                           {{#if groups.length}}
+                                {{#each groups}}
+                                    <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup1}}selected{{/ifEquals}}>{{this.groupName}}</option>
+                                {{/each}}
+                            {{/if}}
+                    </select>
+                    <br>
+                <label class="form-label" for="group2">Group 2:</label>
+                    <select class="form-input" id="group2" name="group2">
+                        <option value="N/A" {{#ifEquals selectedGroup2 "N/A"}}selected{{/ifEquals}}>N/A</option>
+                           {{#if groups.length}}
+                                {{#each groups}}
+                                    <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup2}}selected{{/ifEquals}}>{{this.groupName}}</option>
+                                {{/each}}
+                            {{/if}}
+                    </select>
+                    <br>
+                <label class="form-label" for="group3">Group 3:</label>
+                    <select class="form-input" id="group3" name="group3">
+                        <option value="N/A" {{#ifEquals selectedGroup3 "N/A"}}selected{{/ifEquals}}>N/A</option>
+                           {{#if groups.length}}
+                                {{#each groups}}
+                                    <option value="{{this._id}}" {{#ifEquals this._id ../selectedGroup3}}selected{{/ifEquals}}>{{this.groupName}}</option>
+                                {{/each}}
+                            {{/if}}
+                    </select>
+                    <br>
+            <label class="form-label" for="link">Link:</label>
+                <input class="form-input" type="url" id="link" name="link" value="{{gameObj.link}}">
+                <br>
+            <label class="form-label" for="linkdesc">Link Description:</label>
+                <input class="form-input" type="text" id="linkdesc" name="linkdesc" value="{{gameObj.linkdesc}}">
+                <br>
+            <label class="form-label" for="link2">Link 2:</label>
+                <input class="form-input" type="url" id="link2" name="link2" value="{{gameObj.link2}}">
+                <br>
+            <label class="form-label" for="link2desc">Link 2 Description:</label>
+                <input class="form-input" type="text" id="link2desc" name="link2desc" value="{{gameObj.link2desc}}">
+                <br>
+            <label class="form-label" for="visibility">Visibility:</label>
+                <select class="form-input" id="visibility" name="visibility">
+                    <option value="public" {{#elseEquals gameObj.visibility "private"}}selected{{/elseEquals}}>Public</option>
+                    <option value="private" {{#ifEquals gameObj.visibility "private"}}selected{{/ifEquals}}>Private</option>
+                </select>
+                <br>
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input" id="privateDescription" name="privateDescription">{{gameObj.privateDescription}}</textarea>
+                <br>
+
+            <h4>Leaders</h4>
+            <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
+            <div id="event-leaders-editor">
+                {{#each leaders}}
+                    <div class="leader-row" data-leader-row>
+                        <label class="form-label">Title
+                            <input class="form-input leader-title" type="text" name="leaders[{{@index}}][title]" value="{{this.title}}" maxlength="80" placeholder="e.g. Primary Cook">
+                        </label>
+                        <label class="form-label">Person
+                            <input class="form-input leader-search" type="text" value="{{this.label}}" placeholder="Type a name or username" autocomplete="off">
+                            <input type="hidden" class="leader-user-id" name="leaders[{{@index}}][userId]" value="{{this.userId}}">
+                            <ul class="leader-suggestions" hidden></ul>
+                            <span class="muted leader-selected-note">Selected profile linked</span>
+                        </label>
+                        <button type="button" class="reject-button remove-leader-row">Remove</button>
+                    </div>
                 {{/each}}
-                </select>
-                <br>
-            <label class="form-label" for="zip">Zipcode:</label>
-                <input class="form-input" type="text" id="zip" name="zip" value="{{gameObj.gameLocation.zip}}">
-                <br>
-        <label class="form-label" for="map">Maps Link:</label>
-            <input class="form-input" type="url" id="map" name="map" value="{{gameObj.map}}">
-            <br>
-        <label class="form-label" for="directions">Directions:</label>
-            <input class="form-input" type="text" id="directions" name="directions" value="{{gameObj.directions}}">
-            <br>
-        <label class="form-label" for="description">Description:</label>
-            <textarea class="form-input" id="description" name="gameDescription" >{{gameObj.description}}</textarea>
-            <br>
-        <label class="form-label" for="date">Date:</label>
-            <input class="form-input" type="date" id="date" name="date" value="{{gameObj.gameDate}}" >
-            <br>
-        <label class="form-label" for="start-time">Start Time:</label>
-            <input class="form-input" type="time" id="start-time" name="startTime" value="{{gameObj.startTime}}">
-            <br>
-        <label class="form-label" for="end-time">End Time:</label>
-            <input class="form-input" type="time" id="end-time" name="endTime" value="{{gameObj.endTime}}">
-            <br>
-        <label class="form-label" for="max-players">Max attendees:</label>
-            <input class="form-input" type="text" id="max-players" name="maxPlayers" value="{{gameObj.maxCapacity}}">
-            <br>
-            <label class="form-label" for="group">Group:</label>
-                <select class="form-input" id="group" name="group" required>
-                       {{#if groups.length}}
-                            {{#each groups}}
-                                <option value="{{this._id}}">{{this.groupName}}</option>
-                            {{/each}}
-                        {{else}}
-                            <option value="N/A">N/A</option>
-                        {{/if}}
-                </select>
-                <br>
-        <label class="form-label" for="link">Link:</label>
-            <input class="form-input" type="url" id="link" name="link" value="{{gameObj.link}}">
-            <br>
-        <label class="form-label" for="linkdesc">Link Description:</label>
-            <input class="form-input" type="text" id="linkdesc" name="linkdesc" value="{{gameObj.linkdesc}}">
-            <br>
-        <label class="form-label" for="visibility">Visibility:</label>
-            <select class="form-input" id="visibility" name="visibility">
-                <option value="public" {{#elseEquals gameObj.visibility "private"}}selected{{/elseEquals}}>Public</option>
-                <option value="private" {{#ifEquals gameObj.visibility "private"}}selected{{/ifEquals}}>Private</option>
-            </select>
-            <br>
-        <label class="form-label" for="privateDescription">Private Description:</label>
-            <textarea class="form-input" id="privateDescription" name="privateDescription">{{gameObj.privateDescription}}</textarea>
+            </div>
+            <button type="button" id="add-leader-row" class="form-submit-button">Add leader</button>
             <br>
 
-        <h4>Leaders</h4>
-        <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
-        <div id="event-leaders-editor">
-            {{#each leaders}}
-                <div class="leader-row" data-leader-row>
-                    <label class="form-label">Title
-                        <input class="form-input leader-title" type="text" name="leaders[{{@index}}][title]" value="{{this.title}}" maxlength="80" placeholder="e.g. Primary Cook">
-                    </label>
-                    <label class="form-label">Person
-                        <input class="form-input leader-search" type="text" value="{{this.label}}" placeholder="Type a name or username" autocomplete="off">
-                        <input type="hidden" class="leader-user-id" name="leaders[{{@index}}][userId]" value="{{this.userId}}">
-                        <ul class="leader-suggestions" hidden></ul>
-                        <span class="muted leader-selected-note">Selected profile linked</span>
-                    </label>
-                    <button type="button" class="reject-button remove-leader-row">Remove</button>
-                </div>
-            {{/each}}
+            <button type="submit"  id="game-submit-button" class="form-submit-button">Submit</button>
+        </form>
+    </div>
+
+    <section class="edit-game-media" aria-label="Event pictures">
+        {{#if gameObj.gameImage}}
+            <div class="edit-game-flyer">
+                <h3>Event picture</h3>
+                <img src="{{gameObj.gameImage}}" alt="Current event flyer" class="edit-game-flyer-img">
+            </div>
+        {{/if}}
+
+        {{> updateGameImage}}
+
+        <div class="edit-game-slideshow">
+            <h3>Picture slideshow</h3>
+            {{> partials/pictureSlider}}
+            {{> addToSlideshow gameId=gameObj._id}}
         </div>
-        <button type="button" id="add-leader-row" class="form-submit-button">Add leader</button>
-        <br>
+    </section>
 
-        <button type="submit"  id="game-submit-button" class="form-submit-button">Submit</button>
-    </form>
-
-    {{> updateGameImage}}
-    {{> addToSlideshow gameId=gameObj._id}}
-    
-    <p id="error-label" hidden></a>
-    <p id="message-label" hidden></a>
     <script src='/public/js/gameValidation.js'></script>
     <script src="/public/js/eventLeaders.js"></script>
-    <script src="/public/js/pictures.js"></script>
 </div>

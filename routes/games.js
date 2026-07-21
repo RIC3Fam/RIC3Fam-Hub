@@ -9,14 +9,17 @@ router
     .route('/')
     .get(async (req, res) => {
         try {
-            const allEvents = await gamesData.getAll(false, req.session.user?._id);
+            const viewerId = req.session.user?._id;
+            const allEvents = await gamesData.getAll(false, viewerId);
+            const pastEvents = await gamesData.getPast(viewerId);
             const eventsPageSlideshow = await mediaData.getEventPageSlideshow();
-            //const eventsPage = await gamesData.getGamesPage();
 
             const ret = {
                 title: 'Events',
                 events: allEvents,
-                slideshowImages: eventsPageSlideshow.slideshowImages,
+                pastEvents,
+                slideshowImages: helpers.normalizeSlideshowSlides(eventsPageSlideshow.slideshowImages),
+                portraitSlideshow: true,
             };
 
             return res.render('eventsList', ret);
@@ -37,10 +40,14 @@ router
         let startTime = req.body.startTime;
         let endTime = req.body.endTime;
         const group = req.body.group;
+        const group2 = req.body.group2;
+        const group3 = req.body.group3;
         let gameLocation = { zip: zip, state: state, streetAddress: streetAddress, city: city };
         const organizer = req.session.user._id;
         let link = req.body.link;
         let linkdesc = req.body.linkdesc;
+        let link2 = req.body.link2;
+        let link2desc = req.body.link2desc;
         const visibility = req.body.visibility;
         const privateDescription = req.body.privateDescription;
 
@@ -50,13 +57,6 @@ router
             startTime = helpers.stringHelper(startTime, 'Start Time');
             endTime = helpers.stringHelper(endTime, 'End Time');
             gameDate = helpers.stringHelper(gameDate, 'Event Date');
-            if(link != null && link != ""){
-                link = helpers.stringHelper(link, 'Link');
-                linkdesc = helpers.stringHelper(linkdesc, 'Link Description', 1, 300);
-            }
-            //startTime = helpers.convertTo12Hour(startTime);
-            //endTime = helpers.convertTo12Hour(endTime);
-            //gameDate = helpers.convertToMMDDYYYY(gameDate);
             gamesData.formatAndValidateGame(gameName, gameDescription, gameLocation, maxPlayersNumber, gameDate, startTime, endTime, organizer, link, linkdesc);
 
             const createResult = await gamesData.create(
@@ -72,9 +72,13 @@ router
                 link,
                 linkdesc,
                 visibility,
-                privateDescription
+                privateDescription,
+                link2,
+                link2desc,
+                group2,
+                group3
             );
-            return res.redirect(`games/${createResult._id}`);
+            return res.redirect(`/events/${createResult._id}`);
         } catch (err) {
             return res.status(400).render('error', { title: 'Error', error: err || 'An error occurred while creating the event' });
         }
@@ -93,18 +97,30 @@ router.route('/:gameId').get(async (req, res) => {
                 entityType: 'event',
                 entityName: gameObj.gameName,
                 canJoin: !!req.session.user,
-                joinUrl: '/games/join/' + gameId
+                joinUrl: '/events/join/' + gameId
             });
         }
 
-        let hostGroup = null;
-
-        if (gameObj.group !== 'N/A') {
-            hostGroup = await groupsData.get(gameObj.group);
+        let hostGroups = [];
+        const groupIds =
+            Array.isArray(gameObj.groups) && gameObj.groups.length
+                ? gameObj.groups
+                : gameObj.group && gameObj.group !== 'N/A'
+                  ? [gameObj.group]
+                  : [];
+        for (const gid of groupIds) {
+            try {
+                hostGroups.push(await groupsData.get(gid));
+            } catch (e) {
+                continue;
+            }
         }
 
-        gameObj.startTime = helpers.convertTo12Hour(gameObj.startTime);
-        gameObj.endTime = helpers.convertTo12Hour(gameObj.endTime);
+        const start12 = helpers.convertTo12Hour(gameObj.startTime);
+        const end12 = helpers.convertTo12Hour(gameObj.endTime);
+        const eventSchedule = helpers.formatEventSchedule(gameObj.gameDate, start12, end12);
+        gameObj.startTime = start12;
+        gameObj.endTime = end12;
         gameObj.gameDate = helpers.convertToMMDDYYYY(gameObj.gameDate);
 
         let players = (gameObj.players || []).filter((id) => id !== gameObj.organizer);
@@ -142,8 +158,6 @@ router.route('/:gameId').get(async (req, res) => {
             }
         }
 
-        //const weather = await weatherData.getWeather(gameObj.gameLocation.zip);
-
         const currentUserId = req.session.user ? req.session.user._id : null;
         for (const comment of gameObj.comments) {
             try {
@@ -160,13 +174,13 @@ router.route('/:gameId').get(async (req, res) => {
             players: playersArr,
             organizer: organizerDisplay,
             leaders,
-            hostGroup: hostGroup,
+            hostGroups,
+            eventSchedule,
             isOwner: isOwner,
             isMember: isMember,
-            slideshowImages: gameObj.slideshowImages || [],
+            slideshowImages: helpers.normalizeSlideshowSlides(gameObj.slideshowImages || []),
             canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, gameObj, 'game'),
             isPublic: gameObj.visibility !== 'private',
-            //weather: weather,
         });
     } catch (e) {
         res.status(400).render('error', { title: 'Error', error: e });
@@ -201,6 +215,12 @@ router
                 }
             }
 
+            const selectedGroups = Array.isArray(gameObj.groups) && gameObj.groups.length
+                ? gameObj.groups
+                : gameObj.group && gameObj.group !== 'N/A'
+                  ? [gameObj.group]
+                  : [];
+
             return res.render('editGame', {
                 title: 'Edit Event',
                 user: req.session.user,
@@ -208,6 +228,11 @@ router
                 states: helpers.states,
                 groups: allGroupsData,
                 leaders: leadersForEdit,
+                selectedGroup1: selectedGroups[0] || 'N/A',
+                selectedGroup2: selectedGroups[1] || 'N/A',
+                selectedGroup3: selectedGroups[2] || 'N/A',
+                slideshowImages: helpers.normalizeSlideshowSlides(gameObj.slideshowImages || []),
+                isOwner: true,
             });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
@@ -231,18 +256,12 @@ router
             let startTime = helpers.stringHelper(req.body.startTime, 'Start Time');
             let endTime = helpers.stringHelper(req.body.endTime, 'End Time');
             let gameDate = helpers.stringHelper(req.body.date, 'Event Date');
-            let map = helpers.stringHelper(req.body.map, 'Map Link');
-            let directions = helpers.stringHelper(req.body.directions, 'Directions');
+            let map = req.body.map != null ? helpers.optionalString(req.body.map, 'Map Link') : '';
+            let directions = req.body.directions != null ? helpers.optionalString(req.body.directions, 'Directions') : '';
             const organizer = req.session.user._id;
-            let link = helpers.stringHelper(req.body.link, "Link");
-            let linkdesc = helpers.stringHelper(req.body.linkdesc, "Link Description");
-
 
             if (!helpers.isValidDay(gameDate)) throw 'Event Date is not valid';
 
-            // let startTime = helpers.convertTo12Hour(req.body.startTime);
-            // let endTime = helpers.convertTo12Hour(req.body.endTime);
-            // let gameDate = helpers.convertToMMDDYYYY(req.body.date);
             let gameLocation = { zip: req.body.zip, state: req.body.state, streetAddress: req.body.streetAddress, city: req.body.city };
 
             gamesData.formatAndValidateGame(
@@ -254,8 +273,8 @@ router
                 startTime,
                 endTime,
                 organizer,
-                link,
-                linkdesc
+                req.body.link,
+                req.body.linkdesc
             );
 
             await gamesData.update(
@@ -272,14 +291,18 @@ router
                 null,
                 map,
                 directions,
-                link,
-                linkdesc,
+                req.body.link,
+                req.body.linkdesc,
                 req.body.visibility,
                 req.body.privateDescription,
-                req.body.leaders
+                req.body.leaders,
+                req.body.link2,
+                req.body.link2desc,
+                req.body.group2,
+                req.body.group3
             );
 
-            return res.redirect('/games/' + gameId);
+            return res.redirect('/events/' + gameId);
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
         }
@@ -297,7 +320,7 @@ router.route('/:gameId/comments').post(async (req, res) => {
 
         await gamesData.addComment(gameId, userId, comment);
 
-        return res.redirect('/games/' + gameId);
+        return res.redirect('/events/' + gameId);
     } catch (e) {
         if (e === 'Could not update group successfully') return res.status(500).render('error', { error: e });
         return res.status(400).render('error', { title: 'Error', error: e });
@@ -313,7 +336,7 @@ router.route('/:gameId/comments/delete').post(async (req, res) => {
         helpers.isValidId(commentId);
 
         await gamesData.removeComment(gameId, commentId);
-        return res.redirect('/games/' + gameId);
+        return res.redirect('/events/' + gameId);
     } catch (err) {
         return res.status(400).render('error', { title: 'Error', error: err });
     }
@@ -352,7 +375,7 @@ router.route('/join/:gameId').post(async (req, res) => {
 
         await gamesData.addUser(currentUser._id, gameId);
 
-        return res.redirect('/games/' + gameId);
+        return res.redirect('/events/' + gameId);
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });
     }
@@ -366,7 +389,7 @@ router.route('/leave/:gameId').post(async (req, res) => {
         helpers.isValidId(gameId);
 
         await gamesData.leaveGame(currentUser._id, gameId);
-        return res.redirect('/games/' + gameId);
+        return res.redirect('/events/' + gameId);
     } catch (e) {
         return res.status(400).render('error', { title: 'Error', error: e });
     }

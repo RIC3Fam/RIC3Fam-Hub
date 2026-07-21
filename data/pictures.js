@@ -22,7 +22,7 @@ if (process.env.SECRET_KEY) {
  * @param {string} type
  * @returns
  */
-const generateUploadSignedUrl = async (id, filename, type) => {
+const generateUploadSignedUrl = async (id, filename, type, contentType = 'image/jpeg') => {
     const bucketName = process.env.BUCKET_NAME;
 
     // These options will allow temporary uploading of the file
@@ -30,7 +30,7 @@ const generateUploadSignedUrl = async (id, filename, type) => {
         version: 'v4',
         action: 'write',
         expires: Date.now() + 10 * 60 * 1000, // 10 minutes
-        contentType: 'image/jpeg',
+        contentType: contentType || 'image/jpeg',
     };
 
     // Get a signed URL for uploading file

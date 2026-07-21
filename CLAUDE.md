@@ -54,7 +54,7 @@ config/*.js   DB connection + collection handles + settings
   `/public`, urlencoded, Handlebars, session), request-scoped middleware
   (`res.locals.currentUser`, logging, auth redirects), mounts routes, and starts
   the server. It also runs the background event-expiry sweep (below).
-- **`routes/index.js`** — mounts routers: `/users`, `/games`, `/groups`,
+- **`routes/index.js`** — mounts routers: `/users`, `/events` (legacy `/games` redirects here), `/groups`,
   `/search`, `/pictures`, and `/` (main), plus `/config` and a `*` 404 handler.
 - **`data/index.js`** — re-exports each data module as `gamesData`, `usersData`,
   `groupsData`, `weatherData`, `picturesData`, `mediaData`. Import data functions

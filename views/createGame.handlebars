@@ -1,7 +1,7 @@
 
 <main>
     <div class="form-wrapper">
-        <form action="/games" method="POST" id="create-game-form" class="create-form">
+        <form action="/events" method="POST" id="create-game-form" class="create-form">
             <h3>Create Event</h3>
             <label class="form-label" for="game-name">Event Name:</label>
                 <input class="form-input" type="text" id="game-name" name="gameName" required>
@@ -38,15 +38,33 @@
             <label class="form-label" for="max-players">Max attendees:</label>
                 <input class="form-input" type="text" id="max-players" name="maxPlayers">
                 <br>
-            <label class="form-label" for="group">Group:</label>
-                <select class="form-input" id="group" name="group" required>
-                    <option value="" disabled selected>Select your group</option>
+            <label class="form-label" for="group">Group 1:</label>
+                <select class="form-input" id="group" name="group">
+                    <option value="N/A" selected>N/A</option>
                        {{#if groups.length}}
                             {{#each groups}}
                                 <option value="{{this._id}}">{{this.groupName}}</option>
                             {{/each}}
-                        {{else}}
-                            <option value="N/A">N/A</option>
+                        {{/if}}
+                </select>
+                <br>
+            <label class="form-label" for="group2">Group 2:</label>
+                <select class="form-input" id="group2" name="group2">
+                    <option value="N/A" selected>N/A</option>
+                       {{#if groups.length}}
+                            {{#each groups}}
+                                <option value="{{this._id}}">{{this.groupName}}</option>
+                            {{/each}}
+                        {{/if}}
+                </select>
+                <br>
+            <label class="form-label" for="group3">Group 3:</label>
+                <select class="form-input" id="group3" name="group3">
+                    <option value="N/A" selected>N/A</option>
+                       {{#if groups.length}}
+                            {{#each groups}}
+                                <option value="{{this._id}}">{{this.groupName}}</option>
+                            {{/each}}
                         {{/if}}
                 </select>
                 <br>
@@ -55,6 +73,12 @@
                 <br>
             <label class="form-label" for="linkdesc">Link Description:</label>
                 <input class="form-input" type="text" id="linkdesc" name="linkdesc">
+                <br>
+            <label class="form-label" for="link2">Link 2:</label>
+                <input class="form-input" type="url" id="link2" name="link2">
+                <br>
+            <label class="form-label" for="link2desc">Link 2 Description:</label>
+                <input class="form-input" type="text" id="link2desc" name="link2desc">
                 <br>
             <label class="form-label" for="visibility">Visibility:</label>
                 <select class="form-input" id="visibility" name="visibility">

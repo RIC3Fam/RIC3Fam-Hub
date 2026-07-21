@@ -40,6 +40,12 @@ var hbs = exphbs.create({
         elseEquals: function (arg1, arg2, options) {
             return arg1 != arg2 ? options.fn(this) : options.inverse(this);
         },
+        ifIncludes: function (array, value, options) {
+            if (Array.isArray(array) && array.includes(value)) {
+                return options.fn(this);
+            }
+            return options.inverse(this);
+        },
     },
     defaultLayout: 'main',
     partialsDir: __dirname + '/views',
@@ -83,7 +89,7 @@ app.use('/', (req, res, next) => {
         }
     }
 
-    let onlyAuthenticatedRoutes = ['/logout', '/create-event', '/create-group'];
+    let onlyAuthenticatedRoutes = ['/logout', '/create-event', '/create-group', '/edit-home'];
 
     let onlyNonAuthenticatedRoutes = ['/login', '/register'];
 
@@ -104,7 +110,7 @@ configRoutesFunction(app);
 const port = process.env.PORT || 3000;
 
 // Periodically mark past events as expired instead of running a full
-// collection sweep on every GET /games request. Runs once at startup and
+// collection sweep on every GET /events request. Runs once at startup and
 // then on a fixed interval.
 const EXPIRY_SWEEP_INTERVAL_MS = 1000 * 60 * 10; // 10 minutes
 
