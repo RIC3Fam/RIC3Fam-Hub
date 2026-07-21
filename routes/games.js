@@ -231,6 +231,8 @@ router
                 selectedGroup1: selectedGroups[0] || 'N/A',
                 selectedGroup2: selectedGroups[1] || 'N/A',
                 selectedGroup3: selectedGroups[2] || 'N/A',
+                slideshowImages: helpers.normalizeSlideshowSlides(gameObj.slideshowImages || []),
+                isOwner: true,
             });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });

@@ -1,24 +1,125 @@
-<main id="index-main">
-    <!-- TOP PICTURE -->
-    <div class="welcome-container" style="margin-bottom: 5px; text-align: center;">
-        <a href="https://ric3family.com/users/65abfd56c49b7bd251abc17b" target="_blank" rel="noopener noreferrer">
-            <img src="https://i.ibb.co/LhzFk1TM/Welcome-4-Chinese-RIC3-Fam.jpg" alt="Welcome 4Chinese RIC3 Fam" class="logo-image" style="display: block; margin: 0 auto; max-width: 100%; height: auto;">
-        </a>
+<main id="index-main" class="home-building-page">
+    <div class="home-building-wrap">
+        <div class="home-building-stage">
+            <img
+                class="home-building-image"
+                src="{{home.buildingImageUrl}}"
+                alt="RIC3 Fam building"
+            >
+
+            {{!-- Billboard video / poster (only when media is configured) --}}
+            {{#if home.billboardVideoUrl}}
+            <div
+                class="home-hotspot home-billboard"
+                style="top: {{home.billboard.top}}%; left: {{home.billboard.left}}%; width: {{home.billboard.width}}%; height: {{home.billboard.height}}%;"
+            >
+                <video
+                    id="home-billboard-video"
+                    class="home-billboard-video"
+                    playsinline
+                    controls
+                    {{#if home.billboardPosterUrl}}poster="{{home.billboardPosterUrl}}"{{/if}}
+                >
+                    <source src="{{home.billboardVideoUrl}}" type="video/mp4">
+                </video>
+                {{#if home.billboardPosterUrl}}
+                    <button
+                        type="button"
+                        id="home-billboard-poster-btn"
+                        class="home-billboard-poster-btn"
+                        aria-label="Play billboard video"
+                    >
+                        <img src="{{home.billboardPosterUrl}}" alt="Billboard" class="home-billboard-poster">
+                    </button>
+                {{else}}
+                    <button type="button" id="home-billboard-poster-btn" class="home-billboard-poster-btn home-billboard-poster-btn--empty" aria-label="Play billboard video">
+                        Play video
+                    </button>
+                {{/if}}
+            </div>
+            {{else}}
+                {{#if home.billboardPosterUrl}}
+                <div
+                    class="home-hotspot home-billboard"
+                    style="top: {{home.billboard.top}}%; left: {{home.billboard.left}}%; width: {{home.billboard.width}}%; height: {{home.billboard.height}}%;"
+                >
+                    <img src="{{home.billboardPosterUrl}}" alt="Billboard" class="home-billboard-poster">
+                </div>
+                {{/if}}
+            {{/if}}
+
+            {{!-- Towel 1: overlay uploaded art on the painted towel --}}
+            <a
+                class="home-hotspot home-towel home-towel-1{{#unless home.towel1.linkUrl}} is-disabled{{/unless}}"
+                href="{{#if home.towel1.linkUrl}}{{home.towel1.linkUrl}}{{else}}#{{/if}}"
+                {{#if home.towel1.linkUrl}}target="_blank" rel="noopener noreferrer"{{/if}}
+                style="top: {{home.towel1.top}}%; left: {{home.towel1.left}}%; width: {{home.towel1.width}}%; height: {{home.towel1.height}}%;"
+                title="Towel 1"
+            >
+                {{#if home.towel1.imageUrl}}
+                    <img src="{{home.towel1.imageUrl}}" alt="Towel 1">
+                {{else}}
+                    <span class="visually-hidden">Towel 1</span>
+                {{/if}}
+            </a>
+
+            {{!-- Towel 2 --}}
+            <a
+                class="home-hotspot home-towel home-towel-2{{#unless home.towel2.linkUrl}} is-disabled{{/unless}}"
+                href="{{#if home.towel2.linkUrl}}{{home.towel2.linkUrl}}{{else}}#{{/if}}"
+                {{#if home.towel2.linkUrl}}target="_blank" rel="noopener noreferrer"{{/if}}
+                style="top: {{home.towel2.top}}%; left: {{home.towel2.left}}%; width: {{home.towel2.width}}%; height: {{home.towel2.height}}%;"
+                title="Towel 2"
+            >
+                {{#if home.towel2.imageUrl}}
+                    <img src="{{home.towel2.imageUrl}}" alt="Towel 2">
+                {{else}}
+                    <span class="visually-hidden">Towel 2</span>
+                {{/if}}
+            </a>
+
+            {{!-- Named link hotspots --}}
+            {{#each home.hotspots}}
+                {{#if this.url}}
+                    <a
+                        class="home-hotspot home-link-hotspot"
+                        href="{{this.url}}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="{{this.label}}"
+                        style="top: {{this.top}}%; left: {{this.left}}%; width: {{this.width}}%; height: {{this.height}}%;"
+                    >
+                        <span class="visually-hidden">{{this.label}}</span>
+                    </a>
+                {{else}}
+                    {{#if ../currentUser.isAdmin}}
+                        <span
+                            class="home-hotspot home-link-hotspot home-hotspot-empty"
+                            title="{{this.label}} (set URL in Edit Home)"
+                            style="top: {{this.top}}%; left: {{this.left}}%; width: {{this.width}}%; height: {{this.height}}%;"
+                        ></span>
+                    {{/if}}
+                {{/if}}
+            {{/each}}
+        </div>
     </div>
-    <p class="index" style="margin: 5px 0; text-align: center;">
-        Welcome to the RIC3 Family Hub, created to support the people, activities and events of the 
-        <a href="https://familyfrisbee-548221658433.us-central1.run.app/users/69968a00ee5db71ea81c42f9">RIC3 2 RICE</a> movement. 
-        Hello, my name is <a href="https://ric3family.com/users/65abfd56c49b7bd251abc17b">Wilkin Lai</a> and I am a Creative Real Estate Professional, licensed as both a mortgage broker and a Realtor. 
+
+    {{#if currentUser.isAdmin}}
+        <p class="home-admin-link"><a href="/edit-home">Edit home page (admin)</a></p>
+    {{/if}}
+
+    <p class="index home-welcome-copy">
+        Welcome to the RIC3 Family Hub, created to support the people, activities and events of the
+        <a href="https://familyfrisbee-548221658433.us-central1.run.app/users/69968a00ee5db71ea81c42f9">RIC3 2 RICE</a> movement.
+        Hello, my name is <a href="https://ric3family.com/users/65abfd56c49b7bd251abc17b">Wilkin Lai</a> and I am a Creative Real Estate Professional, licensed as both a mortgage broker and a Realtor.
         Please check out our new <a href="https://familyfrisbee-548221658433.us-central1.run.app/users/6a2afecbfba2f05e9f426993">artist in residence(s)</a> initiative!
     </p>
-    <!-- RESTORED BOTTOM IMAGES SECTION -->
+
     <div class="footer-logos" style="text-align: center; margin-top: 20px;">
-        <!-- LEFT BOTTOM PICTURE -->
         <div style="display: inline-block; margin: 0 15px; vertical-align: top;">
             <p style="font-size: 12px; margin-bottom: 5px; font-weight: bold;">ORGANIZED BY</p>
             <img src="https://i.ibb.co/rKQyxwDv/RIC3-Creative-Community-Family.jpg" alt="RIC3 Creative Community Family" style="height: 100px;">
         </div>
-        <!-- RIGHT BOTTOM PICTURE -->
         <div style="display: inline-block; margin: 0 15px; vertical-align: top;">
             <p style="font-size: 12px; margin-bottom: 5px; font-weight: bold;">SPONSORED BY</p>
             <img src="https://i.ibb.co/x8RJqYJ8/Real-People-Real-Investments.jpg" alt="Real People Real Investments" style="height: 100px;">
@@ -26,4 +127,6 @@
             <img src="https://i.ibb.co/vYm0vF4/EHO-Logo.png" alt="Equal Housing Opportunity" style="height: 20px; margin-top: 5px;">
         </div>
     </div>
+
+    <script src="/public/js/homeBuilding.js"></script>
 </main>

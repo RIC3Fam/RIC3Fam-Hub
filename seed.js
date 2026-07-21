@@ -236,6 +236,7 @@ export async function seed() {
 
     console.log('Creating all media...');
     await mediaData.createEventPageSlideshow();
+    await mediaData.createHomePageConfig();
 
     console.log('Done inserting all data.');
 }

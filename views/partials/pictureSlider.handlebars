@@ -13,9 +13,7 @@
                         <button type="button" class="gallery-delete-button slider-delete-button">Delete</button>
                     {{/if}}
                 {{/unless}}
-                {{#if this.caption}}
-                    <figcaption class="picture-slider-caption">{{this.caption}}</figcaption>
-                {{/if}}
+                <figcaption class="picture-slider-caption">{{#if this.caption}}{{this.caption}}{{else}}&nbsp;{{/if}}</figcaption>
             </figure>
         {{/each}}
     </div>

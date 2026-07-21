@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { usersData, gamesData, groupsData } from "../data/index.js";
+import { usersData, gamesData, groupsData, mediaData } from "../data/index.js";
 import * as helpers from '../helpers.js';
 
 const router = Router();
@@ -8,7 +8,64 @@ const router = Router();
 router
     .route("/")
     .get(async (req, res) => {
-        return res.render("index", {title: "Home"});
+        try {
+            const home = await mediaData.getHomePageConfig();
+            return res.render("index", { title: "Home", home });
+        } catch (e) {
+            return res.status(400).render('error', { title: "Error", error: e });
+        }
+    });
+
+router
+    .route('/edit-home')
+    .get(async (req, res) => {
+        try {
+            if (!req.session.user) return res.redirect('/login');
+            const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+            if (!isAdmin) throw 'Admin only';
+            const home = await mediaData.getHomePageConfig();
+            return res.render('editHome', { title: 'Edit Home', home });
+        } catch (e) {
+            return res.status(403).render('error', { title: 'Error', error: e });
+        }
+    })
+    .post(async (req, res) => {
+        try {
+            if (!req.session.user) return res.redirect('/login');
+            const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+            if (!isAdmin) throw 'Admin only';
+
+            await mediaData.updateHomePageConfig({
+                billboardVideoUrl: req.body.billboardVideoUrl,
+                billboardPosterUrl: req.body.billboardPosterUrl,
+                billboard: {
+                    top: req.body.billboardTop,
+                    left: req.body.billboardLeft,
+                    width: req.body.billboardWidth,
+                    height: req.body.billboardHeight,
+                },
+                towel1: {
+                    imageUrl: req.body.towel1ImageUrl,
+                    linkUrl: req.body.towel1LinkUrl,
+                    top: req.body.towel1Top,
+                    left: req.body.towel1Left,
+                    width: req.body.towel1Width,
+                    height: req.body.towel1Height,
+                },
+                towel2: {
+                    imageUrl: req.body.towel2ImageUrl,
+                    linkUrl: req.body.towel2LinkUrl,
+                    top: req.body.towel2Top,
+                    left: req.body.towel2Left,
+                    width: req.body.towel2Width,
+                    height: req.body.towel2Height,
+                },
+                hotspots: req.body.hotspots,
+            });
+            return res.redirect('/');
+        } catch (e) {
+            return res.status(400).render('error', { title: 'Error', error: e });
+        }
     });
 
 router  

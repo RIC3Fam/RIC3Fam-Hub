@@ -280,4 +280,35 @@ router
         return res.json(url);
     });
 
+router.route('/home').post(async function (req, res) {
+    try {
+        if (!req.session.user) throw 'Must be logged in';
+        const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+        if (!isAdmin) throw 'Admin only';
+
+        const field = helpers.stringHelper(req.body.field, 'Field', 1, 40);
+        const filename = helpers.stringHelper(req.body.filename, 'Filename', 1, 120);
+        if (filename.includes(' ')) throw 'Filename cannot contain spaces';
+
+        const allowed = {
+            billboardPosterUrl: { type: 'poster', contentType: 'image/jpeg' },
+            billboardVideoUrl: { type: 'billboard', contentType: 'video/mp4' },
+            towel1Image: { type: 'towel1', contentType: 'image/jpeg' },
+            towel2Image: { type: 'towel2', contentType: 'image/jpeg' },
+        };
+        const spec = allowed[field];
+        if (!spec) throw 'Unknown home upload field';
+
+        const contentType = req.body.contentType || spec.contentType;
+        if (contentType !== spec.contentType) throw 'Invalid content type';
+
+        const url = await picturesData.generateUploadSignedUrl('homePage', filename, spec.type, contentType);
+        await mediaData.setHomeAssetUrl(field, `${spec.type}/${filename}`);
+        return res.json({ url });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ error: String(err) });
+    }
+});
+
 export default router;
