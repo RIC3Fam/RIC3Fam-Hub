@@ -37,9 +37,8 @@ router
 
 
             const isAdmin = req.session.user ? await usersData.isUserAdmin(req.session.user._id) : false;
-            const shortDescription = (userObj.statement && userObj.statement.trim())
-                || (userObj.description && userObj.description.trim())
-                || '';
+            const shortDescription = (userObj.statement && userObj.statement.trim()) || '';
+            const longDescription = (userObj.description && userObj.description.trim()) || '';
 
             const ret = {
                 title: "User", 
@@ -52,7 +51,8 @@ router
                 notFriend: notFriend,
                 slideshowImages: helpers.normalizeSlideshowSlides(userObj.slideshowImages || []),
                 shortDescription,
-                canSeePrivateCommunications: isAdmin || isOwner,
+                longDescription,
+                canSeePrivateCommunications: isAdmin,
                 canSeeConnections: isAdmin,
                 canSeeAdminNotes: isAdmin,
                 isPublic: userObj.visibility !== 'private'

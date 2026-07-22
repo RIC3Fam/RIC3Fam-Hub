@@ -7,54 +7,56 @@
 
     <h1 class="profile-name-top">{{user.name}}</h1>
 
-    <div class="profile-layout">
-        <div class="profile-left">
-            <img src="{{user.profilePicture}}" class="profile-picture profile-picture-square" alt="{{user.name}}'s profile picture">
-            <p class="profile-username">@{{user.username}}</p>
-            {{#if user.link1}}
-                <p class="profile-link profile-link-col">
-                    <a href="{{user.link1}}" target="_blank" rel="noopener noreferrer">{{#if user.link1desc}}{{user.link1desc}}{{else}}Website{{/if}}</a>
-                </p>
+    <div class="profile-hero">
+        <img
+            src="{{user.profilePicture}}"
+            class="profile-picture profile-picture-square"
+            alt="{{user.name}}'s profile picture"
+        >
+
+        <div class="profile-short-desc-wrap">
+            {{#if shortDescription}}
+                <p class="profile-short-desc">{{shortDescription}}</p>
             {{/if}}
         </div>
-        <div class="profile-right">
-            {{#if shortDescription}}
-                <p class="profile-statement profile-short-desc">{{shortDescription}}</p>
+
+        <p class="profile-username">@{{user.username}}</p>
+
+        <div class="profile-link profile-link-website">
+            {{#if user.link1}}
+                <a href="{{user.link1}}" target="_blank" rel="noopener noreferrer">{{#if user.link1desc}}{{user.link1desc}}{{else}}Website{{/if}}</a>
             {{/if}}
+        </div>
+
+        <div class="profile-link profile-link-social">
             {{#if user.link2}}
-                <p class="profile-link profile-link-col">
-                    <a href="{{user.link2}}" target="_blank" rel="noopener noreferrer">{{#if user.link2desc}}{{user.link2desc}}{{else}}Social Media{{/if}}</a>
-                </p>
+                <a href="{{user.link2}}" target="_blank" rel="noopener noreferrer">{{#if user.link2desc}}{{user.link2desc}}{{else}}Social Media{{/if}}</a>
             {{/if}}
         </div>
     </div>
 
+    {{#if longDescription}}
+        <div class="profile-description">{{longDescription}}</div>
+    {{/if}}
+
     {{#if slideshowImages.length}}
-        <section class="profile-section">
+        <section class="profile-section profile-picture-bar">
             {{#if user.slideshowDescription}}
                 <p class="picture-bar-description">{{user.slideshowDescription}}</p>
             {{/if}}
             {{> showSlideshow}}
         </section>
-    {{else}}
-        {{#if isOwner}}
-            <section class="profile-section">
-                {{> addToSlideshow route=user._id}}
-            </section>
-        {{/if}}
     {{/if}}
 
     {{#if isOwner}}
-        {{#if slideshowImages.length}}
-            <section class="profile-section">
-                {{> addToSlideshow route=user._id}}
-            </section>
-        {{/if}}
+        <section class="profile-section">
+            {{> addToSlideshow route=user._id}}
+        </section>
     {{/if}}
 
     {{#if user.additionalDescription}}
         <section class="profile-section">
-            <div class="description-box">{{user.additionalDescription}}</div>
+            <div class="profile-description">{{user.additionalDescription}}</div>
         </section>
     {{/if}}
 
@@ -129,15 +131,21 @@
                     {{/ifEquals}}
                 {{/each}}
             </ul>
-            {{#if user.optInCreativeRealEstate}}
-                <p>✓ Opted into Creative Real Estate &amp; Artists in Residence(s) updates</p>
-            {{/if}}
-            {{#if user.optInFrisbeeNotices}}
-                <p>✓ Opted into RIC3 Fam Frisbee event notices</p>
-            {{/if}}
-            {{#if user.optInCcsnUpdates}}
-                <p>✓ Opted into CCSN updates and volunteer opportunities</p>
-            {{/if}}
+
+            <div class="opt-in-readonly">
+                <label class="opt-in-label">
+                    <input type="checkbox" disabled {{#if user.optInCreativeRealEstate}}checked{{/if}}>
+                    Opt-into Creative Real Estate &amp; Artists in Residence(s) updates
+                </label>
+                <label class="opt-in-label">
+                    <input type="checkbox" disabled {{#if user.optInFrisbeeNotices}}checked{{/if}}>
+                    Opt into RIC3 Fam Frisbee event notices
+                </label>
+                <label class="opt-in-label">
+                    <input type="checkbox" disabled {{#if user.optInCcsnUpdates}}checked{{/if}}>
+                    Opt into CCSN updates and volunteer opportunities
+                </label>
+            </div>
         </div>
     {{/if}}
 

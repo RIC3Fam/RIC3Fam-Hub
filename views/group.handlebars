@@ -1,33 +1,29 @@
 <main class="group-page">
     <div class="group-page-header">
-        <h1 class="group-page-name">{{group.groupName}}
-            {{#ifEquals group.visibility "private"}}
-                <span class="visibility-badge">Private</span>
-            {{else}}
-                <span class="visibility-badge">Public</span>
-            {{/ifEquals}}
-        </h1>
+        <h1 class="group-page-name">{{group.groupName}}</h1>
+        {{#ifEquals group.visibility "private"}}
+            <span class="visibility-badge visibility-private">Private</span>
+        {{else}}
+            <span class="visibility-badge visibility-public">Public</span>
+        {{/ifEquals}}
     </div>
 
-    <div class="group-container">
-        <div class="group-image-container">
-            <img src="{{group.groupImage}}" alt="Group Image" class="group-image">
+    <div class="group-hero">
+        <div class="group-hero-left">
+            <img src="{{group.groupImage}}" alt="Group Image" class="group-image group-image-square">
         </div>
-        <div class="group-content group-content-col2">
+        <div class="group-hero-right">
             {{#if group.description}}
                 <p class="group-short-desc">{{group.description}}</p>
             {{/if}}
-
-            {{#if group.link1}}
-                <p class="group-links">
+            <div class="group-links">
+                {{#if group.link1}}
                     <a href="{{group.link1}}" target="_blank" rel="noopener noreferrer">{{#if group.link1desc}}{{group.link1desc}}{{else}}Website{{/if}}</a>
-                </p>
-            {{/if}}
-            {{#if group.link2}}
-                <p class="group-links">
+                {{/if}}
+                {{#if group.link2}}
                     <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
-                </p>
-            {{/if}}
+                {{/if}}
+            </div>
         </div>
     </div>
 
@@ -57,8 +53,9 @@
             <h3>Project Framers</h3>
             <ul class="event-leaders-inline group-framers-inline">
                 {{#each projectFramers}}
-                    <li>
-                        {{#if this.title}}<span class="leader-title-text">{{this.title}}</span> — {{/if}}
+                    <li class="title-person-line">
+                        {{#if this.title}}<span class="leader-title-text">{{this.title}}</span>{{/if}}
+                        {{#if this.title}}<span class="title-person-sep"> — </span>{{/if}}
                         <a href="/users/{{this._id}}">{{this.name}}</a>
                     </li>
                 {{/each}}
@@ -68,7 +65,11 @@
 
     <div class="group-full-width">
         {{#if owner}}
-            <p>Group Leader: <a href="/users/{{owner._id}}">{{owner.username}}</a></p>
+            <p class="title-person-line">
+                <span class="leader-title-text">Group Leader</span>
+                <span class="title-person-sep"> — </span>
+                <a href="/users/{{owner._id}}">{{owner.username}}</a>
+            </p>
         {{/if}}
 
         {{#if uppercaseMembers}}
