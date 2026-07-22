@@ -7,7 +7,7 @@
                 alt="RIC3 Fam building"
             >
 
-            {{!-- Billboard video / poster (only when media is configured) --}}
+            {{!-- Billboard video: autoplay muted; unmute / double-click fullscreen --}}
             {{#if home.billboardVideoUrl}}
             <div
                 class="home-hotspot home-billboard"
@@ -15,70 +15,51 @@
             >
                 <video
                     id="home-billboard-video"
-                    class="home-billboard-video"
+                    class="home-billboard-video is-playing"
                     playsinline
-                    controls
-                    {{#if home.billboardPosterUrl}}poster="{{home.billboardPosterUrl}}"{{/if}}
+                    muted
+                    autoplay
+                    loop
+                    preload="auto"
                 >
                     <source src="{{home.billboardVideoUrl}}" type="video/mp4">
                 </video>
-                {{#if home.billboardPosterUrl}}
-                    <button
-                        type="button"
-                        id="home-billboard-poster-btn"
-                        class="home-billboard-poster-btn"
-                        aria-label="Play billboard video"
-                    >
-                        <img src="{{home.billboardPosterUrl}}" alt="Billboard" class="home-billboard-poster">
-                    </button>
-                {{else}}
-                    <button type="button" id="home-billboard-poster-btn" class="home-billboard-poster-btn home-billboard-poster-btn--empty" aria-label="Play billboard video">
-                        Play video
-                    </button>
-                {{/if}}
+                <button
+                    type="button"
+                    id="home-billboard-unmute"
+                    class="home-billboard-unmute"
+                    aria-label="Unmute video"
+                    title="Unmute"
+                >Unmute</button>
             </div>
-            {{else}}
-                {{#if home.billboardPosterUrl}}
-                <div
-                    class="home-hotspot home-billboard"
-                    style="top: {{home.billboard.top}}%; left: {{home.billboard.left}}%; width: {{home.billboard.width}}%; height: {{home.billboard.height}}%;"
-                >
-                    <img src="{{home.billboardPosterUrl}}" alt="Billboard" class="home-billboard-poster">
-                </div>
-                {{/if}}
             {{/if}}
 
-            {{!-- Towel 1: overlay uploaded art on the painted towel --}}
-            <a
-                class="home-hotspot home-towel home-towel-1{{#unless home.towel1.linkUrl}} is-disabled{{/unless}}"
-                href="{{#if home.towel1.linkUrl}}{{home.towel1.linkUrl}}{{else}}#{{/if}}"
-                {{#if home.towel1.linkUrl}}target="_blank" rel="noopener noreferrer"{{/if}}
+            {{!-- Square signs (uploadable art). Towel in the base image stays static. --}}
+            <div
+                class="home-hotspot home-sign home-sign-1"
                 style="top: {{home.towel1.top}}%; left: {{home.towel1.left}}%; width: {{home.towel1.width}}%; height: {{home.towel1.height}}%;"
-                title="Towel 1"
+                title="Sign 1"
             >
                 {{#if home.towel1.imageUrl}}
-                    <img src="{{home.towel1.imageUrl}}" alt="Towel 1">
+                    <img src="{{home.towel1.imageUrl}}" alt="Sign 1">
                 {{else}}
-                    <span class="visually-hidden">Towel 1</span>
+                    <span class="visually-hidden">Sign 1</span>
                 {{/if}}
-            </a>
+            </div>
 
-            {{!-- Towel 2 --}}
-            <a
-                class="home-hotspot home-towel home-towel-2{{#unless home.towel2.linkUrl}} is-disabled{{/unless}}"
-                href="{{#if home.towel2.linkUrl}}{{home.towel2.linkUrl}}{{else}}#{{/if}}"
-                {{#if home.towel2.linkUrl}}target="_blank" rel="noopener noreferrer"{{/if}}
+            <div
+                class="home-hotspot home-sign home-sign-2"
                 style="top: {{home.towel2.top}}%; left: {{home.towel2.left}}%; width: {{home.towel2.width}}%; height: {{home.towel2.height}}%;"
-                title="Towel 2"
+                title="Sign 2"
             >
                 {{#if home.towel2.imageUrl}}
-                    <img src="{{home.towel2.imageUrl}}" alt="Towel 2">
+                    <img src="{{home.towel2.imageUrl}}" alt="Sign 2">
                 {{else}}
-                    <span class="visually-hidden">Towel 2</span>
+                    <span class="visually-hidden">Sign 2</span>
                 {{/if}}
-            </a>
+            </div>
 
-            {{!-- Named link hotspots --}}
+            {{!-- 3 custom buttons: awnings / door-window --}}
             {{#each home.hotspots}}
                 {{#if this.url}}
                     <a

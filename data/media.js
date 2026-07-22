@@ -4,19 +4,16 @@ import * as helpers from '../helpers.js';
 
 const HOME_TITLE = 'Home Page Config';
 const DEFAULT_BUILDING = '/public/images/home/building-base.png';
-const LAYOUT_VERSION = 3;
+const LAYOUT_VERSION = 4;
 
-// Percent positions tuned to public/images/home/building-base.png (clean template).
+// Percent positions for the mobile-portrait facade:
+// - 2 square signs (uploadable art)
+// - 3 custom link buttons on awnings / door-window
+// Towel art stays painted in the base image (static).
 const defaultHotspots = () => [
-    { id: 'list-stage', label: 'List/Stage with us', url: '', top: 14.0, left: 15.5, width: 22.5, height: 3.0 },
-    { id: 'find-home', label: 'Find your home', url: '', top: 14.0, left: 39.0, width: 22.0, height: 3.0 },
-    { id: 'pre-approved', label: 'Get Pre-approved', url: '', top: 14.0, left: 62.0, width: 22.5, height: 3.0 },
-    { id: 'premier-agent', label: 'Premier Agent Network', url: '', top: 18.2, left: 15.5, width: 33.5, height: 9.5 },
-    { id: 'mortgage-broker', label: 'RIC3 Mortgage Broker', url: '', top: 18.2, left: 51.0, width: 33.5, height: 9.5 },
-    { id: 'artists-residence', label: 'Artists in residence(s)', url: '', top: 29.0, left: 15.5, width: 69.0, height: 5.2 },
-    { id: 'ric3-fam', label: 'RIC3 FAM', url: '', top: 41.5, left: 0.5, width: 17.0, height: 9.5 },
-    { id: 'creative-community', label: 'Creative Community Service Network', url: '', top: 61.5, left: 14.5, width: 29.0, height: 19.0 },
-    { id: 'frisbee', label: 'RIC3 FAM Frisbee', url: '', top: 61.5, left: 48.0, width: 37.0, height: 19.0 },
+    { id: 'awning-left', label: 'Left awning', url: '', top: 61.5, left: 14.5, width: 22.0, height: 19.0 },
+    { id: 'awning-center', label: 'Center door / window', url: '', top: 61.5, left: 38.0, width: 18.0, height: 19.0 },
+    { id: 'awning-right', label: 'Right awning', url: '', top: 61.5, left: 58.0, width: 27.0, height: 19.0 },
 ];
 
 const defaultBillboard = () => ({ top: 1.8, left: 19.5, width: 61.0, height: 10.5 });
@@ -89,6 +86,12 @@ const normalizeHotspots = (hotspotsInput) => {
 const applyLatestLayout = (doc) => {
     const defaults = defaultHomeConfig();
     const byId = Object.fromEntries((doc.hotspots || []).map((h) => [h.id, h]));
+    const urlFor = (...ids) => {
+        for (const id of ids) {
+            if (byId[id]?.url) return byId[id].url;
+        }
+        return '';
+    };
     return {
         ...defaults,
         buildingImageUrl: DEFAULT_BUILDING,
@@ -98,16 +101,21 @@ const applyLatestLayout = (doc) => {
         towel1: {
             ...defaults.towel1,
             imageUrl: doc.towel1?.imageUrl || '',
-            linkUrl: doc.towel1?.linkUrl || '',
+            linkUrl: '',
         },
         towel2: {
             ...defaults.towel2,
             imageUrl: doc.towel2?.imageUrl || '',
-            linkUrl: doc.towel2?.linkUrl || '',
+            linkUrl: '',
         },
         hotspots: defaults.hotspots.map((d) => ({
             ...d,
-            url: byId[d.id]?.url || '',
+            url:
+                d.id === 'awning-left'
+                    ? urlFor('awning-left', 'creative-community')
+                    : d.id === 'awning-right'
+                      ? urlFor('awning-right', 'frisbee')
+                      : urlFor('awning-center', 'ric3-fam', 'artists-residence'),
         })),
         layoutVersion: LAYOUT_VERSION,
     };
