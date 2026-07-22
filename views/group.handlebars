@@ -49,6 +49,10 @@
         {{else}}
             {{#if isOwner}}
                 <p class="muted group-slideshow-empty">No slideshow pictures yet. Upload JPEGs below, then add captions.</p>
+            {{else}}
+                {{#if currentUser.isAdmin}}
+                    <p class="muted group-slideshow-empty">No slideshow pictures yet. Upload JPEGs below, then add captions.</p>
+                {{/if}}
             {{/if}}
             <p id="error-label" hidden></p>
             <p id="message-label" hidden></p>
