@@ -1572,6 +1572,27 @@ p.index {
   height: auto;
 }
 
+@media (max-width: 640px) {
+  .home-building-page {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .home-building-stage {
+    max-width: none;
+    width: 100%;
+  }
+
+  .home-welcome-copy {
+    padding: 0 12px;
+  }
+
+  .home-admin-link {
+    padding: 0 12px;
+  }
+}
+
 .home-hotspot {
   position: absolute;
   display: block;
@@ -1653,6 +1674,11 @@ p.index {
 .home-welcome-copy {
   margin: 16px 0;
   text-align: center;
+}
+
+.home-edit-thumb-wide {
+  max-width: 220px;
+  height: auto;
 }
 
 .visually-hidden {
