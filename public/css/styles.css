@@ -1116,6 +1116,11 @@ p.index {
   margin: 24px auto;
 }
 
+.group-slideshow-empty {
+  text-align: center;
+  margin: 12px 0 16px;
+}
+
 .group-framers-inline {
   list-style: none;
   padding: 0;

@@ -26,6 +26,7 @@
 </div>
 {{#if isOwner}}
     <div class="slider-caption-editor">
+        <p class="muted">Add or edit a caption for each slide, then Save.</p>
         {{#each slideshowImages}}
             <div class="gallery-caption-edit" data-image-url="{{this.url}}">
                 <label class="form-label" for="slide-caption-{{@index}}">Caption</label>
@@ -41,6 +42,26 @@
             </div>
         {{/each}}
     </div>
+{{else}}
+    {{#if currentUser.isAdmin}}
+        <div class="slider-caption-editor">
+            <p class="muted">Add or edit a caption for each slide, then Save.</p>
+            {{#each slideshowImages}}
+                <div class="gallery-caption-edit" data-image-url="{{this.url}}">
+                    <label class="form-label" for="slide-caption-admin-{{@index}}">Caption</label>
+                    <input
+                        type="text"
+                        id="slide-caption-admin-{{@index}}"
+                        class="gallery-caption-input form-input"
+                        value="{{this.caption}}"
+                        placeholder="Add caption"
+                        maxlength="200"
+                    >
+                    <button type="button" class="gallery-caption-save form-submit-button">Save</button>
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
 {{/if}}
 {{/if}}
 <p id="error-label" hidden></p>

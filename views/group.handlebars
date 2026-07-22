@@ -39,12 +39,28 @@
     {{/if}}
 
     <section class="group-slideshow-section group-full-width">
+        <h3 class="visually-hidden">Picture slideshow</h3>
         {{#if group.slideshowDescription}}
             <p class="picture-bar-description">{{group.slideshowDescription}}</p>
         {{/if}}
-        {{> partials/pictureSlider}}
+
+        {{#if slideshowImages.length}}
+            {{> partials/pictureSlider}}
+        {{else}}
+            {{#if isOwner}}
+                <p class="muted group-slideshow-empty">No slideshow pictures yet. Upload JPEGs below, then add captions.</p>
+            {{/if}}
+            <p id="error-label" hidden></p>
+            <p id="message-label" hidden></p>
+            <script src="/public/js/pictures.js"></script>
+        {{/if}}
+
         {{#if isOwner}}
             {{> addToSlideshow groupId=group._id}}
+        {{else}}
+            {{#if currentUser.isAdmin}}
+                {{> addToSlideshow groupId=group._id}}
+            {{/if}}
         {{/if}}
     </section>
 
