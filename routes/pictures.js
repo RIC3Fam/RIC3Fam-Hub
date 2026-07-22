@@ -4,6 +4,13 @@ import * as helpers from '../helpers.js';
 
 const router = Router();
 
+async function assertCanManageGroupSlideshow(userId, group) {
+    if (!userId) throw 'Must be logged in';
+    if (group.groupLeader === userId) return;
+    if (await usersData.isUserAdmin(userId)) return;
+    throw 'You are not the leader of this group';
+}
+
 // req in the form of {filenames: ['filename.jpeg']}
 router
     .route('/slideshow')
@@ -25,9 +32,7 @@ router
             try {
                 helpers.isValidId(groupId);
                 const group = await groupsData.get(groupId);
-                if (group.groupLeader !== req.session.user._id) {
-                    throw 'You are not the leader of this group';
-                }
+                await assertCanManageGroupSlideshow(req.session.user?._id, group);
                 id = groupId;
             } catch (err) {
                 console.log(err);
@@ -98,7 +103,7 @@ router
             if (groupId) {
                 helpers.isValidId(groupId);
                 const group = await groupsData.get(groupId);
-                if (group.groupLeader !== req.session.user._id) throw 'You are not the leader of this group';
+                await assertCanManageGroupSlideshow(req.session.user._id, group);
                 await groupsData.updateSlideshowCaption(groupId, imageUrl, caption);
             } else if (gameId) {
                 helpers.isValidId(gameId);
@@ -132,9 +137,7 @@ router
             if (groupId) {
                 helpers.isValidId(groupId);
                 const group = await groupsData.get(groupId);
-                if (group.groupLeader !== req.session.user._id) {
-                    throw 'You are not the leader of this group';
-                }
+                await assertCanManageGroupSlideshow(req.session.user?._id, group);
                 id = groupId;
             } else if (gameId) {
                 helpers.isValidId(gameId);
