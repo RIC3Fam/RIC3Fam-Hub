@@ -64,6 +64,7 @@
         });
     }
 
+    wireUpload('home-building-form', 'home-building-upload', 'buildingImageUrl', 'image/jpeg', 15);
     wireUpload('home-video-form', 'home-video-upload', 'billboardVideoUrl', 'video/mp4', 100);
     wireUpload('home-towel1-form', 'home-towel1-upload', 'towel1Image', 'image/jpeg', 10);
     wireUpload('home-towel2-form', 'home-towel2-upload', 'towel2Image', 'image/jpeg', 10);

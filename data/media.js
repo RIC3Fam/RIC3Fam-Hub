@@ -94,9 +94,9 @@ const applyLatestLayout = (doc) => {
     };
     return {
         ...defaults,
-        buildingImageUrl: DEFAULT_BUILDING,
+        buildingImageUrl: doc.buildingImageUrl || DEFAULT_BUILDING,
         billboardVideoUrl: doc.billboardVideoUrl || '',
-        billboardPosterUrl: doc.billboardPosterUrl || '',
+        billboardPosterUrl: '',
         billboard: defaults.billboard,
         towel1: {
             ...defaults.towel1,
@@ -256,8 +256,6 @@ const getHomePageConfig = async () => {
     if ((doc.layoutVersion || 0) < LAYOUT_VERSION) {
         return await updateHomePageConfig(applyLatestLayout(doc));
     }
-    // Always serve the clean local building template for the interactive home.
-    doc.buildingImageUrl = DEFAULT_BUILDING;
     return withHomeDefaults(doc);
 };
 
@@ -273,27 +271,27 @@ const updateHomePageConfig = async (updates = {}) => {
     const next = {
         title: HOME_TITLE,
         layoutVersion: updates.layoutVersion != null ? updates.layoutVersion : current.layoutVersion || LAYOUT_VERSION,
-        buildingImageUrl: DEFAULT_BUILDING,
+        buildingImageUrl:
+            updates.buildingImageUrl != null
+                ? helpers.optionalString(updates.buildingImageUrl, 'Building image') || DEFAULT_BUILDING
+                : current.buildingImageUrl || DEFAULT_BUILDING,
         billboardVideoUrl:
             updates.billboardVideoUrl != null
                 ? helpers.optionalString(updates.billboardVideoUrl, 'Billboard video')
                 : current.billboardVideoUrl,
-        billboardPosterUrl:
-            updates.billboardPosterUrl != null
-                ? helpers.optionalString(updates.billboardPosterUrl, 'Billboard poster')
-                : current.billboardPosterUrl,
+        billboardPosterUrl: '',
         billboard:
             updates.billboard != null
                 ? normalizeBox({ ...current.billboard, ...updates.billboard }, defaultBillboard)
                 : current.billboard,
         towel1:
             updates.towel1 != null
-                ? normalizeTowel({ ...current.towel1, ...updates.towel1 }, defaultTowel1)
-                : current.towel1,
+                ? normalizeTowel({ ...current.towel1, ...updates.towel1, linkUrl: '' }, defaultTowel1)
+                : { ...current.towel1, linkUrl: '' },
         towel2:
             updates.towel2 != null
-                ? normalizeTowel({ ...current.towel2, ...updates.towel2 }, defaultTowel2)
-                : current.towel2,
+                ? normalizeTowel({ ...current.towel2, ...updates.towel2, linkUrl: '' }, defaultTowel2)
+                : { ...current.towel2, linkUrl: '' },
         hotspots: updates.hotspots != null ? normalizeHotspots(updates.hotspots) : current.hotspots,
     };
 
@@ -312,15 +310,15 @@ const setHomeAssetUrl = async (field, imagePath) => {
     const base = 'https://storage.googleapis.com';
     const url = `${base}/${bucketName}/homePage/${imagePath}`;
 
+    if (field === 'buildingImageUrl') return updateHomePageConfig({ buildingImageUrl: url });
     if (field === 'billboardVideoUrl') return updateHomePageConfig({ billboardVideoUrl: url });
-    if (field === 'billboardPosterUrl') return updateHomePageConfig({ billboardPosterUrl: url });
     if (field === 'towel1Image') {
         const current = await getHomePageConfig();
-        return updateHomePageConfig({ towel1: { ...current.towel1, imageUrl: url } });
+        return updateHomePageConfig({ towel1: { ...current.towel1, imageUrl: url, linkUrl: '' } });
     }
     if (field === 'towel2Image') {
         const current = await getHomePageConfig();
-        return updateHomePageConfig({ towel2: { ...current.towel2, imageUrl: url } });
+        return updateHomePageConfig({ towel2: { ...current.towel2, imageUrl: url, linkUrl: '' } });
     }
     throw 'Unknown home asset field';
 };

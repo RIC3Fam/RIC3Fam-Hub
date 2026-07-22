@@ -325,7 +325,7 @@ router.route('/home').post(async function (req, res) {
         if (filename.includes(' ')) throw 'Filename cannot contain spaces';
 
         const allowed = {
-            billboardPosterUrl: { type: 'poster', contentType: 'image/jpeg' },
+            buildingImageUrl: { type: 'building', contentType: 'image/jpeg' },
             billboardVideoUrl: { type: 'billboard', contentType: 'video/mp4' },
             towel1Image: { type: 'towel1', contentType: 'image/jpeg' },
             towel2Image: { type: 'towel2', contentType: 'image/jpeg' },

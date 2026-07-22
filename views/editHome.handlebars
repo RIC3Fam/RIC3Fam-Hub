@@ -2,17 +2,19 @@
     <div class="form-wrapper home-edit-wrapper">
         <h3>Edit Home Page</h3>
         <p class="muted">
-            Upload the two square sign images and the billboard video.
+            Upload a wide building facade (JPEG) for mobile portrait, the two square sign images, and the billboard video.
             Set custom links for the three awning / door buttons.
-            The towel is part of the building art and stays static.
+            The towel is part of the building art and stays static — not a button.
+            Video autoplays muted on Home; visitors can unmute or double-click for fullscreen. No separate poster image.
         </p>
 
         <form method="POST" action="/edit-home" id="edit-home-form" class="create-form">
+            <input type="hidden" name="buildingImageUrl" id="buildingImageUrl" value="{{home.buildingImageUrl}}">
+
             <h4>Billboard video</h4>
             <label class="form-label" for="billboardVideoUrl">Video URL (mp4) — or upload below</label>
             <input class="form-input" type="url" id="billboardVideoUrl" name="billboardVideoUrl" value="{{home.billboardVideoUrl}}" placeholder="https://.../video.mp4">
             <br>
-            <input type="hidden" name="billboardPosterUrl" value="{{home.billboardPosterUrl}}">
             <div class="home-hotspot-coords">
                 <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="billboardTop" value="{{home.billboard.top}}"></label>
                 <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="billboardLeft" value="{{home.billboard.left}}"></label>
@@ -24,7 +26,6 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 1</legend>
                 <input type="hidden" name="towel1ImageUrl" value="{{home.towel1.imageUrl}}">
-                <input type="hidden" name="towel1LinkUrl" value="">
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Top" value="{{home.towel1.top}}"></label>
                     <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Left" value="{{home.towel1.left}}"></label>
@@ -35,7 +36,6 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 2</legend>
                 <input type="hidden" name="towel2ImageUrl" value="{{home.towel2.imageUrl}}">
-                <input type="hidden" name="towel2LinkUrl" value="">
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Top" value="{{home.towel2.top}}"></label>
                     <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Left" value="{{home.towel2.left}}"></label>
@@ -68,6 +68,15 @@
         </form>
 
         <hr class="my-5">
+
+        <h4>Upload building facade (JPEG, wide for mobile portrait)</h4>
+        {{#if home.buildingImageUrl}}
+            <p class="muted">Current: <img src="{{home.buildingImageUrl}}" alt="Building facade" class="home-edit-thumb home-edit-thumb-wide"></p>
+        {{/if}}
+        <form id="home-building-form" class="create-form">
+            <input type="file" id="home-building-upload" accept="image/jpeg">
+            <button type="submit" class="form-submit-button">Upload building image</button>
+        </form>
 
         <h4>Upload billboard video (MP4)</h4>
         <form id="home-video-form" class="create-form">
