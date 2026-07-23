@@ -1547,133 +1547,698 @@ p.index {
 }
 /* ===== END VISIBILITY / PROFILE / SLIDER ===== */
 
-/* ===== HOME BUILDING ===== */
-.home-building-page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 12px 32px;
-}
-
-.home-building-wrap {
+/* ===== HOME FACADE ===== */
+.home-facade-page {
   width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-.home-building-stage {
-  position: relative;
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  line-height: 0;
-}
-
-.home-building-image {
-  display: block;
+#index-main.home-facade-page {
   width: 100%;
   height: auto;
+  margin: 0;
 }
 
-@media (max-width: 640px) {
-  .home-building-page {
-    max-width: none;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .home-building-stage {
-    max-width: none;
-    width: 100%;
-  }
-
-  .home-welcome-copy {
-    padding: 0 12px;
-  }
-
-  .home-admin-link {
-    padding: 0 12px;
-  }
-}
-
-.home-hotspot {
-  position: absolute;
-  display: block;
+.facade-scene {
+  --facade-scale-width: min(82vw, 820px);
+  --building-width: min(62vw, 580px);
+  --gold: #c9bd42;
+  --glass: #536b6a;
+  --shadow: rgba(0, 0, 0, 0.35);
+  min-height: 1120px;
+  padding: 24px 0 42px;
   box-sizing: border-box;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.18) 0, rgba(255,255,255,0) 12%, rgba(255,255,255,0) 88%, rgba(255,255,255,0.18) 100%),
+    linear-gradient(180deg, #3d4c53 0%, #6f8793 47%, #a8c9d8 100%);
+}
+
+.facade-shell {
+  position: relative;
+  width: var(--facade-scale-width);
+  max-width: calc(100vw - 18px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.facade-billboard {
+  position: relative;
+  z-index: 4;
+  width: min(74vw, 640px);
+  max-width: calc(100vw - 42px);
+  padding: 7px 7px 14px;
+  background: #2a2a28;
+  border: 3px solid #3e4240;
+  box-shadow: 0 14px 0 #3f3f3d, 0 18px 18px rgba(0, 0, 0, 0.28);
+}
+
+.facade-billboard-screen {
+  aspect-ratio: 16 / 7.5;
+  background: #050505;
+  border: 2px solid #151515;
+  overflow: hidden;
+}
+
+.home-billboard-video,
+.facade-video-poster {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  background: #050505 url("/public/images/home/billboard-poster.svg") center / cover no-repeat;
+}
+
+.facade-billboard-lip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -14px;
+  height: 14px;
+  background: linear-gradient(90deg, #3b3d3b, #72736f 48%, #373935);
+}
+
+.facade-billboard-pole {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 14px);
+  width: 54px;
+  height: 86px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #747a76, #c3c6bf 46%, #737a75);
+  clip-path: polygon(18% 0, 82% 0, 82% 70%, 50% 100%, 18% 70%);
+  box-shadow: 0 8px 10px rgba(0,0,0,0.22);
+}
+
+.facade-building {
+  position: relative;
+  z-index: 2;
+  width: var(--building-width);
+  max-width: calc(100vw - 36px);
+  margin-top: 92px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.08), transparent 18%, transparent 82%, rgba(0,0,0,0.08)),
+    #cfd1cc;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 22px 42px rgba(0,0,0,0.24);
+}
+
+.facade-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 38px;
+  background:
+    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.18) 0 1px, transparent 2px),
+    linear-gradient(#a7aaa4, #7f837e);
+  border-bottom: 3px solid #242424;
+}
+
+.facade-nav a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 7px;
+  color: #111;
+  text-decoration: none;
+  text-align: center;
+  font-size: clamp(11px, 1.35vw, 15px);
+  font-weight: 800;
+  line-height: 1.05;
+  border-right: 1px solid rgba(0,0,0,0.24);
+}
+
+.facade-nav a:last-child {
+  border-right: 0;
+}
+
+.facade-nav a:hover,
+.facade-nav a:focus-visible {
+  color: #063d54;
+  background: rgba(255,255,255,0.2);
+  outline: 2px solid #f7df35;
+  outline-offset: -2px;
+}
+
+.facade-brick-zone {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 42px;
+  padding: 18px 72px 42px;
+  background:
+    linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)),
+    repeating-linear-gradient(0deg, transparent 0 28px, rgba(255,255,255,0.18) 28px 31px),
+    repeating-linear-gradient(90deg, #713126 0 58px, #51251f 58px 62px);
+}
+
+.facade-brick-zone::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28px;
+  background: rgba(191, 126, 136, 0.58);
+}
+
+.facade-top-panel {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.22);
+  overflow: hidden;
+}
+
+.facade-top-panel img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.facade-top-panel:focus-visible {
+  outline: 3px solid #f7df35;
+  outline-offset: 3px;
+}
+
+.facade-residence-sign {
+  position: relative;
+  z-index: 5;
+  width: 74%;
+  margin: -23px auto 0;
+  padding: 14px 18px 17px;
+  background: #fff312;
+  border-radius: 9px;
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+  box-shadow: 0 13px 0 #4d4d4a, 0 18px 16px rgba(0,0,0,0.35);
+}
+
+.facade-residence-sign h1 {
+  margin: 0;
+  color: #8b2b65;
+  text-align: center;
+  font-size: clamp(28px, 4.1vw, 42px);
+  line-height: 1.03;
+  font-weight: 900;
+}
+
+.facade-balcony-zone {
+  position: relative;
+  min-height: 292px;
+  padding-top: 18px;
+  background:
+    linear-gradient(rgba(255,255,255,0.28), rgba(255,255,255,0.28)),
+    repeating-linear-gradient(0deg, transparent 0 72px, rgba(122,122,118,0.35) 72px 75px),
+    repeating-linear-gradient(90deg, #bec1bc 0 118px, #999e99 118px 121px);
+}
+
+.facade-side-logo {
+  position: absolute;
+  z-index: 7;
+  left: -102px;
+  top: 118px;
+  width: 92px;
+  height: 92px;
+}
+
+.facade-side-logo::before {
+  content: "";
+  position: absolute;
+  left: 74px;
+  top: 42px;
+  width: 56px;
+  height: 10px;
+  background: #0b0d0f;
+  z-index: -1;
+}
+
+.facade-side-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 5px 4px rgba(0,0,0,0.35));
+}
+
+.facade-side-logo:focus-visible {
+  outline: 3px solid #f7df35;
+  border-radius: 50%;
+}
+
+.facade-upper-door {
+  width: 90px;
+  height: 132px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7e93a;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.08;
+  background: linear-gradient(90deg, var(--gold) 0 10px, #243c41 10px calc(100% - 10px), var(--gold) calc(100% - 10px));
+  border: 4px solid #303b39;
+  box-shadow: inset 0 0 0 3px rgba(246,236,65,0.45);
+}
+
+.facade-balcony {
+  position: relative;
+  width: 82%;
+  height: 104px;
+  margin: -8px auto 0;
+  border-bottom: 18px solid #73746f;
+  background: linear-gradient(#4f514d, #2f322f);
+  box-shadow: 0 12px 14px rgba(0,0,0,0.22);
+}
+
+.facade-balcony::before,
+.facade-balcony::after {
+  content: "";
+  position: absolute;
+  bottom: -58px;
+  width: 14px;
+  height: 44px;
+  background: #333532;
+  border-radius: 0 0 5px 5px;
+}
+
+.facade-balcony::before {
+  left: 26%;
+}
+
+.facade-balcony::after {
+  right: 26%;
+}
+
+.facade-rail {
+  position: absolute;
+  inset: 14px 0 12px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 19px, #151716 19px 29px),
+    linear-gradient(#171918 0 9px, transparent 9px calc(100% - 10px), #171918 calc(100% - 10px));
+}
+
+.facade-banner {
+  position: absolute;
+  z-index: 4;
+  top: -12px;
+  width: 78px;
+  height: 86px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 4px rgba(0,0,0,0.25));
+}
+
+.facade-banner-left {
+  left: 28px;
+}
+
+.facade-banner-right {
+  right: 28px;
+}
+
+.facade-storefront {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.45fr;
+  gap: 28px;
+  align-items: end;
+  padding: 76px 72px 0;
+  min-height: 392px;
+  background:
+    linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)),
+    repeating-linear-gradient(0deg, transparent 0 72px, rgba(122,122,118,0.35) 72px 75px),
+    repeating-linear-gradient(90deg, #cfd1cc 0 118px, #a2a7a2 118px 121px);
+}
+
+.facade-store {
+  position: relative;
   z-index: 2;
 }
 
-.home-link-hotspot {
-  background: transparent;
-  border: none;
-  cursor: pointer;
+.facade-awning {
+  height: 76px;
+  margin: 0 auto -6px;
+  border-radius: 46px 46px 8px 8px;
+  border-bottom: 10px solid #333532;
+  background:
+    repeating-linear-gradient(90deg, #d75c4b 0 35px, #f1eee2 35px 70px);
+  box-shadow: 0 8px 10px rgba(0,0,0,0.22);
 }
 
-.home-link-hotspot:hover,
-.home-link-hotspot:focus-visible {
-  outline: 2px solid rgba(21, 157, 216, 0.85);
-  outline-offset: 1px;
-  background: rgba(21, 157, 216, 0.12);
+.facade-awning-small {
+  width: 92%;
 }
 
-.home-billboard {
-  overflow: hidden;
-  background: #000;
-}
-
-.home-billboard-video {
+.facade-awning-large {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  background: #000;
-  cursor: pointer;
 }
 
-.home-billboard-unmute {
+.facade-door,
+.facade-window {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 230px;
+  background: linear-gradient(90deg, var(--gold) 0 12px, var(--glass) 12px calc(100% - 12px), var(--gold) calc(100% - 12px));
+  border: 4px solid #161914;
+  box-shadow: inset 0 0 0 8px rgba(238,225,59,0.35);
+  text-decoration: none;
+}
+
+.facade-door {
+  height: 252px;
+}
+
+.facade-door img {
+  width: 74%;
+  max-height: 112px;
+}
+
+.facade-window img {
+  width: 78%;
+  max-height: 160px;
+}
+
+.facade-door:focus-visible,
+.facade-window:focus-visible {
+  outline: 3px solid #f7df35;
+  outline-offset: 4px;
+}
+
+.facade-door-handle {
   position: absolute;
-  right: 6px;
-  bottom: 6px;
-  z-index: 4;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  line-height: 1.2;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
+  right: 18px;
+  top: 46%;
+  width: 16px;
+  height: 48px;
+  border: 4px solid #9e9c67;
+  border-radius: 9px;
 }
 
-.home-billboard-unmute:hover,
-.home-billboard-unmute:focus-visible {
-  background: rgba(0, 0, 0, 0.85);
+.facade-volunteer-tag {
+  position: absolute;
+  right: -24px;
+  bottom: 60px;
+  padding: 5px 8px;
+  color: #222;
+  background: #fff;
+  border: 1px solid #c2c2c2;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.18);
 }
 
-.home-sign {
-  overflow: hidden;
+.facade-people {
+  position: absolute;
+  z-index: 5;
+  right: 34px;
+  bottom: -2px;
+  width: 44%;
+  max-width: 300px;
   pointer-events: none;
 }
 
-.home-sign img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 2px;
+.facade-ground {
+  position: relative;
+  height: 54px;
+  background: #4e524e;
+  border-top: 5px solid rgba(0,0,0,0.18);
 }
 
-.home-hotspot-empty {
-  border: 1px dashed rgba(21, 157, 216, 0.55);
-  background: rgba(21, 157, 216, 0.08);
-  pointer-events: none;
+.facade-ground::before {
+  content: "";
+  position: absolute;
+  left: -110px;
+  bottom: 0;
+  width: 180px;
+  height: 122px;
+  background: linear-gradient(145deg, transparent 0 49%, #5d625e 50%);
 }
 
 .home-admin-link {
   text-align: center;
-  margin: 16px 0 8px;
+  margin: 16px 0 28px;
 }
 
-.home-welcome-copy {
-  margin: 16px 0;
-  text-align: center;
+@media (max-width: 1024px) {
+  .facade-scene {
+    --facade-scale-width: min(88vw, 760px);
+    --building-width: min(68vw, 560px);
+    min-height: 1040px;
+  }
+
+  .facade-brick-zone {
+    padding-left: 58px;
+    padding-right: 58px;
+    gap: 34px;
+  }
+
+  .facade-side-logo {
+    left: -82px;
+    width: 78px;
+    height: 78px;
+  }
+
+  .facade-storefront {
+    padding-left: 58px;
+    padding-right: 58px;
+  }
+}
+
+@media (max-width: 768px) {
+  .facade-scene {
+    --facade-scale-width: calc(100vw - 8px);
+    --building-width: min(78vw, 520px);
+    min-height: 980px;
+    padding-top: 18px;
+  }
+
+  .facade-billboard {
+    width: min(86vw, 600px);
+  }
+
+  .facade-building {
+    margin-top: 84px;
+  }
+
+  .facade-brick-zone {
+    padding: 16px 42px 38px;
+    gap: 28px;
+  }
+
+  .facade-residence-sign {
+    width: 78%;
+  }
+
+  .facade-side-logo {
+    left: -58px;
+    top: 126px;
+    width: 68px;
+    height: 68px;
+  }
+
+  .facade-side-logo::before {
+    left: 52px;
+    width: 38px;
+    height: 8px;
+  }
+
+  .facade-balcony {
+    width: 86%;
+  }
+
+  .facade-banner {
+    width: 66px;
+    height: 76px;
+  }
+
+  .facade-storefront {
+    grid-template-columns: 0.88fr 1.25fr;
+    gap: 20px;
+    padding: 64px 42px 0;
+  }
+
+  .facade-door,
+  .facade-window {
+    height: 210px;
+  }
+
+  .facade-door {
+    height: 232px;
+  }
+
+  .facade-people {
+    width: 47%;
+    right: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .facade-scene {
+    --building-width: calc(100vw - 34px);
+    min-height: 900px;
+    padding-bottom: 28px;
+  }
+
+  .facade-shell {
+    max-width: 100vw;
+  }
+
+  .facade-billboard {
+    width: calc(100vw - 44px);
+    padding: 5px 5px 11px;
+  }
+
+  .facade-billboard-pole {
+    width: 40px;
+    height: 72px;
+  }
+
+  .facade-building {
+    max-width: calc(100vw - 34px);
+    margin-top: 72px;
+  }
+
+  .facade-nav {
+    height: 34px;
+  }
+
+  .facade-nav a {
+    padding: 0 4px;
+    font-size: 10px;
+  }
+
+  .facade-brick-zone {
+    padding: 13px 32px 34px;
+    gap: 20px;
+  }
+
+  .facade-residence-sign {
+    width: 82%;
+    padding: 11px 12px 14px;
+  }
+
+  .facade-residence-sign h1 {
+    font-size: 27px;
+  }
+
+  .facade-balcony-zone {
+    min-height: 248px;
+  }
+
+  .facade-upper-door {
+    width: 72px;
+    height: 108px;
+    font-size: 8px;
+  }
+
+  .facade-side-logo {
+    left: -18px;
+    top: 116px;
+    width: 58px;
+    height: 58px;
+  }
+
+  .facade-side-logo::before {
+    display: none;
+  }
+
+  .facade-balcony {
+    width: 88%;
+    height: 88px;
+  }
+
+  .facade-rail {
+    background:
+      repeating-linear-gradient(90deg, transparent 0 14px, #151716 14px 22px),
+      linear-gradient(#171918 0 8px, transparent 8px calc(100% - 9px), #171918 calc(100% - 9px));
+  }
+
+  .facade-banner {
+    top: -7px;
+    width: 54px;
+    height: 64px;
+  }
+
+  .facade-banner-left {
+    left: 16px;
+  }
+
+  .facade-banner-right {
+    right: 16px;
+  }
+
+  .facade-storefront {
+    gap: 14px;
+    padding: 54px 28px 0;
+    min-height: 320px;
+  }
+
+  .facade-awning {
+    height: 56px;
+    background:
+      repeating-linear-gradient(90deg, #d75c4b 0 24px, #f1eee2 24px 48px);
+  }
+
+  .facade-door,
+  .facade-window {
+    height: 176px;
+    border-width: 3px;
+  }
+
+  .facade-door {
+    height: 196px;
+  }
+
+  .facade-volunteer-tag {
+    right: -12px;
+    bottom: 45px;
+    font-size: 9px;
+    padding: 4px 5px;
+  }
+
+  .facade-door-handle {
+    right: 10px;
+    height: 34px;
+  }
+
+  .facade-people {
+    width: 50%;
+    right: 6px;
+  }
+
+  .facade-ground::before {
+    left: -72px;
+    width: 122px;
+    height: 88px;
+  }
+}
+
+@media (max-width: 380px) {
+  .facade-scene {
+    --building-width: calc(100vw - 22px);
+  }
+
+  .facade-building {
+    max-width: calc(100vw - 22px);
+  }
+
+  .facade-brick-zone {
+    padding-left: 26px;
+    padding-right: 26px;
+    gap: 16px;
+  }
+
+  .facade-storefront {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
 }
 
 .home-edit-thumb-wide {
@@ -1716,25 +2281,8 @@ p.index {
 }
 
 @media (max-width: 640px) {
-  .home-building-page {
-    max-width: none;
-    padding: 0 0 24px;
-  }
-
-  .home-building-stage {
-    max-width: none;
-    width: 100%;
-  }
-
-  .home-welcome-copy,
-  .home-admin-link,
-  .footer-logos {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
   .home-hotspot-coords {
     grid-template-columns: 1fr 1fr;
   }
 }
-/* ===== END HOME BUILDING ===== */
+/* ===== END HOME FACADE ===== */

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260">
+  <rect width="320" height="260" fill="#f8f8f2"/>
+  <rect x="36" y="42" width="248" height="176" fill="#d8e1df" stroke="#31434a" stroke-width="8"/>
+  <path d="M78 182h164V90l-82-46-82 46z" fill="#6f8586"/>
+  <path d="M105 182v-70h44v70zm70 0v-54h46v54z" fill="#273b42"/>
+  <text x="160" y="238" text-anchor="middle" font-family="Arial" font-size="22" font-weight="700" fill="#2d3c41">Residence</text>
+</svg>
