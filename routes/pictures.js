@@ -99,6 +99,7 @@ router
             const caption = helpers.optionalString(req.body.caption, 'Caption', 200);
             const groupId = req.body.groupId;
             const gameId = req.body.gameId;
+            const isEventPage = !!(req.body.isEventPage === true || req.body.isEventPage === 'true');
 
             if (groupId) {
                 helpers.isValidId(groupId);
@@ -109,11 +110,11 @@ router
                 helpers.isValidId(gameId);
                 const game = await gamesData.get(gameId);
                 if (game.organizer !== req.session.user._id) throw 'You are not the admin of this event';
-                if (typeof gamesData.updateSlideshowCaption === 'function') {
-                    await gamesData.updateSlideshowCaption(gameId, imageUrl, caption);
-                } else {
-                    throw 'Event captions are not supported yet';
-                }
+                await gamesData.updateSlideshowCaption(gameId, imageUrl, caption);
+            } else if (isEventPage) {
+                const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+                if (!isAdmin) throw 'Admin only';
+                await mediaData.updateEventPageSlideshowCaption(imageUrl, caption);
             } else {
                 await usersData.updateSlideshowCaption(req.session.user._id, imageUrl, caption);
             }
