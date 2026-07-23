@@ -43,29 +43,29 @@
                     {{/each}}
                 </nav>
 
-                <section class="facade-brick-zone" aria-label="Featured images">
-                    <a class="facade-top-panel" href="/events">
+                <section class="facade-brick-zone" aria-label="Featured logo panels">
+                    <a class="facade-top-panel facade-logo-panel" href="/events">
                         {{#if home.towel1.imageUrl}}
                             <img
                                 src="{{home.towel1.imageUrl}}"
-                                alt="Featured residence image"
+                                alt="Featured residence logo"
                                 loading="lazy"
-                                onerror="this.onerror=null;this.src='/public/images/home/top-left-placeholder.svg';"
+                                onerror="this.onerror=null;this.src='/public/images/home/community-logo.svg';"
                             >
                         {{else}}
-                            <img src="/public/images/home/top-left-placeholder.svg" alt="Featured residence artwork" loading="lazy">
+                            <img src="/public/images/home/community-logo.svg" alt="Creative Community Service Network logo" loading="lazy">
                         {{/if}}
                     </a>
-                    <a class="facade-top-panel" href="/search">
+                    <a class="facade-top-panel facade-logo-panel" href="/search">
                         {{#if home.towel2.imageUrl}}
                             <img
                                 src="{{home.towel2.imageUrl}}"
-                                alt="Featured creative community image"
+                                alt="Featured mortgage broker logo"
                                 loading="lazy"
-                                onerror="this.onerror=null;this.src='/public/images/home/top-right-placeholder.svg';"
+                                onerror="this.onerror=null;this.src='/public/images/home/frisbee-logo.svg';"
                             >
                         {{else}}
-                            <img src="/public/images/home/top-right-placeholder.svg" alt="Featured community artwork" loading="lazy">
+                            <img src="/public/images/home/frisbee-logo.svg" alt="RIC3 Fam Frisbee logo" loading="lazy">
                         {{/if}}
                     </a>
                 </section>

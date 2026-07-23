@@ -405,20 +405,6 @@ footer {
   margin-top: 12px;
 }
 
-.gallery-masonry {
-  column-count: 2;
-  column-gap: 12px;
-  display: block;
-}
-
-.gallery-masonry .gallery-item {
-  break-inside: avoid;
-  page-break-inside: avoid;
-  margin: 0 0 12px 0;
-  display: inline-block;
-  width: 100%;
-}
-
 .gallery-caption-edit {
   display: flex;
   gap: 8px;
@@ -479,15 +465,14 @@ footer {
     text-align: center;
     max-width: none;
   }
-
-  .gallery-masonry {
-    column-count: 1;
-  }
 }
 
 /* END USER */
 
-/* PHOTO GALLERY STUFF */
+/* PHOTO GALLERY — Pinterest-style vertical masonry via CSS multi-column.
+   Option A: Express + Handlebars SSR, no React, no infinite-scroll gallery grid,
+   no LTR reading-order requirement. Lightweight native CSS is enough.
+   Important: do not use display:grid here — it forced shared row heights / gaps. */
 
 .gallery-wrapper {
   width: 90%;
@@ -495,17 +480,25 @@ footer {
   margin: 0 auto 20px auto;
 }
 
-.gallery-grid {
-  display: grid;
-  /* Two columns, stacking vertically. */
-  grid-template-columns: repeat(2, 1fr);
-  align-items: start;
-  gap: 12px;
+.gallery-grid,
+.gallery-masonry {
+  display: block;
+  column-count: 3;
+  column-gap: 12px;
+  column-fill: balance;
 }
 
+.gallery-grid .gallery-item,
+.gallery-masonry .gallery-item,
 .gallery-item {
   position: relative;
-  margin: 0;
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  margin: 0 0 12px;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .gallery-image {
@@ -514,6 +507,22 @@ footer {
   display: block;
   border-radius: 5px;
   cursor: zoom-in; /* hint: double-click to enlarge */
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 900px) {
+  .gallery-grid,
+  .gallery-masonry {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery-grid,
+  .gallery-masonry {
+    column-count: 1;
+  }
 }
 
 /* Per-picture caption: a bar pinned to the bottom of the image.
@@ -1562,21 +1571,36 @@ p.index {
 }
 
 .facade-scene {
-  --facade-scale-width: min(82vw, 820px);
-  --building-width: min(62vw, 580px);
+  --facade-scale-width: min(92vw, 980px);
+  --building-width: min(72vw, 700px);
   --gold: #c9bd42;
   --glass: #536b6a;
   --shadow: rgba(0, 0, 0, 0.35);
-  min-height: 1120px;
-  padding: 24px 0 42px;
+  position: relative;
+  min-height: 1340px;
+  padding: 42px 0 62px;
   box-sizing: border-box;
   background:
-    linear-gradient(90deg, rgba(255,255,255,0.18) 0, rgba(255,255,255,0) 12%, rgba(255,255,255,0) 88%, rgba(255,255,255,0.18) 100%),
-    linear-gradient(180deg, #3d4c53 0%, #6f8793 47%, #a8c9d8 100%);
+    linear-gradient(90deg, #1d2534 0, #1d2534 6%, transparent 6%, transparent 94%, #1d2534 94%, #1d2534 100%),
+    linear-gradient(180deg, #202939 0%, #202939 100%);
+  overflow: hidden;
+}
+
+.facade-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0 6%;
+  background:
+    linear-gradient(rgba(92, 127, 143, 0.66), rgba(83, 116, 130, 0.72)),
+    linear-gradient(105deg, transparent 0 8%, rgba(255,255,255,0.18) 8.2% 8.5%, transparent 8.7% 42%, rgba(255,255,255,0.12) 42.2% 42.6%, transparent 42.8%),
+    repeating-linear-gradient(90deg, transparent 0 56px, rgba(255,255,255,0.14) 56px 59px, transparent 59px 78px),
+    linear-gradient(180deg, #49616c 0%, #7d9bac 68%, #a4c5d4 100%);
+  box-shadow: inset 0 0 70px rgba(0,0,0,0.32);
 }
 
 .facade-shell {
   position: relative;
+  z-index: 1;
   width: var(--facade-scale-width);
   max-width: calc(100vw - 18px);
   margin: 0 auto;
@@ -1588,7 +1612,7 @@ p.index {
 .facade-billboard {
   position: relative;
   z-index: 4;
-  width: min(74vw, 640px);
+  width: min(82vw, 760px);
   max-width: calc(100vw - 42px);
   padding: 7px 7px 14px;
   background: #2a2a28;
@@ -1638,7 +1662,7 @@ p.index {
   z-index: 2;
   width: var(--building-width);
   max-width: calc(100vw - 36px);
-  margin-top: 92px;
+  margin-top: 98px;
   background:
     linear-gradient(90deg, rgba(255,255,255,0.08), transparent 18%, transparent 82%, rgba(0,0,0,0.08)),
     #cfd1cc;
@@ -1686,9 +1710,10 @@ p.index {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 42px;
-  padding: 18px 72px 42px;
+  gap: 48px;
+  padding: 56px 86px 62px;
   background:
+    linear-gradient(180deg, rgba(42, 51, 70, 0.1), transparent 62%),
     linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)),
     repeating-linear-gradient(0deg, transparent 0 28px, rgba(255,255,255,0.18) 28px 31px),
     repeating-linear-gradient(90deg, #713126 0 58px, #51251f 58px 62px);
@@ -1706,18 +1731,29 @@ p.index {
 
 .facade-top-panel {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   aspect-ratio: 1 / 1;
   background: #fff;
   box-shadow: 0 5px 12px rgba(0,0,0,0.22);
   overflow: hidden;
 }
 
+.facade-logo-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-sizing: border-box;
+  background:
+    linear-gradient(180deg, #fff, #f2f2ee);
+}
+
 .facade-top-panel img {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .facade-top-panel:focus-visible {
@@ -1729,7 +1765,7 @@ p.index {
   position: relative;
   z-index: 5;
   width: 74%;
-  margin: -23px auto 0;
+  margin: -28px auto 0;
   padding: 14px 18px 17px;
   background: #fff312;
   border-radius: 9px;
@@ -1748,8 +1784,8 @@ p.index {
 
 .facade-balcony-zone {
   position: relative;
-  min-height: 292px;
-  padding-top: 18px;
+  min-height: 342px;
+  padding-top: 28px;
   background:
     linear-gradient(rgba(255,255,255,0.28), rgba(255,255,255,0.28)),
     repeating-linear-gradient(0deg, transparent 0 72px, rgba(122,122,118,0.35) 72px 75px),
@@ -1759,18 +1795,18 @@ p.index {
 .facade-side-logo {
   position: absolute;
   z-index: 7;
-  left: -102px;
-  top: 118px;
-  width: 92px;
-  height: 92px;
+  left: -118px;
+  top: 148px;
+  width: 108px;
+  height: 108px;
 }
 
 .facade-side-logo::before {
   content: "";
   position: absolute;
-  left: 74px;
-  top: 42px;
-  width: 56px;
+  left: 90px;
+  top: 50px;
+  width: 64px;
   height: 10px;
   background: #0b0d0f;
   z-index: -1;
@@ -1789,8 +1825,8 @@ p.index {
 }
 
 .facade-upper-door {
-  width: 90px;
-  height: 132px;
+  width: 104px;
+  height: 154px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -1808,7 +1844,7 @@ p.index {
 .facade-balcony {
   position: relative;
   width: 82%;
-  height: 104px;
+  height: 118px;
   margin: -8px auto 0;
   border-bottom: 18px solid #73746f;
   background: linear-gradient(#4f514d, #2f322f);
@@ -1846,8 +1882,8 @@ p.index {
   position: absolute;
   z-index: 4;
   top: -12px;
-  width: 78px;
-  height: 86px;
+  width: 92px;
+  height: 98px;
   object-fit: contain;
   filter: drop-shadow(0 5px 4px rgba(0,0,0,0.25));
 }
@@ -1864,10 +1900,10 @@ p.index {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1.45fr;
-  gap: 28px;
+  gap: 34px;
   align-items: end;
-  padding: 76px 72px 0;
-  min-height: 392px;
+  padding: 92px 86px 0;
+  min-height: 472px;
   background:
     linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)),
     repeating-linear-gradient(0deg, transparent 0 72px, rgba(122,122,118,0.35) 72px 75px),
@@ -1880,7 +1916,7 @@ p.index {
 }
 
 .facade-awning {
-  height: 76px;
+  height: 88px;
   margin: 0 auto -6px;
   border-radius: 46px 46px 8px 8px;
   border-bottom: 10px solid #333532;
@@ -1903,7 +1939,7 @@ p.index {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 230px;
+  height: 274px;
   background: linear-gradient(90deg, var(--gold) 0 12px, var(--glass) 12px calc(100% - 12px), var(--gold) calc(100% - 12px));
   border: 4px solid #161914;
   box-shadow: inset 0 0 0 8px rgba(238,225,59,0.35);
@@ -1911,7 +1947,7 @@ p.index {
 }
 
 .facade-door {
-  height: 252px;
+  height: 302px;
 }
 
 .facade-door img {
@@ -1957,16 +1993,16 @@ p.index {
 .facade-people {
   position: absolute;
   z-index: 5;
-  right: 34px;
+  right: 42px;
   bottom: -2px;
-  width: 44%;
-  max-width: 300px;
+  width: 46%;
+  max-width: 350px;
   pointer-events: none;
 }
 
 .facade-ground {
   position: relative;
-  height: 54px;
+  height: 64px;
   background: #4e524e;
   border-top: 5px solid rgba(0,0,0,0.18);
 }
@@ -2129,7 +2165,7 @@ p.index {
   }
 
   .facade-balcony-zone {
-    min-height: 248px;
+    min-height: 258px;
   }
 
   .facade-upper-door {

@@ -43,7 +43,7 @@
                 <br>
 
             <h4>Private Communications</h4>
-            <label class="form-label" for="privateDescription">Private communications:</label>
+            <label class="form-label" for="privateDescription">Notes for/chat with RIC3 Fam:</label>
                 <textarea class="form-input" id="privateDescription" name="privateDescription">{{currentUser.privateDescription}}</textarea>
                 <br>
             <label class="form-label" for="preferredEmail">Preferred Communication (private) – Email:</label>
@@ -69,21 +69,6 @@
                 Opt into CCSN updates and volunteer opportunities
             </label>
             <br>
-
-            <h4>RIC3 Fam Connections</h4>
-            {{#each currentUser.skills}}
-                <label class="form-label" for="{{@key}}">{{this.desc}}:</label>
-                    <input class="form-input" type="hidden" id="{{@key}}-desc" name="skills[{{@key}}][desc]" value="{{this.desc}}">
-                    <input class="form-input" type="hidden" id="{{@key}}-type" name="skills[{{@key}}][type]" value="{{this.type}}">
-
-                    {{#ifEquals this.type "checkbox"}}
-                        <input class="form-input" type="{{this.type}}" id="{{@key}}" name="skills[{{@key}}][value]" value="true" {{#if this.value}}checked{{/if}}>
-                    {{/ifEquals}}
-                    {{#elseEquals this.type "checkbox"}}
-                        <input class="form-input" type="{{this.type}}" id="{{@key}}" name="skills[{{@key}}][value]" value="{{this.value}}">
-                    {{/elseEquals}}
-                    <br>
-            {{/each}}
 
             <button type="button" class="form-submit-button" onclick="window.history.back();">Cancel</button>
             <button type="submit" class="form-submit-button">Submit</button>
