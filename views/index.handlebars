@@ -1,113 +1,123 @@
-<main id="index-main" class="home-building-page">
-    <div class="home-building-wrap">
-        <div class="home-building-stage">
-            <img
-                class="home-building-image"
-                src="{{home.buildingImageUrl}}"
-                alt="RIC3 Fam building"
-            >
-
-            {{!-- Billboard video: autoplay muted; unmute / double-click fullscreen --}}
-            {{#if home.billboardVideoUrl}}
-            <div
-                class="home-hotspot home-billboard"
-                style="top: {{home.billboard.top}}%; left: {{home.billboard.left}}%; width: {{home.billboard.width}}%; height: {{home.billboard.height}}%;"
-            >
-                <video
-                    id="home-billboard-video"
-                    class="home-billboard-video is-playing"
-                    playsinline
-                    muted
-                    autoplay
-                    loop
-                    preload="auto"
-                >
-                    <source src="{{home.billboardVideoUrl}}" type="video/mp4">
-                </video>
-                <button
-                    type="button"
-                    id="home-billboard-unmute"
-                    class="home-billboard-unmute"
-                    aria-label="Unmute video"
-                    title="Unmute"
-                >Unmute</button>
-            </div>
-            {{/if}}
-
-            {{!-- Square signs (uploadable art). Towel in the base image stays static. --}}
-            <div
-                class="home-hotspot home-sign home-sign-1"
-                style="top: {{home.towel1.top}}%; left: {{home.towel1.left}}%; width: {{home.towel1.width}}%; height: {{home.towel1.height}}%;"
-                title="Sign 1"
-            >
-                {{#if home.towel1.imageUrl}}
-                    <img src="{{home.towel1.imageUrl}}" alt="Sign 1">
-                {{else}}
-                    <span class="visually-hidden">Sign 1</span>
-                {{/if}}
-            </div>
-
-            <div
-                class="home-hotspot home-sign home-sign-2"
-                style="top: {{home.towel2.top}}%; left: {{home.towel2.left}}%; width: {{home.towel2.width}}%; height: {{home.towel2.height}}%;"
-                title="Sign 2"
-            >
-                {{#if home.towel2.imageUrl}}
-                    <img src="{{home.towel2.imageUrl}}" alt="Sign 2">
-                {{else}}
-                    <span class="visually-hidden">Sign 2</span>
-                {{/if}}
-            </div>
-
-            {{!-- 3 custom buttons: awnings / door-window --}}
-            {{#each home.hotspots}}
-                {{#if this.url}}
-                    <a
-                        class="home-hotspot home-link-hotspot"
-                        href="{{this.url}}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="{{this.label}}"
-                        style="top: {{this.top}}%; left: {{this.left}}%; width: {{this.width}}%; height: {{this.height}}%;"
-                    >
-                        <span class="visually-hidden">{{this.label}}</span>
-                    </a>
-                {{else}}
-                    {{#if ../currentUser.isAdmin}}
-                        <span
-                            class="home-hotspot home-link-hotspot home-hotspot-empty"
-                            title="{{this.label}} (set URL in Edit Home)"
-                            style="top: {{this.top}}%; left: {{this.left}}%; width: {{this.width}}%; height: {{this.height}}%;"
-                        ></span>
+<main id="index-main" class="home-facade-page">
+    <section class="facade-scene" aria-label="RIC3 Fam building facade">
+        <div class="facade-shell">
+            <section class="facade-billboard" aria-label="Featured video billboard">
+                <div class="facade-billboard-screen">
+                    {{#if home.billboardVideoUrl}}
+                        <video
+                            id="home-billboard-video"
+                            class="home-billboard-video"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            preload="metadata"
+                            poster="/public/images/home/billboard-poster.svg"
+                        >
+                            <source src="{{home.billboardVideoUrl}}" type="video/mp4">
+                        </video>
+                    {{else}}
+                        <div class="facade-video-poster" role="img" aria-label="Billboard video poster"></div>
                     {{/if}}
-                {{/if}}
-            {{/each}}
+                </div>
+                <div class="facade-billboard-lip" aria-hidden="true"></div>
+                <div class="facade-billboard-pole" aria-hidden="true"></div>
+            </section>
+
+            <section class="facade-building" aria-label="Building facade">
+                <nav class="facade-nav" aria-label="Facade links">
+                    {{#each home.hotspots}}
+                        {{#if this.url}}
+                            <a href="{{this.url}}" target="_blank" rel="noopener noreferrer">
+                                {{#ifEquals @index 0}}Stage/List with us{{/ifEquals}}
+                                {{#ifEquals @index 1}}Find dream home{{/ifEquals}}
+                                {{#ifEquals @index 2}}Get Pre-approved{{/ifEquals}}
+                            </a>
+                        {{else}}
+                            <a href="/search">
+                                {{#ifEquals @index 0}}Stage/List with us{{/ifEquals}}
+                                {{#ifEquals @index 1}}Find dream home{{/ifEquals}}
+                                {{#ifEquals @index 2}}Get Pre-approved{{/ifEquals}}
+                            </a>
+                        {{/if}}
+                    {{/each}}
+                </nav>
+
+                <section class="facade-brick-zone" aria-label="Featured logo panels">
+                    <a class="facade-top-panel facade-logo-panel" href="/events">
+                        {{#if home.towel1.imageUrl}}
+                            <img
+                                src="{{home.towel1.imageUrl}}"
+                                alt="Featured residence logo"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='/public/images/home/community-logo.svg';"
+                            >
+                        {{else}}
+                            <img src="/public/images/home/community-logo.svg" alt="Creative Community Service Network logo" loading="lazy">
+                        {{/if}}
+                    </a>
+                    <a class="facade-top-panel facade-logo-panel" href="/search">
+                        {{#if home.towel2.imageUrl}}
+                            <img
+                                src="{{home.towel2.imageUrl}}"
+                                alt="Featured mortgage broker logo"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='/public/images/home/frisbee-logo.svg';"
+                            >
+                        {{else}}
+                            <img src="/public/images/home/frisbee-logo.svg" alt="RIC3 Fam Frisbee logo" loading="lazy">
+                        {{/if}}
+                    </a>
+                </section>
+
+                <section class="facade-residence-sign" aria-label="Artists in residence">
+                    <h1>artists in<br>residence(s)</h1>
+                </section>
+
+                <section class="facade-balcony-zone" aria-label="Balcony level">
+                    <a class="facade-side-logo" href="https://bit.ly/RICthree" aria-label="RIC3 Fam">
+                        <img src="/public/images/home/ric3-side-logo.svg" alt="RIC3 Fam logo" loading="lazy">
+                    </a>
+
+                    <div class="facade-upper-door">
+                        <span>artists in<br>residence(s)</span>
+                    </div>
+
+                    <div class="facade-balcony">
+                        <img class="facade-banner facade-banner-left" src="/public/images/home/i-love-ny-banner.svg" alt="I love New York banner" loading="lazy">
+                        <div class="facade-rail" aria-hidden="true"></div>
+                        <img class="facade-banner facade-banner-right" src="/public/images/home/love-banner.svg" alt="Love banner" loading="lazy">
+                    </div>
+                </section>
+
+                <section class="facade-storefront" aria-label="Storefront level">
+                    <article class="facade-store facade-store-door">
+                        <div class="facade-awning facade-awning-small" aria-hidden="true"></div>
+                        <a class="facade-door" href="/events">
+                            <img src="/public/images/home/community-logo.svg" alt="Creative Community Service Network logo" loading="lazy">
+                            <span class="facade-door-handle" aria-hidden="true"></span>
+                            <span class="facade-volunteer-tag">Volunteer</span>
+                        </a>
+                    </article>
+
+                    <article class="facade-store facade-store-window">
+                        <div class="facade-awning facade-awning-large" aria-hidden="true"></div>
+                        <a class="facade-window" href="/events">
+                            <img src="/public/images/home/frisbee-logo.svg" alt="RIC3 Fam Frisbee artwork" loading="lazy">
+                        </a>
+                    </article>
+
+                    <img class="facade-people" src="/public/images/home/family-silhouettes.svg" alt="Family silhouettes in front of the storefront" loading="lazy">
+                </section>
+
+                <div class="facade-ground" aria-hidden="true"></div>
+            </section>
         </div>
-    </div>
+    </section>
 
     {{#if currentUser.isAdmin}}
         <p class="home-admin-link"><a href="/edit-home">Edit home page (admin)</a></p>
     {{/if}}
-
-    <p class="index home-welcome-copy">
-        Welcome to the RIC3 Family Hub, created to support the people, activities and events of the
-        <a href="https://familyfrisbee-548221658433.us-central1.run.app/users/69968a00ee5db71ea81c42f9">RIC3 2 RICE</a> movement.
-        Hello, my name is <a href="https://ric3family.com/users/65abfd56c49b7bd251abc17b">Wilkin Lai</a> and I am a Creative Real Estate Professional, licensed as both a mortgage broker and a Realtor.
-        Please check out our new <a href="https://familyfrisbee-548221658433.us-central1.run.app/users/6a2afecbfba2f05e9f426993">artist in residence(s)</a> initiative!
-    </p>
-
-    <div class="footer-logos" style="text-align: center; margin-top: 20px;">
-        <div style="display: inline-block; margin: 0 15px; vertical-align: top;">
-            <p style="font-size: 12px; margin-bottom: 5px; font-weight: bold;">ORGANIZED BY</p>
-            <img src="https://i.ibb.co/rKQyxwDv/RIC3-Creative-Community-Family.jpg" alt="RIC3 Creative Community Family" style="height: 100px;">
-        </div>
-        <div style="display: inline-block; margin: 0 15px; vertical-align: top;">
-            <p style="font-size: 12px; margin-bottom: 5px; font-weight: bold;">SPONSORED BY</p>
-            <img src="https://i.ibb.co/x8RJqYJ8/Real-People-Real-Investments.jpg" alt="Real People Real Investments" style="height: 100px;">
-            <br>
-            <img src="https://i.ibb.co/vYm0vF4/EHO-Logo.png" alt="Equal Housing Opportunity" style="height: 20px; margin-top: 5px;">
-        </div>
-    </div>
 
     <script src="/public/js/homeBuilding.js"></script>
 </main>

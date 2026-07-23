@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <circle cx="110" cy="110" r="92" fill="#97a8a5"/>
+  <path d="M154 65a58 58 0 1 0 0 90l-27-25a22 22 0 1 1 0-40z" fill="#153b50"/>
+  <path d="M154 84a35 35 0 1 0 0 52" fill="none" stroke="#1694c8" stroke-width="12"/>
+  <text x="110" y="34" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#1a1a1a">Creative Community</text>
+  <text x="110" y="196" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#1a1a1a">Service Network</text>
+</svg>

@@ -53,7 +53,6 @@ router
                 shortDescription,
                 longDescription,
                 canSeePrivateCommunications: isAdmin,
-                canSeeConnections: isAdmin,
                 canSeeAdminNotes: isAdmin,
                 isPublic: userObj.visibility !== 'private'
             }

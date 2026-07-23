@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Billboard RIC3 Family | Mockup</title>
+  <style>
+    /* First mockup of https://www.ricthree.com/copy-of-welcome-to-ric3-family
+       + two white boxes on the red brick wall only */
+
+    :root {
+      --ric3-navy: #1f2634;
+      --ric3-cream: #dbdad4;
+      --ric3-muted: #616158;
+      --ric3-page: #1f2634;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--ric3-page);
+      color: var(--ric3-cream);
+      font-family: Avenir, "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ========== TOP WELCOME BAR ========== */
+    .welcome-bar {
+      position: relative;
+      width: 100%;
+      min-height: 182px;
+      background: var(--ric3-navy);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 23px 24px 16px;
+    }
+
+    .welcome-bar__text {
+      width: min(902px, 92%);
+      text-align: center;
+      font-family: Avenir, "Avenir Next", Helvetica, Arial, sans-serif;
+      font-weight: 800;
+      font-size: clamp(18px, 2.4vw, 30px);
+      line-height: 1.4;
+      color: var(--ric3-cream);
+      letter-spacing: 0.01em;
+    }
+
+    .welcome-bar__socials {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+      margin-left: auto;
+      margin-right: max(8%, calc((100% - 902px) / 2));
+      padding-right: 4px;
+    }
+
+    .welcome-bar__socials a {
+      width: 39px;
+      height: 39px;
+      border-radius: 2px;
+      overflow: hidden;
+      flex: 0 0 39px;
+    }
+
+    .welcome-bar__socials img {
+      width: 39px;
+      height: 39px;
+      object-fit: cover;
+    }
+
+    /* ========== FACADE STAGE ========== */
+    .facade-section {
+      position: relative;
+      width: 100%;
+      background: var(--ric3-navy);
+      overflow: hidden;
+    }
+
+    .facade-stage {
+      position: relative;
+      width: 1688px;
+      max-width: none;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      aspect-ratio: 1688 / 3231;
+    }
+
+    .facade-stage__image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .facade-video {
+      position: absolute;
+      left: 17.09%;
+      top: 9.07%;
+      width: 54.8%;
+      height: 16.12%;
+      overflow: hidden;
+      background: #050505;
+      z-index: 2;
+    }
+
+    .facade-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .facade-video__mute {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 3;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font: 600 12px/1 Arial, Helvetica, sans-serif;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .hotspot {
+      position: absolute;
+      z-index: 4;
+      display: block;
+      background: transparent;
+    }
+
+    .hotspot:focus-visible {
+      outline: 2px solid #f5d76e;
+      outline-offset: 2px;
+    }
+
+    .hotspot--mortgage {
+      left: 24.26%;
+      top: 20.27%;
+      width: 16.77%;
+      height: 1.95%;
+    }
+
+    .hotspot--community {
+      left: 44.93%;
+      top: 20.27%;
+      width: 17.54%;
+      height: 1.95%;
+    }
+
+    .hotspot--frisbee-nav {
+      left: 64.66%;
+      top: 20.27%;
+      width: 16.77%;
+      height: 1.95%;
+    }
+
+    .hotspot--reviews {
+      left: 41.85%;
+      top: 42.77%;
+      width: 19.02%;
+      height: 6.07%;
+    }
+
+    .hotspot--door {
+      left: 33.03%;
+      top: 82.98%;
+      width: 8.65%;
+      height: 4.36%;
+    }
+
+    .hotspot--window {
+      left: 59.15%;
+      top: 79.63%;
+      width: 12.44%;
+      height: 6.31%;
+    }
+
+    .hotspot--newsletter {
+      left: 8.9%;
+      top: 62.7%;
+      width: 12.9%;
+      height: 6.7%;
+    }
+
+    .hotspot--summer-mi {
+      left: 32.3%;
+      top: 70.9%;
+      width: 12.9%;
+      height: 6.7%;
+    }
+
+    .hotspot--summer-ny {
+      left: 74.3%;
+      top: 58.0%;
+      width: 12.9%;
+      height: 6.7%;
+    }
+
+    /* Two white boxes on red brick wall — sized/aligned to mortgage broker card */
+    .brick-white-boxes {
+      position: absolute;
+      z-index: 5;
+      /* Same horizontal span as RIC3 Mortgage Broker box top edge */
+      left: 30%;
+      top: 30%;
+      margin-top: 3.4%;
+      width: 44%;
+      /* Shorter so they sit on brick, not the grey ledge */
+      height: 9%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.2%;
+    }
+
+    .brick-white-boxes__box {
+      background: #ffffff;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .soft-label {
+      position: absolute;
+      z-index: 3;
+      font-family: Avenir, "Avenir Next", Helvetica, Arial, sans-serif;
+      font-weight: 800;
+      color: #929184;
+      line-height: 1.15;
+      pointer-events: none;
+      opacity: 0.35;
+      white-space: nowrap;
+    }
+
+    .soft-label--about {
+      left: 84.7%;
+      top: 29.1%;
+      font-size: clamp(10px, 1.6vw, 28px);
+    }
+
+    .soft-label--blue {
+      left: 65.9%;
+      top: 40.0%;
+      font-size: clamp(9px, 1.1vw, 17px);
+    }
+
+    .bio-band {
+      position: relative;
+      width: 100%;
+      background: var(--ric3-navy);
+      padding: 28px 24px 48px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .bio-band__text {
+      width: min(980px, 86%);
+      text-align: center;
+      color: var(--ric3-cream);
+      font-family: Avenir, "Avenir Next", Helvetica, Arial, sans-serif;
+      font-weight: 800;
+      font-size: clamp(14px, 1.6vw, 19px);
+      line-height: 1.4;
+    }
+
+    .bio-band__logo {
+      flex: 0 0 82px;
+      width: 82px;
+      height: 80px;
+      margin-top: 4px;
+    }
+
+    .bio-band__logo img {
+      width: 82px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .mockup-note {
+      width: 100%;
+      text-align: center;
+      padding: 10px 16px 28px;
+      color: var(--ric3-muted);
+      font: 12px/1.4 Arial, Helvetica, sans-serif;
+      background: var(--ric3-navy);
+    }
+
+    @media (max-width: 980px) {
+      .welcome-bar {
+        min-height: 150px;
+        padding-top: 18px;
+      }
+
+      .welcome-bar__socials {
+        margin-right: 4%;
+        margin-left: auto;
+      }
+
+      .facade-stage {
+        width: 140%;
+        margin-left: 50%;
+      }
+
+      .bio-band {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .bio-band__logo {
+        order: 2;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .welcome-bar__text {
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .welcome-bar__socials {
+        margin: 12px auto 0;
+      }
+
+      .facade-stage {
+        width: 185%;
+      }
+
+      .facade-video__mute {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="welcome-bar" aria-label="Welcome">
+    <p class="welcome-bar__text">
+      Welcome to the RIC3 Fam website, where the collective initiatives of broker, director and project framer Wilkin Lai come together.
+    </p>
+    <div class="welcome-bar__socials" aria-label="Social links">
+      <a href="https://g.page/r/CWCy-sB-1b5wEAI/review" target="_blank" rel="noopener noreferrer" title="Google reviews">
+        <img
+          src="https://static.wixstatic.com/media/4766c0_35ee2063b023444b9dd1dea0ae4baa7e~mv2.jpg/v1/fill/w_78,h_78,al_c,q_80,usm_0.66_1.00_0.01/4766c0_35ee2063b023444b9dd1dea0ae4baa7e~mv2.jpg"
+          alt="Google reviews"
+          width="39"
+          height="39"
+        >
+      </a>
+      <a href="https://chat.whatsapp.com/GObL9IrRPA3CptEjmOGbbN" target="_blank" rel="noopener noreferrer" title="WhatsApp">
+        <img
+          src="https://static.wixstatic.com/media/11062b_1db239e728f641c3a3be5b7ca708f239~mv2.png/v1/fill/w_78,h_78,al_c,q_85,usm_0.66_1.00_0.01/11062b_1db239e728f641c3a3be5b7ca708f239~mv2.png"
+          alt="WhatsApp"
+          width="39"
+          height="39"
+        >
+      </a>
+      <a href="https://vimeo.com/user212547274" target="_blank" rel="noopener noreferrer" title="Vimeo">
+        <img
+          src="https://static.wixstatic.com/media/11062b_49761dcbd8da4d6ebf5a4e16c5a6ed72~mv2.png/v1/fill/w_78,h_78,al_c,q_85,usm_0.66_1.00_0.01/11062b_49761dcbd8da4d6ebf5a4e16c5a6ed72~mv2.png"
+          alt="Vimeo"
+          width="39"
+          height="39"
+        >
+      </a>
+    </div>
+  </header>
+
+  <main class="facade-section" aria-label="RIC3 Fam building facade">
+    <div class="facade-stage">
+      <img
+        class="facade-stage__image"
+        src="https://static.wixstatic.com/media/4766c0_d4a3d6fa36574519b3abe13769b3761e~mv2.jpg/v1/fill/w_1688,h_3231,al_c,q_90,usm_0.66_1.00_0.01/bgrd.jpg"
+        alt="RIC3 Fam building facade collage"
+        width="1688"
+        height="3231"
+        display="none"
+      >
+
+      <div class="facade-video" aria-label="Featured video billboard">
+        <video
+          id="billboard-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="https://static.wixstatic.com/media/4766c0_e866f7097f0b41b492efc90071923db0f000.jpg/v1/fill/w_925,h_521,al_c,q_85,usm_0.66_1.00_0.01/4766c0_e866f7097f0b41b492efc90071923db0f000.jpg"
+        >
+          <source
+            src="https://video.wixstatic.com/video/4766c0_e866f7097f0b41b492efc90071923db0/720p/mp4/file.mp4"
+            type="video/mp4"
+          >
+        </video>
+        <button class="facade-video__mute" id="billboard-mute" type="button" aria-label="Unmute video">Unmute</button>
+      </div>
+
+      <a class="hotspot hotspot--mortgage" href="https://www.ricthree.com/" target="_blank" rel="noopener noreferrer" aria-label="Mortgage Broker"></a>
+      <a class="hotspot hotspot--community" href="https://www.ricthree.com/" target="_blank" rel="noopener noreferrer" aria-label="Creative Community"></a>
+      <a class="hotspot hotspot--frisbee-nav" href="https://frisbee.ric3family.com/" target="_blank" rel="noopener noreferrer" aria-label="Family Frisbee"></a>
+      <a class="hotspot hotspot--reviews" href="https://www.google.com/search?q=ric3+mortgage" target="_blank" rel="noopener noreferrer" aria-label="Reviews"></a>
+      <a class="hotspot hotspot--newsletter" href="https://www.canva.com/design/DAGJFW5K_5Q/zhqeLM2F9uvaVneb8Ie0Mg/view?utm_content=DAGJFW5K_5Q&utm_campaign=designshare&utm_medium=link&utm_source=editor" target="_blank" rel="noopener noreferrer" aria-label="RIC3 Fam Newsletter"></a>
+      <a class="hotspot hotspot--summer-mi" href="https://www.ricthree.com/" target="_blank" rel="noopener noreferrer" aria-label="Summer Edition: MI"></a>
+      <a class="hotspot hotspot--summer-ny" href="https://www.ricthree.com/" target="_blank" rel="noopener noreferrer" aria-label="Summer Edition: NY"></a>
+      <a class="hotspot hotspot--door" href="https://wilkinlai.wixsite.com/mysite-2/ric3fam" target="_blank" rel="noopener noreferrer" aria-label="RIC3 Creative Community door"></a>
+      <a class="hotspot hotspot--window" href="https://lightroom.adobe.com/shares/3884edc87f7d46888c0219e707cdb1f3" target="_blank" rel="noopener noreferrer" aria-label="RICE Family Ultimate Frisbee window"></a>
+
+      <!-- Only change: two white boxes on the red brick wall, with gap -->
+      <div class="brick-white-boxes" aria-hidden="true">
+        <div class="brick-white-boxes__box"></div>
+        <div class="brick-white-boxes__box"></div>
+      </div>
+
+      <span class="soft-label soft-label--about">About RIC3 FAM</span>
+      <span class="soft-label soft-label--blue">Blue House</span>
+    </div>
+  </main>
+
+  <footer class="bio-band" aria-label="About Wilkin Lai">
+    <p class="bio-band__text">
+      Wilkin Lai is a creative real estate professional.
+      He is a licensed mortgage broker with RIC3 Mortgage Broker (NMLS License #166537/Company #2126804),
+      a Realtor with Premier Agent Network (MLS License#10401397210)
+      and is working to a form a staging company in collaboration with RIC3 Creative Community.
+    </p>
+    <a class="bio-band__logo" href="https://www.ricthree.com/" target="_blank" rel="noopener noreferrer" aria-label="Equal Housing Lender">
+      <img
+        src="https://static.wixstatic.com/media/4766c0_af5d1d85797247bba4325f94d602476f~mv2.png/v1/fill/w_164,h_160,al_c,q_85,usm_0.66_1.00_0.01/Equal%2520Housing%2520Lender%2520Logo%2520copy_edited.png"
+        alt="Equal Housing Lender"
+        width="82"
+        height="80"
+      >
+    </a>
+  </footer>
+
+  <p class="mockup-note">
+    Mockup of
+    <a href="https://www.ricthree.com/copy-of-welcome-to-ric3-family" target="_blank" rel="noopener noreferrer">ricthree.com/copy-of-welcome-to-ric3-family</a>
+    — original collage + two white boxes on the red brick wall.
+  </p>
+
+  <script>
+    (function () {
+      var video = document.getElementById('billboard-video');
+      var btn = document.getElementById('billboard-mute');
+      if (!video || !btn) return;
+
+      function syncLabel() {
+        btn.textContent = video.muted ? 'Unmute' : 'Mute';
+        btn.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+      }
+
+      video.muted = true;
+      video.play().catch(function () {});
+      syncLabel();
+
+      btn.addEventListener('click', function () {
+        video.muted = !video.muted;
+        if (!video.muted && video.paused) video.play().catch(function () {});
+        syncLabel();
+      });
+    })();
+  </script>
+</body>
+</html>

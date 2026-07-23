@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 160">
+  <rect x="5" y="0" width="170" height="160" rx="8" fill="#ee4b43"/>
+  <text x="90" y="52" text-anchor="middle" font-family="Georgia, serif" font-size="44" font-weight="900" fill="#fff" stroke="#111" stroke-width="2">I</text>
+  <path d="M75 62c-20-24-56 8-19 38l34 28 34-28c37-30 1-62-19-38-8-10-22-10-30 0z" fill="#e02022" stroke="#fff" stroke-width="7"/>
+  <text x="90" y="139" text-anchor="middle" font-family="Georgia, serif" font-size="62" font-weight="900" fill="#fff" stroke="#111" stroke-width="3">NY</text>
+</svg>
