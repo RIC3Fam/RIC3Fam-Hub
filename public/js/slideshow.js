@@ -89,10 +89,12 @@ document.querySelectorAll('.gallery-caption-save').forEach((button) => {
             const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
             const gameSlideshowId = document.getElementById('game-slideshow-id');
             const gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
+            const isEventPage = document.getElementById('is-event-page') != null;
 
             const body = { imageUrl, caption: input.value };
             if (groupId) body.groupId = groupId;
             if (gameId) body.gameId = gameId;
+            if (isEventPage) body.isEventPage = true;
 
             const response = await fetch('/pictures/slideshow', {
                 method: 'PATCH',
