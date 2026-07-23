@@ -243,4 +243,53 @@ test.describe('RIC3Fam Hub e2e', () => {
 
         await strangerCtx.close();
     });
+
+    test('admin can save a caption on the events page slideshow', async ({ page }) => {
+        const { MongoClient } = await import('mongodb');
+        const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/';
+        const admin = userCreds('eadm');
+        await register(page, admin);
+
+        const slideUrl = `https://example.com/e2e-events-slide-${unique}.jpg`;
+        const client = new MongoClient(dbUrl);
+        await client.connect();
+        try {
+            const db = client.db('RIC3-Frisbee');
+            await db.collection('users').updateOne(
+                { username: admin.username },
+                { $set: { isAdmin: true, admin: true } }
+            );
+            await db.collection('media').updateOne(
+                { title: 'Event Page Slideshow' },
+                {
+                    $set: {
+                        title: 'Event Page Slideshow',
+                        slideshowImages: [{ url: slideUrl, caption: 'Old events caption' }],
+                    },
+                },
+                { upsert: true }
+            );
+        } finally {
+            await client.close();
+        }
+
+        await login(page, admin);
+        await page.goto('/events');
+        await expect(page.locator('#is-event-page')).toHaveCount(1);
+        await expect(page.locator('.slider-caption-editor')).toBeVisible();
+
+        const captionInput = page.locator('.gallery-caption-edit').first().locator('.gallery-caption-input');
+        const saveBtn = page.locator('.gallery-caption-edit').first().locator('.gallery-caption-save');
+        await expect(captionInput).toBeVisible();
+        await captionInput.fill(`Events caption ${unique}`);
+        await saveBtn.click();
+
+        await expect(page.locator('#message-label')).toContainText('Caption saved');
+        await expect(page.locator('#error-label')).toBeHidden();
+        await expect(page.locator('.picture-slider-caption').first()).toContainText(`Events caption ${unique}`);
+
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').first()).toHaveValue(`Events caption ${unique}`);
+        await expect(page.locator('.picture-slider-caption').first()).toContainText(`Events caption ${unique}`);
+    });
 });

@@ -307,6 +307,21 @@ export function captionFromImageUrl(url) {
     }
 }
 
+/** Compare slideshow image URLs ignoring query strings / encoding drift. */
+export function slideshowUrlsMatch(a, b) {
+    const norm = (value) => {
+        try {
+            return decodeURIComponent(String(value || '').split('?')[0].trim());
+        } catch (e) {
+            return String(value || '').split('?')[0].trim();
+        }
+    };
+    const left = norm(a);
+    const right = norm(b);
+    if (!left || !right) return false;
+    return left === right || left.endsWith(right) || right.endsWith(left);
+}
+
 /**
  * Normalize slideshow image entries to { url, caption }.
  * Drops empty / invalid URLs (fixes blank-slide glitches).

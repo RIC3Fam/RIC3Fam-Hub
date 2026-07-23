@@ -161,7 +161,7 @@ const createEventPageSlideshow = async () => {
 
 /**
  * Gets the default event page slideshow object.
- * Also purges blank/invalid URLs that render as empty slides.
+ * Normalizes slides to { url, caption } and persists that shape.
  * @returns
  */
 const getEventPageSlideshow = async () => {
@@ -171,15 +171,19 @@ const getEventPageSlideshow = async () => {
     if (!slideshow) throw 'Could not find event page slideshow';
 
     const raw = Array.isArray(slideshow.slideshowImages) ? slideshow.slideshowImages : [];
-    // Drop blank / invalid entries that caused empty "ghost" slides.
-    const cleanedUrls = raw
-        .map((img) => (typeof img === 'string' ? img.trim() : img && img.url ? String(img.url).trim() : ''))
-        .filter((url) => url && url !== 'undefined' && url !== 'null' && /^https?:\/\//i.test(url));
+    const normalized = helpers.normalizeSlideshowSlides(raw);
 
-    if (cleanedUrls.length !== raw.length) {
-        await mediaCollection.updateOne({ title: 'Event Page Slideshow' }, { $set: { slideshowImages: cleanedUrls } });
-        slideshow.slideshowImages = cleanedUrls;
+    // Persist normalized {url, caption} objects (and drop invalid / legacy string entries).
+    const needsRewrite =
+        normalized.length !== raw.length ||
+        raw.some((img) => typeof img === 'string' || !(img && typeof img === 'object' && img.url));
+    if (needsRewrite) {
+        await mediaCollection.updateOne(
+            { title: 'Event Page Slideshow' },
+            { $set: { slideshowImages: normalized } }
+        );
     }
+    slideshow.slideshowImages = normalized;
 
     return slideshow;
 };
@@ -198,10 +202,14 @@ const addEventPageSlideshowImage = async (imagePath) => {
     const base = 'https://storage.googleapis.com';
 
     const url = `${base}/${bucketName}/eventPage/${imagePath}`;
+    const slide = { url, caption: helpers.captionFromImageUrl(url) };
 
     // Update user info
     const mediaCollection = await media();
-    const updatedInfo = await mediaCollection.updateOne({ title: 'Event Page Slideshow' }, { $push: { slideshowImages: url } });
+    const updatedInfo = await mediaCollection.updateOne(
+        { title: 'Event Page Slideshow' },
+        { $push: { slideshowImages: slide } }
+    );
 
     if (!updatedInfo) throw 'Could not update Event Page successfully';
 
@@ -222,12 +230,44 @@ const removeEventPageSlideshowImage = async (imagePath) => {
 
     const url = `${base}/${bucketName}/eventPage/${imagePath}`;
 
-    // Update user info
+    const slideshow = await getEventPageSlideshow();
+    const next = helpers
+        .normalizeSlideshowSlides(slideshow.slideshowImages || [])
+        .filter((slide) => !helpers.slideshowUrlsMatch(slide.url, url));
+
     const mediaCollection = await media();
-    const updatedInfo = await mediaCollection.updateOne({ title: 'Event Page Slideshow' }, { $pull: { slideshowImages: url } });
+    const updatedInfo = await mediaCollection.updateOne(
+        { title: 'Event Page Slideshow' },
+        { $set: { slideshowImages: next } }
+    );
 
     if (!updatedInfo) throw 'Could not update Event Page successfully';
 
+    return updatedInfo;
+};
+
+const updateEventPageSlideshowCaption = async (imageUrl, caption) => {
+    helpers.stringHelper(imageUrl, 'Image URL', 1, 2048);
+    const nextCaption = helpers.optionalString(caption, 'Caption', 200);
+
+    const slideshow = await getEventPageSlideshow();
+    const slides = helpers.normalizeSlideshowSlides(slideshow.slideshowImages || []);
+    let found = false;
+    const next = slides.map((slide) => {
+        if (helpers.slideshowUrlsMatch(slide.url, imageUrl)) {
+            found = true;
+            return { url: slide.url, caption: nextCaption };
+        }
+        return slide;
+    });
+    if (!found) throw 'Slideshow image not found';
+
+    const mediaCollection = await media();
+    const updatedInfo = await mediaCollection.updateOne(
+        { title: 'Event Page Slideshow' },
+        { $set: { slideshowImages: next } }
+    );
+    if (!updatedInfo) throw 'Could not update caption';
     return updatedInfo;
 };
 
@@ -328,6 +368,7 @@ export default {
     getEventPageSlideshow,
     addEventPageSlideshowImage,
     removeEventPageSlideshowImage,
+    updateEventPageSlideshowCaption,
     createHomePageConfig,
     getHomePageConfig,
     updateHomePageConfig,

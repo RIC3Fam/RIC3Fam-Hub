@@ -590,7 +590,7 @@ const updateSlideshowCaption = async (gameId, imageUrl, caption) => {
     const slides = helpers.normalizeSlideshowSlides(game.slideshowImages || []);
     let found = false;
     const next = slides.map((slide) => {
-        if (slide.url === imageUrl) {
+        if (helpers.slideshowUrlsMatch(slide.url, imageUrl)) {
             found = true;
             return { url: slide.url, caption: nextCaption };
         }
