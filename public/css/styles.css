@@ -1572,7 +1572,7 @@ p.index {
 
 .facade-scene {
   --facade-scale-width: min(92vw, 980px);
-  --building-width: min(72vw, 700px);
+  --building-width: min(61vw, 595px);
   --gold: #c9bd42;
   --glass: #536b6a;
   --shadow: rgba(0, 0, 0, 0.35);
@@ -1581,21 +1581,20 @@ p.index {
   padding: 42px 0 62px;
   box-sizing: border-box;
   background:
-    linear-gradient(90deg, #1d2534 0, #1d2534 6%, transparent 6%, transparent 94%, #1d2534 94%, #1d2534 100%),
-    linear-gradient(180deg, #202939 0%, #202939 100%);
+    radial-gradient(ellipse at 18% 12%, rgba(255,255,255,0.86) 0 9%, rgba(255,255,255,0) 22%),
+    radial-gradient(ellipse at 78% 18%, rgba(255,255,255,0.62) 0 8%, rgba(255,255,255,0) 20%),
+    linear-gradient(180deg, #acd8ee 0%, #bde3f3 48%, #d6eef8 100%);
   overflow: hidden;
 }
 
 .facade-scene::before {
   content: "";
   position: absolute;
-  inset: 0 6%;
+  inset: 0;
   background:
-    linear-gradient(rgba(92, 127, 143, 0.66), rgba(83, 116, 130, 0.72)),
-    linear-gradient(105deg, transparent 0 8%, rgba(255,255,255,0.18) 8.2% 8.5%, transparent 8.7% 42%, rgba(255,255,255,0.12) 42.2% 42.6%, transparent 42.8%),
-    repeating-linear-gradient(90deg, transparent 0 56px, rgba(255,255,255,0.14) 56px 59px, transparent 59px 78px),
-    linear-gradient(180deg, #49616c 0%, #7d9bac 68%, #a4c5d4 100%);
-  box-shadow: inset 0 0 70px rgba(0,0,0,0.32);
+    radial-gradient(ellipse at 35% 8%, rgba(255,255,255,0.5) 0 7%, rgba(255,255,255,0) 18%),
+    radial-gradient(ellipse at 63% 30%, rgba(255,255,255,0.34) 0 8%, rgba(255,255,255,0) 20%);
+  pointer-events: none;
 }
 
 .facade-shell {
@@ -1794,22 +1793,15 @@ p.index {
 
 .facade-side-logo {
   position: absolute;
-  z-index: 7;
-  left: -118px;
-  top: 148px;
-  width: 108px;
-  height: 108px;
+  z-index: 8;
+  left: 14px;
+  bottom: 10px;
+  width: 96px;
+  height: 96px;
 }
 
 .facade-side-logo::before {
-  content: "";
-  position: absolute;
-  left: 90px;
-  top: 50px;
-  width: 64px;
-  height: 10px;
-  background: #0b0d0f;
-  z-index: -1;
+  display: none;
 }
 
 .facade-side-logo img {
@@ -1950,7 +1942,7 @@ p.index {
   height: 302px;
 }
 
-.facade-door img {
+.facade-door > img:not(.facade-volunteer-sign) {
   width: 74%;
   max-height: 112px;
 }
@@ -1976,27 +1968,26 @@ p.index {
   border-radius: 9px;
 }
 
-.facade-volunteer-tag {
+.facade-volunteer-sign {
   position: absolute;
-  right: -24px;
-  bottom: 60px;
-  padding: 5px 8px;
-  color: #222;
-  background: #fff;
-  border: 1px solid #c2c2c2;
-  border-radius: 3px;
-  font-size: 11px;
-  line-height: 1;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+  right: -38px;
+  top: 38%;
+  width: 86px;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  transform: scaleY(1.18);
+  transform-origin: center;
+  filter: drop-shadow(0 4px 5px rgba(0,0,0,0.22));
 }
 
 .facade-people {
   position: absolute;
   z-index: 5;
-  right: 42px;
+  right: 64px;
   bottom: -2px;
-  width: 46%;
-  max-width: 350px;
+  width: 34%;
+  max-width: 250px;
   pointer-events: none;
 }
 
@@ -2008,13 +1999,7 @@ p.index {
 }
 
 .facade-ground::before {
-  content: "";
-  position: absolute;
-  left: -110px;
-  bottom: 0;
-  width: 180px;
-  height: 122px;
-  background: linear-gradient(145deg, transparent 0 49%, #5d625e 50%);
+  display: none;
 }
 
 .home-admin-link {
@@ -2025,7 +2010,7 @@ p.index {
 @media (max-width: 1024px) {
   .facade-scene {
     --facade-scale-width: min(88vw, 760px);
-    --building-width: min(68vw, 560px);
+    --building-width: min(58vw, 476px);
     min-height: 1040px;
   }
 
@@ -2036,7 +2021,8 @@ p.index {
   }
 
   .facade-side-logo {
-    left: -82px;
+    left: 12px;
+    bottom: 9px;
     width: 78px;
     height: 78px;
   }
@@ -2050,7 +2036,7 @@ p.index {
 @media (max-width: 768px) {
   .facade-scene {
     --facade-scale-width: calc(100vw - 8px);
-    --building-width: min(78vw, 520px);
+    --building-width: min(66vw, 442px);
     min-height: 980px;
     padding-top: 18px;
   }
@@ -2073,16 +2059,14 @@ p.index {
   }
 
   .facade-side-logo {
-    left: -58px;
-    top: 126px;
+    left: 10px;
+    bottom: 8px;
     width: 68px;
     height: 68px;
   }
 
   .facade-side-logo::before {
-    left: 52px;
-    width: 38px;
-    height: 8px;
+    display: none;
   }
 
   .facade-balcony {
@@ -2110,14 +2094,14 @@ p.index {
   }
 
   .facade-people {
-    width: 47%;
-    right: 16px;
+    width: 34%;
+    right: 36px;
   }
 }
 
 @media (max-width: 520px) {
   .facade-scene {
-    --building-width: calc(100vw - 34px);
+    --building-width: 84vw;
     min-height: 900px;
     padding-bottom: 28px;
   }
@@ -2137,7 +2121,7 @@ p.index {
   }
 
   .facade-building {
-    max-width: calc(100vw - 34px);
+    max-width: 84vw;
     margin-top: 72px;
   }
 
@@ -2175,8 +2159,8 @@ p.index {
   }
 
   .facade-side-logo {
-    left: -18px;
-    top: 116px;
+    left: 7px;
+    bottom: 7px;
     width: 58px;
     height: 58px;
   }
@@ -2232,11 +2216,10 @@ p.index {
     height: 196px;
   }
 
-  .facade-volunteer-tag {
-    right: -12px;
-    bottom: 45px;
-    font-size: 9px;
-    padding: 4px 5px;
+  .facade-volunteer-sign {
+    right: -22px;
+    top: 38%;
+    width: 58px;
   }
 
   .facade-door-handle {
@@ -2245,8 +2228,8 @@ p.index {
   }
 
   .facade-people {
-    width: 50%;
-    right: 6px;
+    width: 35%;
+    right: 22px;
   }
 
   .facade-ground::before {
@@ -2258,11 +2241,11 @@ p.index {
 
 @media (max-width: 380px) {
   .facade-scene {
-    --building-width: calc(100vw - 22px);
+    --building-width: 84vw;
   }
 
   .facade-building {
-    max-width: calc(100vw - 22px);
+    max-width: 84vw;
   }
 
   .facade-brick-zone {
