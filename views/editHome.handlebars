@@ -3,8 +3,7 @@
         <h3>Edit Home Page</h3>
         <p class="muted">
             Upload a wide building facade (JPEG) for mobile portrait, the two square sign images, and the billboard video.
-            Set custom links for the three awning / door buttons.
-            The towel is part of the building art and stays static — not a button.
+            Set custom links for the awning / door buttons and towel buttons.
             Video autoplays muted on Home; visitors can unmute or double-click for fullscreen. No separate poster image.
         </p>
 
@@ -26,6 +25,9 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 1</legend>
                 <input type="hidden" name="towel1ImageUrl" value="{{home.towel1.imageUrl}}">
+                <label class="form-label">Left towel button URL
+                    <input class="form-input" type="url" name="towel1LinkUrl" value="{{home.towel1.linkUrl}}" placeholder="https://">
+                </label>
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Top" value="{{home.towel1.top}}"></label>
                     <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Left" value="{{home.towel1.left}}"></label>
@@ -36,6 +38,9 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 2</legend>
                 <input type="hidden" name="towel2ImageUrl" value="{{home.towel2.imageUrl}}">
+                <label class="form-label">Right towel button URL
+                    <input class="form-input" type="url" name="towel2LinkUrl" value="{{home.towel2.linkUrl}}" placeholder="https://">
+                </label>
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Top" value="{{home.towel2.top}}"></label>
                     <label>Left % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Left" value="{{home.towel2.left}}"></label>
@@ -43,6 +48,11 @@
                     <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel2Height" value="{{home.towel2.height}}"></label>
                 </div>
             </fieldset>
+
+            <h4>Artists in Residence(s) button</h4>
+            <label class="form-label">Awning / upper door button URL
+                <input class="form-input" type="url" name="artistsResidenceLinkUrl" value="{{home.artistsResidenceLinkUrl}}" placeholder="https://">
+            </label>
 
             <h4>Custom buttons (3)</h4>
             <p class="muted">Each button is tied to an awning or door/window. Set the destination link for each.</p>
