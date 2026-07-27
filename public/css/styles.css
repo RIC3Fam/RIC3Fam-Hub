@@ -1857,6 +1857,13 @@ p.index {
   text-decoration: none;
 }
 
+.facade-upper-door img {
+  display: block;
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}
+
 .facade-balcony {
   position: relative;
   width: 82%;
@@ -2370,6 +2377,9 @@ p.index {
 
 .home-edit-wrapper {
   max-width: 720px;
+  display: block;
+  margin: 24px auto 80px;
+  width: min(94vw, 960px);
 }
 
 .home-hotspot-edit {
