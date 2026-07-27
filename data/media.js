@@ -26,6 +26,7 @@ const defaultHomeConfig = () => ({
     buildingImageUrl: DEFAULT_BUILDING,
     billboardVideoUrl: '',
     billboardPosterUrl: '',
+    artistsResidenceLinkUrl: '',
     billboard: defaultBillboard(),
     towel1: defaultTowel1(),
     towel2: defaultTowel2(),
@@ -97,16 +98,17 @@ const applyLatestLayout = (doc) => {
         buildingImageUrl: doc.buildingImageUrl || DEFAULT_BUILDING,
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: '',
+        artistsResidenceLinkUrl: doc.artistsResidenceLinkUrl || '',
         billboard: defaults.billboard,
         towel1: {
             ...defaults.towel1,
             imageUrl: doc.towel1?.imageUrl || '',
-            linkUrl: '',
+            linkUrl: doc.towel1?.linkUrl || '',
         },
         towel2: {
             ...defaults.towel2,
             imageUrl: doc.towel2?.imageUrl || '',
-            linkUrl: '',
+            linkUrl: doc.towel2?.linkUrl || '',
         },
         hotspots: defaults.hotspots.map((d) => ({
             ...d,
@@ -131,6 +133,7 @@ const withHomeDefaults = (doc) => {
         buildingImageUrl: doc.buildingImageUrl || base.buildingImageUrl,
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: doc.billboardPosterUrl || '',
+        artistsResidenceLinkUrl: helpers.optionalString(doc.artistsResidenceLinkUrl, 'Artists in Residence link', 2000),
         billboard: normalizeBox(doc.billboard, defaultBillboard),
         towel1: normalizeTowel(doc.towel1, defaultTowel1),
         towel2: normalizeTowel(doc.towel2, defaultTowel2),
@@ -320,18 +323,22 @@ const updateHomePageConfig = async (updates = {}) => {
                 ? helpers.optionalString(updates.billboardVideoUrl, 'Billboard video')
                 : current.billboardVideoUrl,
         billboardPosterUrl: '',
+        artistsResidenceLinkUrl:
+            updates.artistsResidenceLinkUrl != null
+                ? helpers.optionalString(updates.artistsResidenceLinkUrl, 'Artists in Residence link', 2000)
+                : current.artistsResidenceLinkUrl,
         billboard:
             updates.billboard != null
                 ? normalizeBox({ ...current.billboard, ...updates.billboard }, defaultBillboard)
                 : current.billboard,
         towel1:
             updates.towel1 != null
-                ? normalizeTowel({ ...current.towel1, ...updates.towel1, linkUrl: '' }, defaultTowel1)
-                : { ...current.towel1, linkUrl: '' },
+                ? normalizeTowel({ ...current.towel1, ...updates.towel1 }, defaultTowel1)
+                : current.towel1,
         towel2:
             updates.towel2 != null
-                ? normalizeTowel({ ...current.towel2, ...updates.towel2, linkUrl: '' }, defaultTowel2)
-                : { ...current.towel2, linkUrl: '' },
+                ? normalizeTowel({ ...current.towel2, ...updates.towel2 }, defaultTowel2)
+                : current.towel2,
         hotspots: updates.hotspots != null ? normalizeHotspots(updates.hotspots) : current.hotspots,
     };
 
@@ -354,11 +361,11 @@ const setHomeAssetUrl = async (field, imagePath) => {
     if (field === 'billboardVideoUrl') return updateHomePageConfig({ billboardVideoUrl: url });
     if (field === 'towel1Image') {
         const current = await getHomePageConfig();
-        return updateHomePageConfig({ towel1: { ...current.towel1, imageUrl: url, linkUrl: '' } });
+        return updateHomePageConfig({ towel1: { ...current.towel1, imageUrl: url } });
     }
     if (field === 'towel2Image') {
         const current = await getHomePageConfig();
-        return updateHomePageConfig({ towel2: { ...current.towel2, imageUrl: url, linkUrl: '' } });
+        return updateHomePageConfig({ towel2: { ...current.towel2, imageUrl: url } });
     }
     throw 'Unknown home asset field';
 };

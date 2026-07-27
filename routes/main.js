@@ -38,6 +38,7 @@ router
             await mediaData.updateHomePageConfig({
                 buildingImageUrl: req.body.buildingImageUrl,
                 billboardVideoUrl: req.body.billboardVideoUrl,
+                artistsResidenceLinkUrl: req.body.artistsResidenceLinkUrl,
                 billboard: {
                     top: req.body.billboardTop,
                     left: req.body.billboardLeft,
@@ -46,7 +47,7 @@ router
                 },
                 towel1: {
                     imageUrl: req.body.towel1ImageUrl,
-                    linkUrl: '',
+                    linkUrl: req.body.towel1LinkUrl,
                     top: req.body.towel1Top,
                     left: req.body.towel1Left,
                     width: req.body.towel1Width,
@@ -54,7 +55,7 @@ router
                 },
                 towel2: {
                     imageUrl: req.body.towel2ImageUrl,
-                    linkUrl: '',
+                    linkUrl: req.body.towel2LinkUrl,
                     top: req.body.towel2Top,
                     left: req.body.towel2Left,
                     width: req.body.towel2Width,

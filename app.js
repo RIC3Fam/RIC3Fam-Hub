@@ -46,6 +46,9 @@ var hbs = exphbs.create({
             }
             return options.inverse(this);
         },
+        defaultUrl: function (url, fallback) {
+            return url || fallback || '/';
+        },
     },
     defaultLayout: 'main',
     partialsDir: __dirname + '/views',

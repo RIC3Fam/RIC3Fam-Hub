@@ -1794,20 +1794,43 @@ p.index {
 .facade-side-logo {
   position: absolute;
   z-index: 8;
-  left: 14px;
-  bottom: 10px;
-  width: 96px;
-  height: 96px;
+  left: -86px;
+  top: 648px;
+  width: 72px;
+  height: 72px;
+  background:
+    linear-gradient(#050505, #050505) right 27% / 30px 8px no-repeat,
+    linear-gradient(#050505, #050505) right 73% / 30px 8px no-repeat;
+  border-radius: 50%;
 }
 
 .facade-side-logo::before {
-  display: none;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -14px;
+  top: 31%;
+  width: 38px;
+  height: 8px;
+  background: #050505;
+}
+
+.facade-side-logo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -14px;
+  bottom: 31%;
+  width: 38px;
+  height: 8px;
+  background: #050505;
 }
 
 .facade-side-logo img {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: contain;
   filter: drop-shadow(0 5px 4px rgba(0,0,0,0.35));
 }
 
@@ -1831,25 +1854,26 @@ p.index {
   background: linear-gradient(90deg, var(--gold) 0 10px, #243c41 10px calc(100% - 10px), var(--gold) calc(100% - 10px));
   border: 4px solid #303b39;
   box-shadow: inset 0 0 0 3px rgba(246,236,65,0.45);
+  text-decoration: none;
 }
 
 .facade-balcony {
   position: relative;
   width: 82%;
-  height: 118px;
+  height: 86px;
   margin: -8px auto 0;
-  border-bottom: 18px solid #73746f;
+  border-bottom: 14px solid #73746f;
   background: linear-gradient(#4f514d, #2f322f);
-  box-shadow: 0 12px 14px rgba(0,0,0,0.22);
+  box-shadow: 0 8px 11px rgba(0,0,0,0.22);
 }
 
 .facade-balcony::before,
 .facade-balcony::after {
   content: "";
   position: absolute;
-  bottom: -58px;
-  width: 14px;
-  height: 44px;
+  bottom: -46px;
+  width: 12px;
+  height: 34px;
   background: #333532;
   border-radius: 0 0 5px 5px;
 }
@@ -1864,28 +1888,41 @@ p.index {
 
 .facade-rail {
   position: absolute;
-  inset: 14px 0 12px;
+  inset: 12px 0 10px;
   background:
-    repeating-linear-gradient(90deg, transparent 0 19px, #151716 19px 29px),
-    linear-gradient(#171918 0 9px, transparent 9px calc(100% - 10px), #171918 calc(100% - 10px));
+    repeating-linear-gradient(90deg, transparent 0 18px, #151716 18px 27px),
+    linear-gradient(#171918 0 7px, transparent 7px calc(100% - 8px), #171918 calc(100% - 8px));
 }
 
 .facade-banner {
   position: absolute;
   z-index: 4;
   top: -12px;
-  width: 92px;
-  height: 98px;
+  width: 80px;
+  height: 86px;
   object-fit: contain;
   filter: drop-shadow(0 5px 4px rgba(0,0,0,0.25));
 }
 
+.facade-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.facade-banner:focus-visible,
+.facade-upper-door:focus-visible {
+  outline: 3px solid #f7df35;
+  outline-offset: 4px;
+}
+
 .facade-banner-left {
-  left: 28px;
+  left: 34px;
 }
 
 .facade-banner-right {
-  right: 28px;
+  right: 34px;
 }
 
 .facade-storefront {
@@ -1945,11 +1982,13 @@ p.index {
 .facade-door > img:not(.facade-volunteer-sign) {
   width: 74%;
   max-height: 112px;
+  transform: translateY(-20px);
 }
 
 .facade-window img {
   width: 78%;
   max-height: 160px;
+  transform: translateY(-18px);
 }
 
 .facade-door:focus-visible,
@@ -1971,7 +2010,7 @@ p.index {
 .facade-volunteer-sign {
   position: absolute;
   right: -38px;
-  top: 38%;
+  top: 58%;
   width: 86px;
   height: auto;
   max-height: none;
@@ -1984,10 +2023,10 @@ p.index {
 .facade-people {
   position: absolute;
   z-index: 5;
-  right: 64px;
-  bottom: -2px;
-  width: 34%;
-  max-width: 250px;
+  right: 42px;
+  bottom: -8px;
+  width: 39%;
+  max-width: 286px;
   aspect-ratio: 460 / 330;
   pointer-events: none;
 }
@@ -2001,17 +2040,17 @@ p.index {
 
 .facade-person-girl {
   left: 6%;
-  height: 68%;
+  height: 74%;
 }
 
 .facade-person-man {
   left: 38%;
-  height: 100%;
+  height: 108%;
 }
 
 .facade-person-boy {
   right: 8%;
-  height: 68%;
+  height: 74%;
 }
 
 .facade-ground {
@@ -2044,10 +2083,13 @@ p.index {
   }
 
   .facade-side-logo {
-    left: 12px;
-    bottom: 9px;
-    width: 78px;
-    height: 78px;
+    left: -72px;
+    top: 626px;
+    width: 58px;
+    height: 58px;
+    background:
+      linear-gradient(#050505, #050505) right 27% / 24px 6px no-repeat,
+      linear-gradient(#050505, #050505) right 73% / 24px 6px no-repeat;
   }
 
   .facade-storefront {
@@ -2082,23 +2124,39 @@ p.index {
   }
 
   .facade-side-logo {
-    left: 10px;
-    bottom: 8px;
-    width: 68px;
-    height: 68px;
+    left: -64px;
+    top: 544px;
+    width: 54px;
+    height: 54px;
+    background:
+      linear-gradient(#050505, #050505) right 27% / 22px 6px no-repeat,
+      linear-gradient(#050505, #050505) right 73% / 22px 6px no-repeat;
   }
 
-  .facade-side-logo::before {
-    display: none;
+  .facade-side-logo::before,
+  .facade-side-logo::after {
+    right: -10px;
+    width: 30px;
+    height: 6px;
   }
 
   .facade-balcony {
     width: 86%;
+    height: 76px;
+    border-bottom-width: 12px;
   }
 
   .facade-banner {
-    width: 66px;
-    height: 76px;
+    width: 62px;
+    height: 70px;
+  }
+
+  .facade-banner-left {
+    left: 28px;
+  }
+
+  .facade-banner-right {
+    right: 28px;
   }
 
   .facade-storefront {
@@ -2117,8 +2175,9 @@ p.index {
   }
 
   .facade-people {
-    width: 34%;
-    right: 36px;
+    width: 39%;
+    right: 22px;
+    bottom: -8px;
   }
 }
 
@@ -2182,39 +2241,47 @@ p.index {
   }
 
   .facade-side-logo {
-    left: 7px;
-    bottom: 7px;
-    width: 58px;
-    height: 58px;
+    left: -36px;
+    top: 428px;
+    width: 42px;
+    height: 42px;
+    background:
+      linear-gradient(#050505, #050505) right 27% / 18px 5px no-repeat,
+      linear-gradient(#050505, #050505) right 73% / 18px 5px no-repeat;
   }
 
-  .facade-side-logo::before {
-    display: none;
+  .facade-side-logo::before,
+  .facade-side-logo::after {
+    right: -3px;
+    width: 18px;
+    height: 5px;
   }
 
   .facade-balcony {
     width: 88%;
-    height: 88px;
+    height: 62px;
+    border-bottom-width: 10px;
   }
 
   .facade-rail {
+    inset: 9px 0 8px;
     background:
-      repeating-linear-gradient(90deg, transparent 0 14px, #151716 14px 22px),
-      linear-gradient(#171918 0 8px, transparent 8px calc(100% - 9px), #171918 calc(100% - 9px));
+      repeating-linear-gradient(90deg, transparent 0 12px, #151716 12px 19px),
+      linear-gradient(#171918 0 6px, transparent 6px calc(100% - 7px), #171918 calc(100% - 7px));
   }
 
   .facade-banner {
-    top: -7px;
-    width: 54px;
-    height: 64px;
+    top: -6px;
+    width: 48px;
+    height: 56px;
   }
 
   .facade-banner-left {
-    left: 16px;
+    left: 22px;
   }
 
   .facade-banner-right {
-    right: 16px;
+    right: 22px;
   }
 
   .facade-storefront {
@@ -2241,7 +2308,7 @@ p.index {
 
   .facade-volunteer-sign {
     right: -22px;
-    top: 38%;
+    top: 47%;
     width: 58px;
   }
 
@@ -2251,8 +2318,9 @@ p.index {
   }
 
   .facade-people {
-    width: 35%;
-    right: 22px;
+    width: 40%;
+    right: 10px;
+    bottom: -7px;
   }
 
   .facade-ground::before {
