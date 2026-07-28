@@ -2,8 +2,8 @@
     <div class="form-wrapper home-edit-wrapper">
         <h3>Edit Home Page</h3>
         <p class="muted">
-            Upload a wide building facade (JPEG) for mobile portrait, the two square sign images, and the billboard video.
-            Set custom links for the awning / door buttons and towel buttons.
+            Upload the billboard video and square sign images.
+            Set custom links for the square signs, lower door, lower window, and Artists in Residence(s) button.
             Video autoplays muted on Home; visitors can unmute or double-click for fullscreen. No separate poster image.
         </p>
 
@@ -25,7 +25,7 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 1</legend>
                 <input type="hidden" name="towel1ImageUrl" value="{{home.towel1.imageUrl}}">
-                <label class="form-label">Left towel button URL
+                <label class="form-label">Left Square Sign 1 Link URL
                     <input class="form-input" type="url" name="towel1LinkUrl" value="{{home.towel1.linkUrl}}" placeholder="https://">
                 </label>
                 <div class="home-hotspot-coords">
@@ -38,7 +38,7 @@
             <fieldset class="home-hotspot-edit">
                 <legend>Sign 2</legend>
                 <input type="hidden" name="towel2ImageUrl" value="{{home.towel2.imageUrl}}">
-                <label class="form-label">Right towel button URL
+                <label class="form-label">Right Square Sign 2 Link URL
                     <input class="form-input" type="url" name="towel2LinkUrl" value="{{home.towel2.linkUrl}}" placeholder="https://">
                 </label>
                 <div class="home-hotspot-coords">
@@ -54,14 +54,29 @@
                 <input class="form-input" type="url" name="artistsResidenceLinkUrl" value="{{home.artistsResidenceLinkUrl}}" placeholder="https://">
             </label>
 
-            <h4>Custom buttons (3)</h4>
-            <p class="muted">Each button is tied to an awning or door/window. Set the destination link for each.</p>
+            <h4>Lower door / window links</h4>
+            <label class="form-label">Lower Left Door "CCSN" Link URL
+                <input class="form-input" type="url" name="lowerCcsnLinkUrl" value="{{home.lowerCcsnLinkUrl}}" placeholder="https://">
+            </label>
+            <label class="form-label">Lower Right Window "RIC3 Fam Frisbee" Link URL
+                <input class="form-input" type="url" name="lowerFrisbeeLinkUrl" value="{{home.lowerFrisbeeLinkUrl}}" placeholder="https://">
+            </label>
+
+            <h4>Top navigation links</h4>
+            <p class="muted">Set optional destination links for the three grey navigation buttons above the signs.</p>
             {{#each home.hotspots}}
                 <fieldset class="home-hotspot-edit">
-                    <legend>{{this.label}}</legend>
+                    <legend>
+                        {{#ifEquals @index 0}}Stage & List With Us{{/ifEquals}}
+                        {{#ifEquals @index 1}}Find your dream home{{/ifEquals}}
+                        {{#ifEquals @index 2}}Get a home loan{{/ifEquals}}
+                    </legend>
                     <input type="hidden" name="hotspots[{{@index}}][id]" value="{{this.id}}">
                     <input type="hidden" name="hotspots[{{@index}}][label]" value="{{this.label}}">
-                    <label class="form-label">Link URL
+                    <label class="form-label">
+                        {{#ifEquals @index 0}}Stage & List With Us Link URL{{/ifEquals}}
+                        {{#ifEquals @index 1}}Find your dream home Link URL{{/ifEquals}}
+                        {{#ifEquals @index 2}}Get a home loan Link URL{{/ifEquals}}
                         <input class="form-input" type="url" name="hotspots[{{@index}}][url]" value="{{this.url}}" placeholder="https://">
                     </label>
                     <div class="home-hotspot-coords">
