@@ -39,6 +39,8 @@ router
                 buildingImageUrl: req.body.buildingImageUrl,
                 billboardVideoUrl: req.body.billboardVideoUrl,
                 artistsResidenceLinkUrl: req.body.artistsResidenceLinkUrl,
+                lowerCcsnLinkUrl: req.body.lowerCcsnLinkUrl,
+                lowerFrisbeeLinkUrl: req.body.lowerFrisbeeLinkUrl,
                 billboard: {
                     top: req.body.billboardTop,
                     left: req.body.billboardLeft,

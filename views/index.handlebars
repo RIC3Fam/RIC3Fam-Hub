@@ -16,6 +16,10 @@
                         >
                             <source src="{{home.billboardVideoUrl}}" type="video/mp4">
                         </video>
+                        <div class="facade-video-controls" role="group" aria-label="Video controls">
+                            <button type="button" id="home-billboard-play" class="facade-video-btn" aria-label="Pause video" title="Pause">Pause</button>
+                            <button type="button" id="home-billboard-unmute" class="facade-video-btn" aria-label="Unmute video" title="Unmute">Unmute</button>
+                        </div>
                     {{else}}
                         <div class="facade-video-poster" role="img" aria-label="Billboard video poster"></div>
                     {{/if}}
@@ -29,15 +33,15 @@
                     {{#each home.hotspots}}
                         {{#if this.url}}
                             <a href="{{this.url}}" target="_blank" rel="noopener noreferrer">
-                                {{#ifEquals @index 0}}Stage/List with us{{/ifEquals}}
-                                {{#ifEquals @index 1}}Find dream home{{/ifEquals}}
-                                {{#ifEquals @index 2}}Get Pre-approved{{/ifEquals}}
+                                {{#ifEquals @index 0}}Stage & List With Us{{/ifEquals}}
+                                {{#ifEquals @index 1}}Find your dream home{{/ifEquals}}
+                                {{#ifEquals @index 2}}Get a home loan{{/ifEquals}}
                             </a>
                         {{else}}
                             <a href="/search">
-                                {{#ifEquals @index 0}}Stage/List with us{{/ifEquals}}
-                                {{#ifEquals @index 1}}Find dream home{{/ifEquals}}
-                                {{#ifEquals @index 2}}Get Pre-approved{{/ifEquals}}
+                                {{#ifEquals @index 0}}Stage & List With Us{{/ifEquals}}
+                                {{#ifEquals @index 1}}Find your dream home{{/ifEquals}}
+                                {{#ifEquals @index 2}}Get a home loan{{/ifEquals}}
                             </a>
                         {{/if}}
                     {{/each}}
@@ -91,9 +95,15 @@
                 </section>
 
                 <section class="facade-storefront" aria-label="Storefront level">
+                    <img
+                        class="facade-family-wall"
+                        src="/public/images/home/we-are-family.png"
+                        alt="We are a family"
+                        loading="lazy"
+                    >
                     <article class="facade-store facade-store-door">
                         <div class="facade-awning facade-awning-small" aria-hidden="true"></div>
-                        <a class="facade-door" href="https://www.ccservicenetwork.org/" target="_blank" rel="noopener noreferrer">
+                        <a class="facade-door" href="{{defaultUrl home.lowerCcsnLinkUrl "https://www.ccservicenetwork.org/"}}" target="_blank" rel="noopener noreferrer">
                             <img src="/public/images/home/door-ccsn-logo.png" alt="Creative Community Service Network logo" loading="lazy">
                             <span class="facade-door-handle" aria-hidden="true"></span>
                             <img
@@ -107,7 +117,7 @@
 
                     <article class="facade-store facade-store-window">
                         <div class="facade-awning facade-awning-large" aria-hidden="true"></div>
-                        <a class="facade-window" href="/events">
+                        <a class="facade-window" href="{{defaultUrl home.lowerFrisbeeLinkUrl "/events"}}">
                             <img src="/public/images/home/door-frisbee-logo.png" alt="RIC3 Fam Frisbee logo" loading="lazy">
                         </a>
                     </article>
@@ -127,10 +137,6 @@
             </section>
         </div>
     </section>
-
-    {{#if currentUser.isAdmin}}
-        <p class="home-admin-link"><a href="/edit-home">Edit home page (admin)</a></p>
-    {{/if}}
 
     <script src="/public/js/homeBuilding.js"></script>
 </main>

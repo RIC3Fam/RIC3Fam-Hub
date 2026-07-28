@@ -1,4 +1,10 @@
+import 'dotenv/config';
 import { defineConfig } from '@playwright/test';
+
+// Load .env so E2E Mongo helpers (DB_URL) match the app started via `npm start`
+// (app.js also imports dotenv/config). Without this, withDb falls back to
+// mongodb://127.0.0.1:27017/ while the app writes to Atlas — findUserByUsername
+// then returns null after a successful UI register/login.
 
 export default defineConfig({
     testDir: './e2e',

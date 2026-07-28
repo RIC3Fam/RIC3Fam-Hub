@@ -338,10 +338,10 @@ export function normalizeSlideshowSlides(images) {
             if (img && typeof img === 'object' && img.url) {
                 const url = String(img.url).trim();
                 if (!url || url === 'undefined' || url === 'null') return null;
-                const caption =
-                    img.caption != null && String(img.caption).trim()
-                        ? String(img.caption).trim()
-                        : captionFromImageUrl(url);
+                let caption = captionFromImageUrl(url);
+                if (Object.prototype.hasOwnProperty.call(img, 'caption') && img.caption != null) {
+                    caption = xss(String(img.caption).trim().slice(0, 200));
+                }
                 return { url, caption };
             }
             return null;

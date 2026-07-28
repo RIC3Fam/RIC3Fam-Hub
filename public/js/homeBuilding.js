@@ -1,16 +1,22 @@
 (function () {
     const video = document.getElementById('home-billboard-video');
     const unmuteBtn = document.getElementById('home-billboard-unmute');
+    const playBtn = document.getElementById('home-billboard-play');
     if (!video) return;
+
+    let userPaused = false;
 
     function tryPlay() {
         video.muted = true;
+        userPaused = false;
         const playPromise = video.play();
         if (playPromise && typeof playPromise.catch === 'function') {
             playPromise.catch(() => {
                 // Autoplay blocked until a gesture; keep muted for next attempt.
             });
         }
+        updatePlayLabel();
+        updateUnmuteLabel();
     }
 
     function updateUnmuteLabel() {
@@ -26,13 +32,40 @@
         }
     }
 
+    function updatePlayLabel() {
+        if (!playBtn) return;
+        if (video.paused) {
+            playBtn.textContent = 'Play';
+            playBtn.setAttribute('aria-label', 'Play video');
+            playBtn.title = 'Play';
+        } else {
+            playBtn.textContent = 'Pause';
+            playBtn.setAttribute('aria-label', 'Pause video');
+            playBtn.title = 'Pause';
+        }
+    }
+
     function toggleMute(event) {
         if (event) event.stopPropagation();
         video.muted = !video.muted;
         if (!video.muted && video.paused) {
+            userPaused = false;
             video.play().catch(() => {});
         }
         updateUnmuteLabel();
+        updatePlayLabel();
+    }
+
+    function togglePlay(event) {
+        if (event) event.stopPropagation();
+        if (video.paused) {
+            userPaused = false;
+            video.play().catch(() => {});
+        } else {
+            userPaused = true;
+            video.pause();
+        }
+        updatePlayLabel();
     }
 
     function enterFullscreen() {
@@ -45,14 +78,25 @@
 
     tryPlay();
     updateUnmuteLabel();
+    updatePlayLabel();
 
-    // Some mobile browsers need a delayed retry after layout.
+    video.addEventListener('play', updatePlayLabel);
+    video.addEventListener('pause', updatePlayLabel);
+
+    // Resume only if the visitor did not intentionally pause.
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && video.paused) tryPlay();
+        if (!document.hidden && video.paused && !userPaused) {
+            video.play().catch(() => {});
+            updatePlayLabel();
+        }
     });
 
     if (unmuteBtn) {
         unmuteBtn.addEventListener('click', toggleMute);
+    }
+
+    if (playBtn) {
+        playBtn.addEventListener('click', togglePlay);
     }
 
     video.addEventListener('dblclick', (event) => {

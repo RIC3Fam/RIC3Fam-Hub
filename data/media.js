@@ -4,7 +4,7 @@ import * as helpers from '../helpers.js';
 
 const HOME_TITLE = 'Home Page Config';
 const DEFAULT_BUILDING = '/public/images/home/building-base.png';
-const LAYOUT_VERSION = 4;
+const LAYOUT_VERSION = 5;
 
 // Percent positions for the mobile-portrait facade:
 // - 2 square signs (uploadable art)
@@ -27,6 +27,8 @@ const defaultHomeConfig = () => ({
     billboardVideoUrl: '',
     billboardPosterUrl: '',
     artistsResidenceLinkUrl: '',
+    lowerCcsnLinkUrl: '',
+    lowerFrisbeeLinkUrl: '',
     billboard: defaultBillboard(),
     towel1: defaultTowel1(),
     towel2: defaultTowel2(),
@@ -99,6 +101,8 @@ const applyLatestLayout = (doc) => {
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: '',
         artistsResidenceLinkUrl: doc.artistsResidenceLinkUrl || '',
+        lowerCcsnLinkUrl: doc.lowerCcsnLinkUrl || '',
+        lowerFrisbeeLinkUrl: doc.lowerFrisbeeLinkUrl || '',
         billboard: defaults.billboard,
         towel1: {
             ...defaults.towel1,
@@ -134,6 +138,8 @@ const withHomeDefaults = (doc) => {
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: doc.billboardPosterUrl || '',
         artistsResidenceLinkUrl: helpers.optionalString(doc.artistsResidenceLinkUrl, 'Artists in Residence link', 2000),
+        lowerCcsnLinkUrl: helpers.optionalString(doc.lowerCcsnLinkUrl, 'Lower CCSN link', 2000),
+        lowerFrisbeeLinkUrl: helpers.optionalString(doc.lowerFrisbeeLinkUrl, 'Lower RIC3 Fam Frisbee link', 2000),
         billboard: normalizeBox(doc.billboard, defaultBillboard),
         towel1: normalizeTowel(doc.towel1, defaultTowel1),
         towel2: normalizeTowel(doc.towel2, defaultTowel2),
@@ -327,6 +333,14 @@ const updateHomePageConfig = async (updates = {}) => {
             updates.artistsResidenceLinkUrl != null
                 ? helpers.optionalString(updates.artistsResidenceLinkUrl, 'Artists in Residence link', 2000)
                 : current.artistsResidenceLinkUrl,
+        lowerCcsnLinkUrl:
+            updates.lowerCcsnLinkUrl != null
+                ? helpers.optionalString(updates.lowerCcsnLinkUrl, 'Lower CCSN link', 2000)
+                : current.lowerCcsnLinkUrl,
+        lowerFrisbeeLinkUrl:
+            updates.lowerFrisbeeLinkUrl != null
+                ? helpers.optionalString(updates.lowerFrisbeeLinkUrl, 'Lower RIC3 Fam Frisbee link', 2000)
+                : current.lowerFrisbeeLinkUrl,
         billboard:
             updates.billboard != null
                 ? normalizeBox({ ...current.billboard, ...updates.billboard }, defaultBillboard)

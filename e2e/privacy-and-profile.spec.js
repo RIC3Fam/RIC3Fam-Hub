@@ -1,7 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { MongoClient } = require('mongodb');
 
 const password = 'Family1$';
 const unique = Date.now().toString(36);
+let e2eMongoClient;
 
 function userCreds(prefix) {
     return {
@@ -23,6 +28,8 @@ async function register(page, user) {
     await expect(page).toHaveURL(/\/login/);
 }
 
+// login() only authenticates an existing user — it does not create one.
+// Caption / DB-seeded tests must call register() first (same pattern as older e2e tests).
 async function login(page, user) {
     await page.goto('/login');
     await page.fill('#login-username', user.username);
@@ -40,7 +47,82 @@ async function openOwnProfile(page) {
     return page.url();
 }
 
+function mongoHostLabel(dbUrl) {
+    try {
+        const u = new URL(dbUrl);
+        return u.hostname || '(unknown-host)';
+    } catch {
+        if (dbUrl.includes('mongodb+srv://')) return 'mongodb-atlas';
+        if (dbUrl.includes('127.0.0.1') || dbUrl.includes('localhost')) return 'localhost';
+        return '(unparsed-host)';
+    }
+}
+
+async function withDb(callback) {
+    // Use createRequire — dynamic import('mongodb') hangs/fails under Playwright's ESM loader
+    // on this Windows/Node setup ("Unexpected module status 3").
+    // DB_URL must match the running app (playwright.config.js loads dotenv/config).
+    const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/';
+    const dbName = 'RIC3-Frisbee';
+    if (!withDb._logged) {
+        console.log(
+            `[e2e-db] host=${mongoHostLabel(dbUrl)} database=${dbName} DB_URL_set=${Boolean(process.env.DB_URL)}`
+        );
+        withDb._logged = true;
+    }
+    if (!e2eMongoClient) {
+        e2eMongoClient = new MongoClient(dbUrl);
+        await e2eMongoClient.connect();
+    }
+    try {
+        return await callback(e2eMongoClient.db(dbName));
+    } catch (err) {
+        await e2eMongoClient.close().catch(() => {});
+        e2eMongoClient = null;
+        throw err;
+    }
+}
+
+async function findUserByUsername(username) {
+    // App stores username via stringHelper (trim + xss); login lookup is case-insensitive.
+    const doc = await withDb((db) =>
+        db.collection('users').findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } })
+    );
+    if (!doc) {
+        const count = await withDb((db) => db.collection('users').countDocuments());
+        console.log(
+            `[e2e-db] findUserByUsername miss username=${username} usersCollectionCount=${count}`
+        );
+    }
+    return doc;
+}
+
+async function patchCaption(page, body) {
+    return page.evaluate(async (payload) => {
+        const response = await fetch('/pictures/slideshow', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const text = await response.text();
+        let data = {};
+        try {
+            data = text ? JSON.parse(text) : {};
+        } catch (e) {
+            data = { raw: text };
+        }
+        return { ok: response.ok, status: response.status, data };
+    }, body);
+}
+
 test.describe('RIC3Fam Hub e2e', () => {
+    test.afterAll(async () => {
+        if (e2eMongoClient) {
+            await e2eMongoClient.close();
+            e2eMongoClient = null;
+        }
+    });
+
     test('home and events pages load', async ({ page }) => {
         await page.goto('/');
         await expect(page.locator('header')).toContainText('Events');
@@ -48,7 +130,13 @@ test.describe('RIC3Fam Hub e2e', () => {
         await page.goto('/events');
         await expect(page.locator('.events-page-title')).toHaveText('EVENTS');
         await expect(page.locator('.list-header').first()).toHaveText('UPCOMING EVENTS');
-        await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(1);
+        // pictureSlider scripts load only when slideshowImages.length > 0
+        const slideCount = await page.locator('.picture-slider-slide').count();
+        if (slideCount > 0) {
+            await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(1);
+        } else {
+            await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(0);
+        }
     });
 
     test('register, edit profile layout fields, show public badge', async ({ page }) => {
@@ -129,7 +217,9 @@ test.describe('RIC3Fam Hub e2e', () => {
         await expect(page).toHaveURL(/\/groups\//);
         await expect(page.locator('.visibility-badge')).toContainText('Public');
         await expect(page.locator('.private-box')).toContainText('Members-only group note');
-        await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(1);
+        // Zero-image groups do not render the slider (or its scripts)
+        await expect(page.locator('.picture-slider')).toHaveCount(0);
+        await expect(page.locator('script[src="/public/js/pictureSlider.js"]')).toHaveCount(0);
         await expect(page.locator('#slideshow-form')).toBeVisible();
         await expect(page.locator('#group-slideshow-id')).toHaveCount(1);
     });
@@ -244,17 +334,227 @@ test.describe('RIC3Fam Hub e2e', () => {
         await strangerCtx.close();
     });
 
+    test('profile slideshow captions add, edit, clear, authorize, and preserve legacy slides', async ({ page, browser }) => {
+        const owner = userCreds('pcap');
+        const stranger = userCreds('pbad');
+        await register(page, owner);
+        await register(page, stranger);
+        await login(page, owner);
+
+        const ownerDoc = await findUserByUsername(owner.username);
+        const ownerId = ownerDoc._id.toString();
+        const objectSlideUrl = `https://example.com/${ownerId}/slideshow/profile-object-${unique}.jpg`;
+        const legacySlideUrl = `https://example.com/${ownerId}/slideshow/profile-legacy-${unique}.jpg`;
+        await withDb((db) =>
+            db.collection('users').updateOne(
+                { _id: ownerDoc._id },
+                {
+                    $set: {
+                        slideshowImages: [
+                            { url: objectSlideUrl, caption: 'Initial profile caption' },
+                            legacySlideUrl,
+                        ],
+                    },
+                }
+            )
+        );
+
+        await page.goto(`/users/${ownerId}`);
+        await expect(page.locator('.gallery-item')).toHaveCount(2);
+        await expect(page.locator('.gallery-caption').nth(0)).toContainText('Initial profile caption');
+        await expect(page.locator('.gallery-caption').nth(1)).toContainText(`profile legacy ${unique}`);
+
+        let result = await patchCaption(page, { imageUrl: objectSlideUrl, caption: 'Owner added caption' });
+        expect(result.ok).toBeTruthy();
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').nth(0)).toHaveValue('Owner added caption');
+        await expect(page.locator('.gallery-caption').nth(0)).toContainText('Owner added caption');
+
+        result = await patchCaption(page, { imageUrl: objectSlideUrl, caption: 'Owner edited caption' });
+        expect(result.ok).toBeTruthy();
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').nth(0)).toHaveValue('Owner edited caption');
+        await expect(page.locator('.gallery-caption').nth(0)).toContainText('Owner edited caption');
+
+        result = await patchCaption(page, { imageUrl: objectSlideUrl, caption: '' });
+        expect(result.ok).toBeTruthy();
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').nth(0)).toHaveValue('');
+        await expect(page.locator('.gallery-caption').nth(0)).not.toContainText('profile-object');
+
+        result = await patchCaption(page, { imageUrl: legacySlideUrl, caption: 'Legacy converted caption' });
+        expect(result.ok).toBeTruthy();
+        const savedOwner = await withDb((db) => db.collection('users').findOne({ _id: ownerDoc._id }));
+        expect(savedOwner.slideshowImages.map((slide) => (typeof slide === 'string' ? slide : slide.url))).toEqual([
+            objectSlideUrl,
+            legacySlideUrl,
+        ]);
+        expect(savedOwner.slideshowImages[1]).toEqual({ url: legacySlideUrl, caption: 'Legacy converted caption' });
+
+        const strangerContext = await browser.newContext();
+        const strangerPage = await strangerContext.newPage();
+        await login(strangerPage, stranger);
+        const denied = await patchCaption(strangerPage, { imageUrl: objectSlideUrl, caption: 'Bad edit' });
+        expect(denied.ok).toBeFalsy();
+        expect([400, 403, 404]).toContain(denied.status);
+        const afterDenied = await withDb((db) => db.collection('users').findOne({ _id: ownerDoc._id }));
+        expect(afterDenied.slideshowImages[0].caption).toBe('');
+        await strangerContext.close();
+    });
+
+    test('group slideshow captions clear, authorize, preserve privacy, and navigate', async ({ page, browser }) => {
+        test.setTimeout(120_000);
+
+        const leader = userCreds('gcap');
+        const member = userCreds('gmem');
+        const outsider = userCreds('gout');
+        const admin = userCreds('gadm');
+        await register(page, leader);
+        await register(page, member);
+        await register(page, outsider);
+        await register(page, admin);
+        await login(page, leader);
+
+        await page.goto('/create-group');
+        const groupName = `Caption Group ${unique}`;
+        await page.fill('#group-name', groupName);
+        await page.fill('#description', 'Caption test group');
+        await page.selectOption('#visibility', 'public');
+        await page.click('#group-submit-button');
+        await expect(page).toHaveURL(/\/groups\//);
+        const groupUrl = page.url();
+        const groupId = groupUrl.split('/').pop();
+
+        const leaderDoc = await findUserByUsername(leader.username);
+        const memberDoc = await findUserByUsername(member.username);
+        const adminDoc = await findUserByUsername(admin.username);
+        const slideA = `https://example.com/${groupId}/slideshow/group-a-${unique}.jpg`;
+        const slideB = `https://example.com/${groupId}/slideshow/group-b-${unique}.jpg`;
+        const legacySlide = `https://example.com/${groupId}/slideshow/group-legacy-${unique}.jpg`;
+
+        await withDb(async (db) => {
+            await db.collection('users').updateOne({ _id: adminDoc._id }, { $set: { isAdmin: true, admin: true } });
+            await db.collection('groups').updateOne(
+                { groupName },
+                {
+                    $set: {
+                        players: [leaderDoc._id.toString(), memberDoc._id.toString()],
+                        slideshowImages: [
+                            { url: slideA, caption: 'First group caption' },
+                            { url: slideB, caption: 'Second group caption' },
+                            legacySlide,
+                        ],
+                    },
+                }
+            );
+        });
+
+        await page.goto(groupUrl);
+        await expect(page.locator('.picture-slider-slide')).toHaveCount(3);
+        await expect(page.locator('.picture-slider-caption').first()).toContainText('First group caption');
+        await expect(page.locator('.picture-slider-caption').nth(1)).toContainText('Second group caption');
+        await expect(page.locator('.picture-slider-caption').nth(2)).toContainText(`group legacy ${unique}`);
+        await page.locator('.picture-slider-next').click();
+        await expect(page.locator('.picture-slider-slide').nth(1)).toHaveClass(/is-active/);
+
+        let result = await patchCaption(page, { groupId, imageUrl: slideA, caption: 'Leader added caption' });
+        expect(result.ok).toBeTruthy();
+        result = await patchCaption(page, { groupId, imageUrl: slideA, caption: 'Leader edited caption' });
+        expect(result.ok).toBeTruthy();
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').first()).toHaveValue('Leader edited caption');
+
+        result = await patchCaption(page, { groupId, imageUrl: slideA, caption: '' });
+        expect(result.ok).toBeTruthy();
+        await page.reload();
+        await expect(page.locator('.gallery-caption-input').first()).toHaveValue('');
+        await expect(page.locator('.picture-slider-caption').first()).not.toContainText('group-a');
+
+        const memberContext = await browser.newContext();
+        const memberPage = await memberContext.newPage();
+        await login(memberPage, member);
+        const memberDenied = await patchCaption(memberPage, { groupId, imageUrl: slideB, caption: 'Member edit' });
+        expect(memberDenied.ok).toBeFalsy();
+        expect(memberDenied.status).toBe(403);
+        await memberContext.close();
+
+        const outsiderContext = await browser.newContext();
+        const outsiderPage = await outsiderContext.newPage();
+        await login(outsiderPage, outsider);
+        const outsiderDenied = await patchCaption(outsiderPage, { groupId, imageUrl: slideB, caption: 'Outsider edit' });
+        expect(outsiderDenied.ok).toBeFalsy();
+        expect(outsiderDenied.status).toBe(403);
+        await outsiderContext.close();
+
+        const adminContext = await browser.newContext();
+        const adminPage = await adminContext.newPage();
+        await login(adminPage, admin);
+        const adminResult = await patchCaption(adminPage, { groupId, imageUrl: slideB, caption: 'Admin caption' });
+        expect(adminResult.ok).toBeTruthy();
+        await adminContext.close();
+
+        await withDb((db) =>
+            db.collection('groups').updateOne(
+                { groupName },
+                {
+                    $set: {
+                        visibility: 'private',
+                        slideshowImages: [{ url: slideA, caption: 'Private caption' }],
+                    },
+                }
+            )
+        );
+        const privateContext = await browser.newContext();
+        const privatePage = await privateContext.newPage();
+        await privatePage.goto(groupUrl);
+        await expect(privatePage.locator('.private-entity')).toContainText('This group is private');
+        await expect(privatePage.locator('.picture-slider')).toHaveCount(0);
+        await privateContext.close();
+
+        await page.goto(groupUrl);
+        await expect(page.locator('.picture-slider-slide')).toHaveCount(1);
+        await expect(page.locator('.picture-slider-caption').first()).toContainText('Private caption');
+
+        await withDb((db) => db.collection('groups').updateOne({ groupName }, { $set: { slideshowImages: [] } }));
+        await page.reload();
+        await expect(page.locator('.picture-slider-slide')).toHaveCount(0);
+        await expect(page.locator('.group-slideshow-empty')).toBeVisible();
+    });
+
+    test('caption validation is enforced server-side', async ({ page }) => {
+        const user = userCreds('vcap');
+        await register(page, user);
+        await login(page, user);
+        const userDoc = await findUserByUsername(user.username);
+        const userId = userDoc._id.toString();
+        const slideUrl = `https://example.com/${userId}/slideshow/validation-${unique}.jpg`;
+        await withDb((db) =>
+            db.collection('users').updateOne(
+                { _id: userDoc._id },
+                { $set: { slideshowImages: [{ url: slideUrl, caption: 'Initial' }] } }
+            )
+        );
+
+        let result = await patchCaption(page, { imageUrl: slideUrl, caption: ''.padEnd(200, 'a') });
+        expect(result.ok).toBeTruthy();
+        result = await patchCaption(page, { imageUrl: slideUrl, caption: ''.padEnd(201, 'b') });
+        expect(result.ok).toBeFalsy();
+        expect(result.status).toBe(400);
+        result = await patchCaption(page, { imageUrl: slideUrl, caption: '<script>alert("x")</script>' });
+        expect(result.ok).toBeTruthy();
+        result = await patchCaption(page, { imageUrl: slideUrl, caption: '   ' });
+        expect(result.ok).toBeTruthy();
+
+        const saved = await withDb((db) => db.collection('users').findOne({ _id: userDoc._id }));
+        expect(saved.slideshowImages[0].caption).toBe('');
+    });
+
     test('admin can save a caption on the events page slideshow', async ({ page }) => {
-        const { MongoClient } = await import('mongodb');
-        const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/';
         const admin = userCreds('eadm');
         await register(page, admin);
 
         const slideUrl = `https://example.com/e2e-events-slide-${unique}.jpg`;
-        const client = new MongoClient(dbUrl);
-        await client.connect();
-        try {
-            const db = client.db('RIC3-Frisbee');
+        await withDb(async (db) => {
             await db.collection('users').updateOne(
                 { username: admin.username },
                 { $set: { isAdmin: true, admin: true } }
@@ -269,9 +569,7 @@ test.describe('RIC3Fam Hub e2e', () => {
                 },
                 { upsert: true }
             );
-        } finally {
-            await client.close();
-        }
+        });
 
         await login(page, admin);
         await page.goto('/events');
