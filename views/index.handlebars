@@ -16,6 +16,10 @@
                         >
                             <source src="{{home.billboardVideoUrl}}" type="video/mp4">
                         </video>
+                        <div class="facade-video-controls" role="group" aria-label="Video controls">
+                            <button type="button" id="home-billboard-play" class="facade-video-btn" aria-label="Pause video" title="Pause">Pause</button>
+                            <button type="button" id="home-billboard-unmute" class="facade-video-btn" aria-label="Unmute video" title="Unmute">Unmute</button>
+                        </div>
                     {{else}}
                         <div class="facade-video-poster" role="img" aria-label="Billboard video poster"></div>
                     {{/if}}
@@ -127,10 +131,6 @@
             </section>
         </div>
     </section>
-
-    {{#if currentUser.isAdmin}}
-        <p class="home-admin-link"><a href="/edit-home">Edit home page (admin)</a></p>
-    {{/if}}
 
     <script src="/public/js/homeBuilding.js"></script>
 </main>

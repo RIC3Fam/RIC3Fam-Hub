@@ -62,8 +62,7 @@ document.querySelectorAll('.gallery-item').forEach((item) => {
     const caption = item.querySelector('.gallery-caption');
     if (!img) return;
 
-    const text = (caption && caption.textContent.trim()) || captionFromUrl(img.src);
-    if (caption && !caption.textContent.trim()) caption.textContent = text;
+    const text = caption ? caption.textContent.trim() : captionFromUrl(img.src);
 
     if (caption) {
         caption.addEventListener('click', (e) => {
@@ -73,53 +72,65 @@ document.querySelectorAll('.gallery-item').forEach((item) => {
     }
 
     img.addEventListener('dblclick', () =>
-        openLightbox(img.src, (caption && caption.textContent.trim()) || captionFromUrl(img.src))
+        openLightbox(img.src, (caption && caption.textContent.trim()) || '')
     );
 });
 
+async function saveCaptionFromControl(control, nextValue = null) {
+    const wrap = control.closest('[data-image-url]') || control.closest('.gallery-item');
+    const input = wrap ? wrap.querySelector('.gallery-caption-input') : null;
+    const imageUrl = wrap ? wrap.getAttribute('data-image-url') : null;
+    if (!wrap || !input || !imageUrl) return;
+
+    if (nextValue != null) input.value = nextValue;
+
+    try {
+        const groupSlideshowId = document.getElementById('group-slideshow-id');
+        const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
+        const gameSlideshowId = document.getElementById('game-slideshow-id');
+        const gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
+        const isEventPage = document.getElementById('is-event-page') != null;
+
+        const body = { imageUrl, caption: input.value };
+        if (groupId) body.groupId = groupId;
+        if (gameId) body.gameId = gameId;
+        if (isEventPage) body.isEventPage = true;
+
+        const response = await fetch('/pictures/slideshow', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Could not save caption');
+        }
+
+        const figure = document.querySelector(`.gallery-item[data-image-url="${CSS.escape(imageUrl)}"]`);
+        const figcaption = figure ? figure.querySelector('.gallery-caption') : null;
+        if (figcaption) figcaption.textContent = input.value.trim() || '\u00a0';
+
+        const slide = document.querySelector(`.picture-slider-slide img[src="${CSS.escape(imageUrl)}"]`);
+        if (slide) {
+            const slideCap = slide.closest('figure')?.querySelector('.picture-slider-caption');
+            if (slideCap) slideCap.textContent = input.value.trim() || '\u00a0';
+        }
+
+        setMessage(input.value.trim() ? 'Caption saved' : 'Caption cleared');
+    } catch (err) {
+        setError(err);
+    }
+}
+
 document.querySelectorAll('.gallery-caption-save').forEach((button) => {
     button.addEventListener('click', async () => {
-        const wrap = button.closest('[data-image-url]') || button.closest('.gallery-item');
-        const input = wrap ? wrap.querySelector('.gallery-caption-input') : null;
-        const imageUrl = wrap ? wrap.getAttribute('data-image-url') : null;
-        if (!wrap || !input || !imageUrl) return;
+        await saveCaptionFromControl(button);
+    });
+});
 
-        try {
-            const groupSlideshowId = document.getElementById('group-slideshow-id');
-            const groupId = groupSlideshowId ? groupSlideshowId.innerText.trim() : null;
-            const gameSlideshowId = document.getElementById('game-slideshow-id');
-            const gameId = gameSlideshowId ? gameSlideshowId.innerText.trim() : null;
-            const isEventPage = document.getElementById('is-event-page') != null;
-
-            const body = { imageUrl, caption: input.value };
-            if (groupId) body.groupId = groupId;
-            if (gameId) body.gameId = gameId;
-            if (isEventPage) body.isEventPage = true;
-
-            const response = await fetch('/pictures/slideshow', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify(body),
-            });
-            if (!response.ok) {
-                const data = await response.json().catch(() => ({}));
-                throw new Error(data.error || 'Could not save caption');
-            }
-
-            const figure = document.querySelector(`.gallery-item[data-image-url="${CSS.escape(imageUrl)}"]`);
-            const figcaption = figure ? figure.querySelector('.gallery-caption') : null;
-            if (figcaption) figcaption.textContent = input.value.trim() || '\u00a0';
-
-            const slide = document.querySelector(`.picture-slider-slide img[src="${CSS.escape(imageUrl)}"]`);
-            if (slide) {
-                const slideCap = slide.closest('figure')?.querySelector('.picture-slider-caption');
-                if (slideCap) slideCap.textContent = input.value.trim() || '\u00a0';
-            }
-
-            setMessage('Caption saved');
-        } catch (err) {
-            setError(err);
-        }
+document.querySelectorAll('.gallery-caption-clear').forEach((button) => {
+    button.addEventListener('click', async () => {
+        await saveCaptionFromControl(button, '');
     });
 });
 

@@ -4,6 +4,21 @@ import * as helpers from '../helpers.js';
 
 const router = Router();
 
+function slideshowPatchStatus(err) {
+    const message = String(err);
+    if (
+        message.includes('Must be logged in') ||
+        message.includes('Admin only') ||
+        message.includes('not the leader') ||
+        message.includes('not the admin') ||
+        message.includes('not the organizer')
+    ) {
+        return 403;
+    }
+    if (message.includes('Slideshow image not found')) return 404;
+    return 400;
+}
+
 async function assertCanManageGroupSlideshow(userId, group) {
     if (!userId) throw 'Must be logged in';
     if (group.groupLeader === userId) return;
@@ -121,7 +136,7 @@ router
             return res.json({ ok: true, caption });
         } catch (err) {
             console.log(err);
-            return res.status(400).json({ error: String(err) });
+            return res.status(slideshowPatchStatus(err)).json({ error: String(err) });
         }
     })
     .delete(async function (req, res) {

@@ -1620,6 +1620,7 @@ p.index {
 }
 
 .facade-billboard-screen {
+  position: relative;
   aspect-ratio: 16 / 7.5;
   background: #050505;
   border: 2px solid #151515;
@@ -1633,6 +1634,32 @@ p.index {
   display: block;
   object-fit: cover;
   background: #050505 url("/public/images/home/billboard-poster.svg") center / cover no-repeat;
+}
+
+.facade-video-controls {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.facade-video-btn {
+  border: 0;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font: 600 12px/1 Arial, Helvetica, sans-serif;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.facade-video-btn:hover,
+.facade-video-btn:focus-visible {
+  background: rgba(0, 0, 0, 0.82);
+  outline: 2px solid #f7df35;
+  outline-offset: 2px;
 }
 
 .facade-billboard-lip {
