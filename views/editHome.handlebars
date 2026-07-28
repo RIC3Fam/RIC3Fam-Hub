@@ -79,15 +79,6 @@
 
         <hr class="my-5">
 
-        <h4>Upload building facade (JPEG, wide for mobile portrait)</h4>
-        {{#if home.buildingImageUrl}}
-            <p class="muted">Current: <img src="{{home.buildingImageUrl}}" alt="Building facade" class="home-edit-thumb home-edit-thumb-wide"></p>
-        {{/if}}
-        <form id="home-building-form" class="create-form">
-            <input type="file" id="home-building-upload" accept="image/jpeg">
-            <button type="submit" class="form-submit-button">Upload building image</button>
-        </form>
-
         <h4>Upload billboard video (MP4)</h4>
         <form id="home-video-form" class="create-form">
             <input type="file" id="home-video-upload" accept="video/mp4">
