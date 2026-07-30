@@ -50,6 +50,7 @@ router
         let link2desc = req.body.link2desc;
         const visibility = req.body.visibility;
         const privateDescription = req.body.privateDescription;
+        const shortDescription = req.body.shortDescription;
 
         try {
             helpers.isValidNum(req.body.maxPlayers);
@@ -76,7 +77,8 @@ router
                 link2,
                 link2desc,
                 group2,
-                group3
+                group3,
+                shortDescription
             );
             return res.redirect(`/events/${createResult._id}`);
         } catch (err) {
@@ -300,7 +302,8 @@ router
                 req.body.link2desc,
                 req.body.group2,
                 req.body.group3,
-                req.body.listOnEventsPage === 'on'
+                req.body.listOnEventsPage === 'on',
+                req.body.shortDescription
             );
 
             return res.redirect('/events/' + gameId);

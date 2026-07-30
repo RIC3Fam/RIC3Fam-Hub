@@ -39,10 +39,27 @@
         <div class="profile-description">{{longDescription}}</div>
     {{/if}}
 
-    {{#if slideshowImages.length}}
+    {{#if hasProfileGalleryInfo}}
         <section class="profile-section profile-picture-bar">
             {{#if user.slideshowDescription}}
                 <p class="picture-bar-description">{{user.slideshowDescription}}</p>
+            {{/if}}
+            {{#if user.statement2}}
+                <p class="profile-short-desc profile-short-desc-secondary">{{user.statement2}}</p>
+            {{/if}}
+            {{#if user.link3}}
+                <div class="profile-extra-links">
+                    <a href="{{user.link3}}" target="_blank" rel="noopener noreferrer">{{#if user.link3desc}}{{user.link3desc}}{{else}}Website 3{{/if}}</a>
+                    {{#if user.link4}}
+                        <a href="{{user.link4}}" target="_blank" rel="noopener noreferrer">{{#if user.link4desc}}{{user.link4desc}}{{else}}Website 4{{/if}}</a>
+                    {{/if}}
+                </div>
+            {{else}}
+                {{#if user.link4}}
+                    <div class="profile-extra-links">
+                        <a href="{{user.link4}}" target="_blank" rel="noopener noreferrer">{{#if user.link4desc}}{{user.link4desc}}{{else}}Website 4{{/if}}</a>
+                    </div>
+                {{/if}}
             {{/if}}
             {{> showSlideshow}}
         </section>

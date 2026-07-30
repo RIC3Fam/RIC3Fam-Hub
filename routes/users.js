@@ -5,6 +5,17 @@ import * as helpers from '../helpers.js';
 
 const router = Router();
 
+function filterRecentProfileEvents(games) {
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 1);
+    cutoff.setHours(0, 0, 0, 0);
+    return games.filter((game) => {
+        if (!game.gameDate) return true;
+        const gameDate = new Date(`${game.gameDate}T00:00:00`);
+        return Number.isNaN(gameDate.getTime()) || gameDate >= cutoff;
+    });
+}
+
 router
     .route('/:userId')
     .get(async (req, res) => {
@@ -31,6 +42,7 @@ router
             let isOwner = req.session.user != null && req.session.user._id.toString() == userId;
             let friends = await usersData.getIDName(userObj.friends);
             let games = await gamesData.getIDName(userObj.games);
+            if (userObj.onlyRecentEvents) games = filterRecentProfileEvents(games);
             let groups = await groupsData.getIDName(userObj.groups);
             
             let requests = await usersData.getIDName(userObj.friendRequests)
@@ -39,6 +51,13 @@ router
             const isAdmin = req.session.user ? await usersData.isUserAdmin(req.session.user._id) : false;
             const shortDescription = (userObj.statement && userObj.statement.trim()) || '';
             const longDescription = (userObj.description && userObj.description.trim()) || '';
+            const hasProfileGalleryInfo = !!(
+                (userObj.slideshowImages && userObj.slideshowImages.length) ||
+                userObj.slideshowDescription ||
+                userObj.statement2 ||
+                userObj.link3 ||
+                userObj.link4
+            );
 
             const ret = {
                 title: "User", 
@@ -50,6 +69,7 @@ router
                 isOwner: isOwner,
                 notFriend: notFriend,
                 slideshowImages: helpers.normalizeSlideshowSlides(userObj.slideshowImages || []),
+                hasProfileGalleryInfo,
                 shortDescription,
                 longDescription,
                 canSeePrivateCommunications: isAdmin,
@@ -192,7 +212,12 @@ router
             let link1desc = req.body.link1desc;
             let link2 = req.body.link2;
             let link2desc = req.body.link2desc;
+            let link3 = req.body.link3;
+            let link3desc = req.body.link3desc;
+            let link4 = req.body.link4;
+            let link4desc = req.body.link4desc;
             let statement = req.body.statement;
+            let statement2 = req.body.statement2;
             let additionalDescription = req.body.additionalDescription;
             let slideshowDescription = req.body.slideshowDescription;
             let visibility = req.body.visibility;
@@ -202,6 +227,7 @@ router
             let optInCreativeRealEstate = req.body.optInCreativeRealEstate;
             let optInFrisbeeNotices = req.body.optInFrisbeeNotices;
             let optInCcsnUpdates = req.body.optInCcsnUpdates;
+            let onlyRecentEvents = req.body.onlyRecentEvents;
 
             //console.log(skills);
             if (currentUser._id !== userId) {
@@ -229,7 +255,14 @@ router
                 preferredPhone,
                 optInCreativeRealEstate,
                 optInFrisbeeNotices,
-                optInCcsnUpdates
+                optInCcsnUpdates,
+                null,
+                statement2,
+                link3,
+                link3desc,
+                link4,
+                link4desc,
+                onlyRecentEvents
             );
             return res.redirect("/users/" + currentUser._id);
         } catch (e) {
