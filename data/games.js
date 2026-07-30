@@ -59,7 +59,8 @@ const create = async (
     link2 = '',
     link2desc = '',
     group2 = '',
-    group3 = ''
+    group3 = '',
+    shortDescription = ''
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc);
 
@@ -71,6 +72,7 @@ const create = async (
 
     visibility = helpers.normalizeVisibility(visibility);
     privateDescription = helpers.optionalString(privateDescription, 'Private description');
+    shortDescription = xss(helpers.optionalString(shortDescription, 'Short description', 1000));
     const website = helpers.normalizeOptionalLinkPair(link, linkdesc, 'Link', 'Link Description');
     const social = helpers.normalizeOptionalLinkPair(link2, link2desc, 'Link 2', 'Link 2 Description');
 
@@ -102,6 +104,7 @@ const create = async (
         link2desc: social.linkdesc,
         visibility,
         privateDescription,
+        shortDescription,
         listOnEventsPage: true,
         slideshowImages: [],
         leaders: [],
@@ -141,6 +144,7 @@ const get = async (gameId) => {
     }
     if (game.link2 == null) game.link2 = '';
     if (game.link2desc == null) game.link2desc = '';
+    if (game.shortDescription == null) game.shortDescription = '';
     if (game.listOnEventsPage == null) game.listOnEventsPage = true;
     return helpers.withVisibilityDefaults(game);
 };
@@ -383,7 +387,8 @@ const update = async (
     link2desc,
     group2,
     group3,
-    listOnEventsPage
+    listOnEventsPage,
+    shortDescription
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
@@ -432,6 +437,10 @@ const update = async (
         link2desc: social.linkdesc,
         visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGame.visibility || 'public',
         listOnEventsPage: listOnEventsPage != null ? !!listOnEventsPage : oldGame.listOnEventsPage !== false,
+        shortDescription:
+            shortDescription != null
+                ? xss(helpers.optionalString(shortDescription, 'Short description', 1000))
+                : oldGame.shortDescription || '',
         privateDescription:
             privateDescription != null
                 ? helpers.optionalString(privateDescription, 'Private description')

@@ -96,6 +96,9 @@
                     <option value="private" {{#ifEquals gameObj.visibility "private"}}selected{{/ifEquals}}>Private</option>
                 </select>
                 <br>
+            <label class="form-label" for="shortDescription">Short Description:</label>
+                <textarea class="form-input event-short-description-input" id="shortDescription" name="shortDescription" rows="4">{{gameObj.shortDescription}}</textarea>
+                <br>
             <h4>Leaders</h4>
             <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
             <div id="event-leaders-editor">

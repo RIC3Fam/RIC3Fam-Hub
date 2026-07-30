@@ -27,6 +27,10 @@
                     </ul>
                 {{/if}}
 
+                {{#if game.shortDescription}}
+                    <div class="event-short-description">{{game.shortDescription}}</div>
+                {{/if}}
+
                 {{#if leaders.length}}
                     <ul class="event-leaders-inline">
                         {{#each leaders}}

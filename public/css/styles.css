@@ -869,10 +869,15 @@ p.index {
 
 .event-info-box,
 .event-members-grid,
+.event-short-description,
 .event-leaders-inline {
   background: #ececec;
   padding: 12px 14px;
   margin: 0 0 12px 0;
+}
+
+.event-short-description {
+  white-space: pre-line;
 }
 
 .event-members-grid {
@@ -928,7 +933,8 @@ p.index {
   }
 
   .event-members-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
   }
 }
 
@@ -995,6 +1001,7 @@ p.index {
 }
 
 .edit-game-page .event-description-input,
+.edit-game-page .event-short-description-input,
 .edit-game-page .event-private-description-input {
   display: block;
   width: 100%;
