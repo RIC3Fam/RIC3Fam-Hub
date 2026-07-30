@@ -66,6 +66,10 @@ export function formatAndValidateUser(userData, ignorePassword) {
     let link1 = "";
     let link2desc = "";
     let link2 = "";
+    let link3desc = "";
+    let link3 = "";
+    let link4desc = "";
+    let link4 = "";
     if (userData.link1 != null && userData.link1 != ""){ 
         link1 = helpers.stringHelper(userData.link1, "Link 1");
         link1desc = helpers.stringHelper(userData.link1desc, 'Link 1 Description', 1, 100); 
@@ -73,6 +77,14 @@ export function formatAndValidateUser(userData, ignorePassword) {
     if(userData.link2 != null && userData.link2 != ""){ 
         link2 = helpers.stringHelper(userData.link2, 'Link 2')
         link2desc = helpers.stringHelper(userData.link2desc, 'Link 2 Description', 1, 100); 
+    }
+    if(userData.link3 != null && userData.link3 != ""){ 
+        link3 = helpers.stringHelper(userData.link3, 'Link 3')
+        link3desc = helpers.stringHelper(userData.link3desc, 'Link 3 Description', 1, 100); 
+    }
+    if(userData.link4 != null && userData.link4 != ""){ 
+        link4 = helpers.stringHelper(userData.link4, 'Link 4')
+        link4desc = helpers.stringHelper(userData.link4desc, 'Link 4 Description', 1, 100); 
     }
 
 
@@ -107,6 +119,7 @@ export function formatAndValidateUser(userData, ignorePassword) {
     let statement = helpers.optionalString(userData.statement, 'Short description');
     let additionalDescription = helpers.optionalString(userData.additionalDescription, 'Additional description');
     let slideshowDescription = helpers.optionalString(userData.slideshowDescription, 'Slideshow description');
+    let statement2 = helpers.optionalString(userData.statement2, 'Short description 2');
     let visibility = helpers.normalizeVisibility(userData.visibility);
     let privateDescription = helpers.optionalString(userData.privateDescription, 'Private communications');
     let preferredEmail = helpers.optionalString(userData.preferredEmail, 'Preferred email', 120);
@@ -127,6 +140,11 @@ export function formatAndValidateUser(userData, ignorePassword) {
         userData.optInCcsnUpdates === 'true' ||
         userData.optInCcsnUpdates === 'on'
     );
+    const onlyRecentEvents = !!(
+        userData.onlyRecentEvents === true ||
+        userData.onlyRecentEvents === 'true' ||
+        userData.onlyRecentEvents === 'on'
+    );
     let adminNotes = helpers.optionalString(userData.adminNotes, 'Admin notes');
     return {
         username,
@@ -140,9 +158,14 @@ export function formatAndValidateUser(userData, ignorePassword) {
         link1desc,
         link2,
         link2desc,
+        link3,
+        link3desc,
+        link4,
+        link4desc,
         statement,
         additionalDescription,
         slideshowDescription,
+        statement2,
         visibility,
         privateDescription,
         preferredEmail,
@@ -150,6 +173,7 @@ export function formatAndValidateUser(userData, ignorePassword) {
         optInCreativeRealEstate,
         optInFrisbeeNotices,
         optInCcsnUpdates,
+        onlyRecentEvents,
         adminNotes,
     };
 }
@@ -204,6 +228,12 @@ const createUser = async (username, emailAddress, password, pfp, description, na
         statement: '',
         additionalDescription: '',
         slideshowDescription: '',
+        statement2: '',
+        link3: '',
+        link3desc: '',
+        link4: '',
+        link4desc: '',
+        onlyRecentEvents: false,
         visibility: 'public',
         privateDescription: '',
         preferredEmail: '',
@@ -262,7 +292,13 @@ const editUser = async (
     optInCreativeRealEstate = false,
     optInFrisbeeNotices = false,
     optInCcsnUpdates = false,
-    adminNotes = null
+    adminNotes = null,
+    statement2 = '',
+    link3 = '',
+    link3desc = '',
+    link4 = '',
+    link4desc = '',
+    onlyRecentEvents = false
 ) => {
     if (!userId) throw 'User Id not given';
     if (typeof userId !== 'string') throw 'User Id is not a string';
@@ -284,9 +320,14 @@ const editUser = async (
         link1desc,
         link2,
         link2desc,
+        link3,
+        link3desc,
+        link4,
+        link4desc,
         statement,
         additionalDescription,
         slideshowDescription,
+        statement2,
         visibility,
         privateDescription,
         preferredEmail,
@@ -294,6 +335,7 @@ const editUser = async (
         optInCreativeRealEstate,
         optInFrisbeeNotices,
         optInCcsnUpdates,
+        onlyRecentEvents,
         adminNotes: adminNotes != null ? adminNotes : existing.adminNotes || '',
     };
     userData = formatAndValidateUser(userData, true);
@@ -322,9 +364,14 @@ const editUser = async (
                 link1desc: userData.link1desc,
                 link2: userData.link2,
                 link2desc: userData.link2desc,
+                link3: userData.link3,
+                link3desc: userData.link3desc,
+                link4: userData.link4,
+                link4desc: userData.link4desc,
                 statement: userData.statement,
                 additionalDescription: userData.additionalDescription,
                 slideshowDescription: userData.slideshowDescription,
+                statement2: userData.statement2,
                 visibility: userData.visibility,
                 privateDescription: userData.privateDescription,
                 preferredEmail: userData.preferredEmail,
@@ -332,6 +379,7 @@ const editUser = async (
                 optInCreativeRealEstate: userData.optInCreativeRealEstate,
                 optInFrisbeeNotices: userData.optInFrisbeeNotices,
                 optInCcsnUpdates: userData.optInCcsnUpdates,
+                onlyRecentEvents: userData.onlyRecentEvents,
                 adminNotes: userData.adminNotes,
             },
         }
@@ -378,7 +426,13 @@ const editPfp = async (userId, imagePath) => {
         !!user.optInCreativeRealEstate,
         !!user.optInFrisbeeNotices,
         !!user.optInCcsnUpdates,
-        user.adminNotes || ''
+        user.adminNotes || '',
+        user.statement2 || '',
+        user.link3 || '',
+        user.link3desc || '',
+        user.link4 || '',
+        user.link4desc || '',
+        !!user.onlyRecentEvents
     );
 };
 
@@ -408,8 +462,14 @@ const getUser = async (userId) => {
     }
     user._id = user._id.toString();
     if (user.statement == null) user.statement = '';
+    if (user.statement2 == null) user.statement2 = '';
     if (user.additionalDescription == null) user.additionalDescription = '';
     if (user.slideshowDescription == null) user.slideshowDescription = '';
+    if (user.link3 == null) user.link3 = '';
+    if (user.link3desc == null) user.link3desc = '';
+    if (user.link4 == null) user.link4 = '';
+    if (user.link4desc == null) user.link4desc = '';
+    if (user.onlyRecentEvents == null) user.onlyRecentEvents = false;
     return helpers.withVisibilityDefaults(user);
 };
 
@@ -519,6 +579,27 @@ export const loginUser = async (username, password) => {
         friendRequests: user.friendRequests,
         skills: user.skills,
         isAdmin: !!(user.isAdmin || user.admin),
+        link1: user.link1 || '',
+        link1desc: user.link1desc || '',
+        link2: user.link2 || '',
+        link2desc: user.link2desc || '',
+        link3: user.link3 || '',
+        link3desc: user.link3desc || '',
+        link4: user.link4 || '',
+        link4desc: user.link4desc || '',
+        statement: user.statement || '',
+        statement2: user.statement2 || '',
+        additionalDescription: user.additionalDescription || '',
+        slideshowDescription: user.slideshowDescription || '',
+        visibility: user.visibility || 'public',
+        privateDescription: user.privateDescription || '',
+        preferredEmail: user.preferredEmail || '',
+        preferredPhone: user.preferredPhone || '',
+        optInCreativeRealEstate: !!user.optInCreativeRealEstate,
+        optInFrisbeeNotices: !!user.optInFrisbeeNotices,
+        optInCcsnUpdates: !!user.optInCcsnUpdates,
+        onlyRecentEvents: !!user.onlyRecentEvents,
+        adminNotes: user.adminNotes || '',
     };
 };
 

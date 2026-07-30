@@ -466,7 +466,7 @@ const getIDName = async (gameIds) => {
 
         try {
             const game = await get(gameId);
-            ret.push({ _id: gameId, name: game.gameName });
+            ret.push({ _id: gameId, name: game.gameName, gameDate: game.gameDate });
         } catch (e) {
             // In the case that a game doesn't exist, we skip
             continue;

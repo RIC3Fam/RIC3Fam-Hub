@@ -17,16 +17,16 @@
             <label class="form-label" for="description">Description:</label>
                 <textarea class="form-input" id="description" name="description">{{currentUser.description}}</textarea>
                 <br>
-            <label class="form-label" for="link1">Website URL:</label>
+            <label class="form-label" for="link1">Website URL 1:</label>
                 <input class="form-input" type="url" id="link1" name="link1" value="{{currentUser.link1}}">
                 <br>
-            <label class="form-label" for="link1desc">Website label:</label>
+            <label class="form-label" for="link1desc">Website label 1:</label>
                 <input class="form-input" id="link1desc" name="link1desc" value="{{currentUser.link1desc}}">
                 <br>
-            <label class="form-label" for="link2">Social media URL:</label>
+            <label class="form-label" for="link2">Social Media URL 2:</label>
                 <input class="form-input" type="url" id="link2" name="link2" value="{{currentUser.link2}}">
                 <br>
-            <label class="form-label" for="link2desc">Social label:</label>
+            <label class="form-label" for="link2desc">Social label 2:</label>
                 <input class="form-input" id="link2desc" name="link2desc" value="{{currentUser.link2desc}}">
                 <br>
             <label class="form-label" for="additionalDescription">Additional description:</label>
@@ -34,6 +34,21 @@
                 <br>
             <label class="form-label" for="slideshowDescription">Picture gallery note:</label>
                 <textarea class="form-input" id="slideshowDescription" name="slideshowDescription">{{currentUser.slideshowDescription}}</textarea>
+                <br>
+            <label class="form-label" for="statement2">Short Description 2:</label>
+                <textarea class="form-input" id="statement2" name="statement2">{{currentUser.statement2}}</textarea>
+                <br>
+            <label class="form-label" for="link3">Website URL 3:</label>
+                <input class="form-input" type="url" id="link3" name="link3" value="{{currentUser.link3}}">
+                <br>
+            <label class="form-label" for="link3desc">Website label 3:</label>
+                <input class="form-input" id="link3desc" name="link3desc" value="{{currentUser.link3desc}}">
+                <br>
+            <label class="form-label" for="link4">Website URL 4:</label>
+                <input class="form-input" type="url" id="link4" name="link4" value="{{currentUser.link4}}">
+                <br>
+            <label class="form-label" for="link4desc">Website label 4:</label>
+                <input class="form-input" id="link4desc" name="link4desc" value="{{currentUser.link4desc}}">
                 <br>
             <label class="form-label" for="visibility">Visibility:</label>
                 <select class="form-input" id="visibility" name="visibility">
@@ -54,6 +69,11 @@
                 <br>
 
             <h4>Updates &amp; notices</h4>
+            <label class="form-label opt-in-label" for="onlyRecentEvents">
+                <input type="checkbox" id="onlyRecentEvents" name="onlyRecentEvents" value="true" {{#if currentUser.onlyRecentEvents}}checked{{/if}}>
+                Events - Only list most recent 12 months of events
+            </label>
+            <br>
             <label class="form-label opt-in-label" for="optInCreativeRealEstate">
                 <input type="checkbox" id="optInCreativeRealEstate" name="optInCreativeRealEstate" value="true" {{#if currentUser.optInCreativeRealEstate}}checked{{/if}}>
                 Opt-into Creative Real Estate &amp; Artists in Residence(s) updates

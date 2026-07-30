@@ -351,6 +351,27 @@ footer a {
   max-width: 28rem;
 }
 
+.profile-short-desc-secondary {
+  max-width: 820px;
+  margin: 0 auto 12px;
+  padding: 0 12px;
+}
+
+.profile-extra-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 0 auto 14px;
+  padding: 0 12px;
+}
+
+.profile-extra-links a {
+  color: #222;
+  text-decoration: underline;
+  word-break: break-word;
+}
+
 .profile-hero .profile-username {
   grid-area: user;
   margin: 0;
