@@ -141,7 +141,11 @@ document.querySelectorAll('.gallery-delete-button').forEach((button) => {
         if (!img) return;
 
         try {
-            await handleDeletion(img.src);
+            const response = await handleDeletion(img.src);
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || `Delete failed with status ${response.status}`);
+            }
             setMessage('Successfully deleted image');
             item.remove();
             location.reload();
@@ -153,7 +157,7 @@ document.querySelectorAll('.gallery-delete-button').forEach((button) => {
 });
 
 async function handleDeletion(fullImagePath) {
-    const filename = fullImagePath.split('/').pop();
+    const filename = decodeURIComponent(fullImagePath.split('/').pop().split('?')[0]);
 
     const isEventPage = document.getElementById('is-event-page') != null;
     const groupSlideshowId = document.getElementById('group-slideshow-id');

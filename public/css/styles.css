@@ -994,6 +994,22 @@ p.index {
   box-sizing: border-box;
 }
 
+.edit-game-page .event-description-input,
+.edit-game-page .event-private-description-input {
+  display: block;
+  width: 100%;
+  min-height: 9em;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.edit-game-page .event-list-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
 .edit-game-media {
   display: flex;
   flex-direction: column;

@@ -4,7 +4,6 @@ let gameForm = document.getElementById('game-image-form');
 let groupForm = document.getElementById('group-image-form');
 let gameId = document.getElementById('game-id');
 let groupId = document.getElementById('group-id');
-let submitButton = document.getElementById('image-submit-button');
 
 const mb = 1048576; // 1 MB
 const maxSize = 10 * mb; // 10 MB
@@ -37,7 +36,8 @@ if (pfpForm) {
 
             await handleUpload([file], [signedUrl]);
             //event.currentTarget.submit();
-            submitButton.disabled = true;
+            const submitButton = pfpForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
         } catch (err) {
             setError(err);
         }
@@ -72,7 +72,8 @@ if (gameForm) {
 
             await handleUpload([file], [signedUrl]);
             //event.currentTarget.submit();
-            submitButton.disabled = true;
+            const submitButton = gameForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
         } catch (err) {
             setError(err);
         }
@@ -107,7 +108,8 @@ if (groupForm) {
 
             await handleUpload([file], [signedUrl]);
             //event.currentTarget.submit();
-            submitButton.disabled = true;
+            const submitButton = groupForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
         } catch (err) {
             setError(err);
         }
@@ -166,7 +168,8 @@ if (slideshowForm) {
 
             await handleUpload(files, signedUrls);
             //event.currentTarget.submit();
-            submitButton.disabled = true;
+            const submitButton = slideshowForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
         } catch (err) {
             setError(err);
         }
@@ -282,15 +285,16 @@ async function handleUpload(files, signedUrls) {
             if (response.ok) {
                 setMessage(`File ${files[i].name} uploaded successfully.`);
             } else {
-                setError(`File ${files[i].name} upload failed with status ${response.status}.`);
+                throw new Error(`File ${files[i].name} upload failed with status ${response.status}.`);
             }
         }
         console.log('Done');
         setMessage('Files done uploading!');
     } catch (error) {
-        setError(`File upload failed: ${error.message}`);
-        console.log(`Error uploading: ${error.message}`);
-        return;
+        const message = error instanceof Error ? error.message : String(error);
+        setError(`File upload failed: ${message}`);
+        console.log(`Error uploading: ${message}`);
+        throw error;
     }
     location.reload();
 }

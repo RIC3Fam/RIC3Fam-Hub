@@ -66,6 +66,13 @@ router
                 return res.status(500).render('error', { title: 'Error', error: err });
             }
         } else if (isEventPage) {
+            try {
+                const isAdmin = await usersData.isUserAdmin(req.session.user?._id);
+                if (!isAdmin) throw 'Admin only';
+            } catch (err) {
+                console.log(err);
+                return res.status(500).render('error', { title: 'Error', error: err });
+            }
             id = 'eventPage';
         } else {
             id = req.session.user._id;
@@ -163,6 +170,8 @@ router
                 }
                 id = gameId;
             } else if (isEventPage) {
+                const isAdmin = await usersData.isUserAdmin(req.session.user?._id);
+                if (!isAdmin) throw 'Admin only';
                 id = 'eventPage';
             } else {
                 id = req.session.user._id;
