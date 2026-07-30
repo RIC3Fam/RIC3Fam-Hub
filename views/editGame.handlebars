@@ -29,7 +29,12 @@
                 <input class="form-input" type="text" id="directions" name="directions" value="{{gameObj.directions}}">
                 <br>
             <label class="form-label" for="description">Description:</label>
-                <textarea class="form-input" id="description" name="gameDescription" >{{gameObj.description}}</textarea>
+                <textarea class="form-input event-description-input" id="description" name="gameDescription" rows="6">{{gameObj.description}}</textarea>
+                <br>
+            <label class="form-label event-list-checkbox" for="listOnEventsPage">
+                <input type="checkbox" id="listOnEventsPage" name="listOnEventsPage" {{#elseEquals gameObj.listOnEventsPage false}}checked{{/elseEquals}}>
+                List on events page
+            </label>
                 <br>
             <label class="form-label" for="date">Date:</label>
                 <input class="form-input" type="date" id="date" name="date" value="{{gameObj.gameDate}}" >
@@ -91,10 +96,6 @@
                     <option value="private" {{#ifEquals gameObj.visibility "private"}}selected{{/ifEquals}}>Private</option>
                 </select>
                 <br>
-            <label class="form-label" for="privateDescription">Private Description:</label>
-                <textarea class="form-input" id="privateDescription" name="privateDescription">{{gameObj.privateDescription}}</textarea>
-                <br>
-
             <h4>Leaders</h4>
             <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
             <div id="event-leaders-editor">
@@ -115,6 +116,10 @@
             </div>
             <button type="button" id="add-leader-row" class="form-submit-button">Add leader</button>
             <br>
+
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input event-private-description-input" id="privateDescription" name="privateDescription" rows="6">{{gameObj.privateDescription}}</textarea>
+                <br>
 
             <button type="submit"  id="game-submit-button" class="form-submit-button">Submit</button>
         </form>

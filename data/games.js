@@ -40,6 +40,8 @@ const filterPrivateGames = (gameList, viewerId = null) => {
     });
 };
 
+const shouldListOnEventsPage = (game) => game.listOnEventsPage !== false;
+
 const create = async (
     gameName,
     gameDescription,
@@ -100,6 +102,7 @@ const create = async (
         link2desc: social.linkdesc,
         visibility,
         privateDescription,
+        listOnEventsPage: true,
         slideshowImages: [],
         leaders: [],
     };
@@ -138,6 +141,7 @@ const get = async (gameId) => {
     }
     if (game.link2 == null) game.link2 = '';
     if (game.link2desc == null) game.link2desc = '';
+    if (game.listOnEventsPage == null) game.listOnEventsPage = true;
     return helpers.withVisibilityDefaults(game);
 };
 
@@ -151,7 +155,7 @@ const getAll = async (includeExpired = false, viewerId = null) => {
 
     if (!gameList) throw 'Could not get all games';
 
-    gameList = filterPrivateGames(gameList, viewerId);
+    gameList = filterPrivateGames(gameList, viewerId).filter(shouldListOnEventsPage);
     gameList = gameList.map((element) => {
         element._id = element._id.toString();
         if (element.visibility !== 'private') element.visibility = 'public';
@@ -164,7 +168,7 @@ const getPast = async (viewerId = null) => {
     const gameCollection = await games();
     let gameList = await gameCollection.find({ expired: true }).toArray();
     if (!gameList) throw 'Could not get past games';
-    gameList = filterPrivateGames(gameList, viewerId);
+    gameList = filterPrivateGames(gameList, viewerId).filter(shouldListOnEventsPage);
     gameList = gameList.map((element) => {
         element._id = element._id.toString();
         if (element.visibility !== 'private') element.visibility = 'public';
@@ -378,7 +382,8 @@ const update = async (
     link2,
     link2desc,
     group2,
-    group3
+    group3,
+    listOnEventsPage
 ) => {
     let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
@@ -426,6 +431,7 @@ const update = async (
         link2: social.link,
         link2desc: social.linkdesc,
         visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGame.visibility || 'public',
+        listOnEventsPage: listOnEventsPage != null ? !!listOnEventsPage : oldGame.listOnEventsPage !== false,
         privateDescription:
             privateDescription != null
                 ? helpers.optionalString(privateDescription, 'Private description')

@@ -299,7 +299,8 @@ router
                 req.body.link2,
                 req.body.link2desc,
                 req.body.group2,
-                req.body.group3
+                req.body.group3,
+                req.body.listOnEventsPage === 'on'
             );
 
             return res.redirect('/events/' + gameId);
