@@ -2455,6 +2455,17 @@ p.index {
   border: 1px solid #ddd;
 }
 
+.home-hotspot-link-label {
+  display: block;
+}
+
+.home-hotspot-link-label .form-input {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 4px;
+}
+
 .home-hotspot-coords {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
