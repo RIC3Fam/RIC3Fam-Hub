@@ -1986,13 +1986,14 @@ p.index {
 .facade-family-wall {
   position: absolute;
   z-index: 1;
-  top: 18px;
+  top: -20px;
   left: 50%;
-  width: 58%;
-  max-width: 430px;
+  width: 68%;
+  max-width: 520px;
   height: auto;
   transform: translateX(-50%);
-  opacity: 0.88;
+  opacity: 0.82;
+  mix-blend-mode: multiply;
   pointer-events: none;
 }
 

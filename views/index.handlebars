@@ -138,5 +138,9 @@
         </div>
     </section>
 
+    {{#if currentUser.isAdmin}}
+        <p class="home-admin-link"><a href="/edit-home">Edit Home Page</a></p>
+    {{/if}}
+
     <script src="/public/js/homeBuilding.js"></script>
 </main>
