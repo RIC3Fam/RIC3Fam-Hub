@@ -30,7 +30,14 @@ const createResult = await groupsData.create(
                 req.body.link1desc,
                 req.body.link2,
                 req.body.link2desc,
-                req.body.projectFramers
+                [],
+                req.body.longDescription,
+                req.body.slideshowDescription,
+                req.body.link3,
+                req.body.link3desc,
+                req.body.link4,
+                req.body.link4desc,
+                req.body.manualMembers || []
             );
             res.redirect(`groups/${createResult._id}`);
         } catch (err) {
@@ -66,9 +73,11 @@ router.route('/:groupId').get(async (req, res) => {
         }
 
         let players=  groupObj.players;
-        players = players.filter(player => player !== groupObj.groupLeader)
+        const manualMemberIds = Array.isArray(groupObj.manualMembers) ? groupObj.manualMembers : [];
+        players = players.filter(player => player !== groupObj.groupLeader && !manualMemberIds.includes(player))
        // Get the list of group members from the database
 let members = await usersData.getIDName(players);
+let manualMembers = await usersData.getIDName(manualMemberIds);
 
 // Separate the members into 3 distinct buckets based on their starting letters
 // Separate the members into 3 distinct buckets based on character rules
@@ -99,21 +108,6 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         let isMember = currentUser && groupObj.players.includes(currentUser._id);
         let isOwner = currentUser && owner && owner._id == currentUser._id;
 
-        const projectFramers = [];
-        for (const row of groupObj.projectFramers || []) {
-            try {
-                const person = await usersData.getUser(row.userId);
-                projectFramers.push({
-                    title: row.title,
-                    _id: person._id,
-                    name: person.name || person.username,
-                    username: person.username,
-                });
-            } catch (e) {
-                continue;
-            }
-        }
-
         groupObj.comments.forEach(async comment => {
             try{
                 comment.sender = (await usersData.getIDName([comment.userId]))[0]
@@ -136,11 +130,11 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         lowercaseTitle: groupObj.lowercaseTitle || "Lowercase Members",
         numericMembers: numericMembers,
         numericTitle: groupObj.numericTitle || "Numbered Members",
+        manualMembers,
         games: games,
         owner: owner,
         isMember: isMember,
         isOwner: isOwner,
-        projectFramers,
         canSeePrivateBox: helpers.viewerCanSeePrivateBox(currentUser, groupObj, 'group'),
         isPublic: groupObj.visibility !== 'private',
         slideshowImages: helpers.normalizeSlideshowSlides(groupObj.slideshowImages || [])
@@ -193,12 +187,11 @@ router
             helpers.isValidId(groupId);
             const groupObj = await groupsData.get(groupId);
 
-            const projectFramers = [];
-            for (const row of groupObj.projectFramers || []) {
+            const manualMembers = [];
+            for (const userId of groupObj.manualMembers || []) {
                 try {
-                    const person = await usersData.getUser(row.userId);
-                    projectFramers.push({
-                        title: row.title,
+                    const person = await usersData.getUser(userId);
+                    manualMembers.push({
                         userId: person._id,
                         label: `${person.name || person.username} (@${person.username})`,
                     });
@@ -210,7 +203,7 @@ router
             return res.render("editGroup", {
                 title: "Edit group",
                 groupObj,
-                projectFramers,
+                manualMembers,
             });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
@@ -247,7 +240,14 @@ router
                 req.body.link1desc,
                 req.body.link2,
                 req.body.link2desc,
-                req.body.projectFramers || []
+                [],
+                req.body.longDescription,
+                req.body.slideshowDescription,
+                req.body.link3,
+                req.body.link3desc,
+                req.body.link4,
+                req.body.link4desc,
+                req.body.manualMembers || []
             );
             return res.redirect("/groups/" + groupId);
         } catch (e) {

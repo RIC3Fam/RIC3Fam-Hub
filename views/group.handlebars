@@ -18,12 +18,15 @@
             {{/if}}
             <div class="group-links">
                 {{#if group.link1}}
-                    <a href="{{group.link1}}" target="_blank" rel="noopener noreferrer">{{#if group.link1desc}}{{group.link1desc}}{{else}}Website{{/if}}</a>
+                    <a href="{{group.link1}}" target="_blank" rel="noopener noreferrer">{{#if group.link1desc}}{{group.link1desc}}{{else}}Website 1{{/if}}</a>
                 {{/if}}
                 {{#if group.link2}}
-                    <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media{{/if}}</a>
+                    <a href="{{group.link2}}" target="_blank" rel="noopener noreferrer">{{#if group.link2desc}}{{group.link2desc}}{{else}}Social Media 2{{/if}}</a>
                 {{/if}}
             </div>
+            {{#if group.longDescription}}
+                <div class="group-long-desc">{{group.longDescription}}</div>
+            {{/if}}
         </div>
     </div>
 
@@ -66,28 +69,28 @@
                 {{> addToSlideshow groupId=group._id}}
             {{/if}}
         {{/if}}
-    </section>
 
-    {{#if projectFramers.length}}
-        <section class="event-leaders profile-section group-full-width">
-            <h3>Project Framers</h3>
-            <ul class="event-leaders-inline group-framers-inline">
-                {{#each projectFramers}}
-                    <li class="title-person-line">
-                        {{#if this.title}}<span class="leader-title-text">{{this.title}}</span>{{/if}}
-                        {{#if this.title}}<span class="title-person-sep"> — </span>{{/if}}
-                        <a href="/users/{{this._id}}">{{this.name}}</a>
-                    </li>
-                {{/each}}
-            </ul>
-        </section>
-    {{/if}}
+        {{#if group.link3}}
+            <div class="group-extra-links">
+                <a href="{{group.link3}}" target="_blank" rel="noopener noreferrer">{{#if group.link3desc}}{{group.link3desc}}{{else}}Website 3{{/if}}</a>
+                {{#if group.link4}}
+                    <a href="{{group.link4}}" target="_blank" rel="noopener noreferrer">{{#if group.link4desc}}{{group.link4desc}}{{else}}Website 4{{/if}}</a>
+                {{/if}}
+            </div>
+        {{else}}
+            {{#if group.link4}}
+                <div class="group-extra-links">
+                    <a href="{{group.link4}}" target="_blank" rel="noopener noreferrer">{{#if group.link4desc}}{{group.link4desc}}{{else}}Website 4{{/if}}</a>
+                </div>
+            {{/if}}
+        {{/if}}
+    </section>
 
     <div class="group-full-width">
         {{#if owner}}
             <p class="title-person-line">
                 <span class="leader-title-text">Group Leader</span>
-                <span class="title-person-sep"> — </span>
+                <span class="title-person-sep"> - </span>
                 <a href="/users/{{owner._id}}">{{owner.username}}</a>
             </p>
         {{/if}}
@@ -114,6 +117,15 @@
             <p><strong>{{numericTitle}}</strong></p>
             <ul>
                 {{#each numericMembers}}
+                    <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        {{/if}}
+
+        {{#if manualMembers}}
+            <p><strong>Manual add</strong></p>
+            <ul class="group-manual-members-row">
+                {{#each manualMembers}}
                     <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
                 {{/each}}
             </ul>

@@ -1158,6 +1158,12 @@ p.index {
   line-height: 1.45;
 }
 
+.group-long-desc {
+  white-space: pre-wrap;
+  color: #333;
+  line-height: 1.55;
+}
+
 .group-links {
   display: flex;
   flex-wrap: wrap;
@@ -1184,9 +1190,19 @@ p.index {
   margin: 12px 0 16px;
 }
 
-.group-framers-inline {
+.group-extra-links,
+.group-manual-members-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
   list-style: none;
   padding: 0;
+  margin: 14px 0;
+}
+
+.group-extra-links a {
+  font-weight: 600;
 }
 
 .title-person-line {

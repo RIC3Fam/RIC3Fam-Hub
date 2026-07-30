@@ -5,54 +5,72 @@
             <label class="form-label" for="group-name">Group Name:</label>
                 <input class="form-input" type="text" id="group-name" name="groupName">
                 <br>
-           <label class="form-label" for="description">Short Description</label>
-        <textarea class="form-input" id="description" name="groupDescription"></textarea>
-        <br>
+            <label class="form-label" for="description">Short Description</label>
+                <textarea class="form-input" id="description" name="groupDescription"></textarea>
+                <br>
 
-        <label class="form-label" for="link1">Website URL:</label>
-        <input class="form-input" type="url" id="link1" name="link1" placeholder="https://">
-        <br>
-        <label class="form-label" for="link1desc">Website label:</label>
-        <input class="form-input" type="text" id="link1desc" name="link1desc" placeholder="e.g., Website">
-        <br>
-        <label class="form-label" for="link2">Social media URL:</label>
-        <input class="form-input" type="url" id="link2" name="link2" placeholder="https://">
-        <br>
-        <label class="form-label" for="link2desc">Social label:</label>
-        <input class="form-input" type="text" id="link2desc" name="link2desc" placeholder="e.g., Social Media">
-        <br>
+            <label class="form-label" for="link1">Website URL 1:</label>
+                <input class="form-input" type="url" id="link1" name="link1" placeholder="https://">
+                <br>
+            <label class="form-label" for="link1desc">Website label 1:</label>
+                <input class="form-input" type="text" id="link1desc" name="link1desc" placeholder="e.g., Website">
+                <br>
+            <label class="form-label" for="link2">Social Media URL 2:</label>
+                <input class="form-input" type="url" id="link2" name="link2" placeholder="https://">
+                <br>
+            <label class="form-label" for="link2desc">Social label 2:</label>
+                <input class="form-input" type="text" id="link2desc" name="link2desc" placeholder="e.g., Social Media">
+                <br>
 
-        <h4>Project Framers</h4>
-        <p class="muted">Title is free text. Person must be an existing profile — type to search, then select.</p>
-        <div id="group-framers-editor"></div>
-        <button type="button" id="add-framer-row" class="form-submit-button">Add project framer</button>
-        <br>
+            <label class="form-label" for="longDescription">Long Description:</label>
+                <textarea class="form-input" id="longDescription" name="longDescription"></textarea>
+                <br>
+            <label class="form-label" for="slideshowDescription">Picture gallery note:</label>
+                <textarea class="form-input" id="slideshowDescription" name="slideshowDescription"></textarea>
+                <br>
+            <label class="form-label" for="link3">Website URL 3:</label>
+                <input class="form-input" type="url" id="link3" name="link3" placeholder="https://">
+                <br>
+            <label class="form-label" for="link3desc">Website label 3:</label>
+                <input class="form-input" type="text" id="link3desc" name="link3desc" placeholder="e.g., Website">
+                <br>
+            <label class="form-label" for="link4">Website URL 4:</label>
+                <input class="form-input" type="url" id="link4" name="link4" placeholder="https://">
+                <br>
+            <label class="form-label" for="link4desc">Website label 4:</label>
+                <input class="form-input" type="text" id="link4desc" name="link4desc" placeholder="e.g., Website">
+                <br>
 
-        <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
-        <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" placeholder="e.g., Gold Tier Members">
-        <br>
+            <label class="form-label" for="uppercaseTitle">All Caps Section Title:</label>
+                <input class="form-input" type="text" id="uppercaseTitle" name="uppercaseTitle" placeholder="e.g., Gold Tier Members">
+                <br>
 
-        <label class="form-label" for="lowercaseTitle">Lowercase Section Title:</label>
-        <input class="form-input" type="text" id="lowercaseTitle" name="lowercaseTitle" placeholder="e.g., Standard Members">
-        <br>
+            <label class="form-label" for="lowercaseTitle">Lowercase Section Title:</label>
+                <input class="form-input" type="text" id="lowercaseTitle" name="lowercaseTitle" placeholder="e.g., Standard Members">
+                <br>
 
-        <label class="form-label" for="numericTitle">Numbered Section Title:</label>
-        <input class="form-input" type="text" id="numericTitle" name="numericTitle" placeholder="e.g., Digit Accounts">
-        <br>
+            <label class="form-label" for="numericTitle">Numbered Section Title:</label>
+                <input class="form-input" type="text" id="numericTitle" name="numericTitle" placeholder="e.g., Digit Accounts">
+                <br>
 
-        <label class="form-label" for="visibility">Visibility:</label>
-        <select class="form-input" id="visibility" name="visibility">
-            <option value="public" selected>Public</option>
-            <option value="private">Private</option>
-        </select>
-        <br>
+            <h4>Manual add</h4>
+            <p class="muted">Search for profiles to add them to this group.</p>
+            <div id="group-manual-members-editor"></div>
+            <button type="button" id="add-manual-member-row" class="form-submit-button">Add manual member</button>
+            <br>
 
-        <label class="form-label" for="privateDescription">Private Description:</label>
-        <textarea class="form-input" id="privateDescription" name="privateDescription"></textarea>
-        <br>
+            <label class="form-label" for="visibility">Visibility:</label>
+                <select class="form-input" id="visibility" name="visibility">
+                    <option value="public" selected>Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <br>
 
-        <button type="submit" id="group-submit-button" class="form-submit-button">Create</button>
-            
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input" id="privateDescription" name="privateDescription"></textarea>
+                <br>
+
+            <button type="submit" id="group-submit-button" class="form-submit-button">Create</button>
         </form>
     </div>
     <p id="message-label" hidden></p>

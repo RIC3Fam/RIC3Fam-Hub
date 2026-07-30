@@ -43,6 +43,27 @@ const normalizeProjectFramers = (framersInput) => {
     return framers;
 };
 
+const normalizeManualMembers = (membersInput) => {
+    if (!membersInput) return [];
+    let rows = membersInput;
+    if (!Array.isArray(rows) && typeof rows === 'object') {
+        rows = Object.keys(rows)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((k) => rows[k]);
+    }
+    if (!Array.isArray(rows)) return [];
+
+    const ids = [];
+    for (const row of rows) {
+        const userId = typeof row === 'object' ? row?.userId : row;
+        const id = userId != null ? String(userId).trim() : '';
+        if (!id) continue;
+        helpers.isValidId(id);
+        if (!ids.includes(id)) ids.push(id);
+    }
+    return ids;
+};
+
 const create = async (
     groupName,
     groupDescription,
@@ -56,7 +77,14 @@ const create = async (
     link1desc = '',
     link2 = '',
     link2desc = '',
-    projectFramers = []
+    projectFramers = [],
+    longDescription = '',
+    slideshowDescription = '',
+    link3 = '',
+    link3desc = '',
+    link4 = '',
+    link4desc = '',
+    manualMembers = []
 ) => {
     // Input Validation
     helpers.validateGroup(groupName, groupDescription, groupLeader);
@@ -70,21 +98,28 @@ const create = async (
     numericTitle = normalizeSectionTitle(numericTitle, 'Numbered Members');
     visibility = helpers.normalizeVisibility(visibility);
     privateDescription = helpers.optionalString(privateDescription, 'Private description');
-    const website = normalizeOptionalLink(link1, link1desc, 'Website URL', 'Website label');
-    const social = normalizeOptionalLink(link2, link2desc, 'Social media URL', 'Social label');
+    longDescription = xss(helpers.optionalString(longDescription, 'Long description'));
+    slideshowDescription = xss(helpers.optionalString(slideshowDescription, 'Slideshow description'));
+    const website = normalizeOptionalLink(link1, link1desc, 'Website URL 1', 'Website label 1');
+    const social = normalizeOptionalLink(link2, link2desc, 'Social Media URL 2', 'Social label 2');
+    const website3 = normalizeOptionalLink(link3, link3desc, 'Website URL 3', 'Website label 3');
+    const website4 = normalizeOptionalLink(link4, link4desc, 'Website URL 4', 'Website label 4');
     const framers = normalizeProjectFramers(projectFramers);
+    const manual = normalizeManualMembers(manualMembers);
+    const players = Array.from(new Set([groupLeader, ...manual]));
 
     // Add group to database
     let newgroup = {
         groupName: xss(groupName),
         description: xss(groupDescription),
+        longDescription,
         groupLeader,
         uppercaseTitle,
         lowercaseTitle,
         numericTitle,
         comments: [],
-        players: [groupLeader],
-        totalNumberOfPlayers: 1,
+        players,
+        totalNumberOfPlayers: players.length,
         groupImage: 'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
         visibility,
         privateDescription,
@@ -92,9 +127,14 @@ const create = async (
         link1desc: website.linkdesc,
         link2: social.link,
         link2desc: social.linkdesc,
+        link3: website3.link,
+        link3desc: website3.linkdesc,
+        link4: website4.link,
+        link4desc: website4.linkdesc,
         projectFramers: framers,
+        manualMembers: manual,
         slideshowImages: [],
-        slideshowDescription: '',
+        slideshowDescription,
     };
     const groupCollection = await groups();
     const insertInfo = await groupCollection.insertOne(newgroup);
@@ -102,7 +142,10 @@ const create = async (
     const newId = insertInfo.insertedId.toString();
 
     const userCollection = await users();
-    const updateUser = await userCollection.updateOne({ _id: new ObjectId(groupLeader) }, { $push: { groups: newId } });
+    const updateUser = await userCollection.updateMany(
+        { _id: { $in: players.map((id) => new ObjectId(id)) } },
+        { $addToSet: { groups: newId } }
+    );
     if (!updateUser) throw 'Could not update user';
 
     const group = await groupCollection.findOne({ _id: new ObjectId(newId) });
@@ -185,11 +228,17 @@ const get = async (groupId) => {
     group._id = group._id.toString();
     if (!Array.isArray(group.slideshowImages)) group.slideshowImages = [];
     if (group.slideshowDescription == null) group.slideshowDescription = '';
+    if (group.longDescription == null) group.longDescription = '';
     if (!Array.isArray(group.projectFramers)) group.projectFramers = [];
+    if (!Array.isArray(group.manualMembers)) group.manualMembers = [];
     if (group.link1 == null) group.link1 = '';
     if (group.link1desc == null) group.link1desc = '';
     if (group.link2 == null) group.link2 = '';
     if (group.link2desc == null) group.link2desc = '';
+    if (group.link3 == null) group.link3 = '';
+    if (group.link3desc == null) group.link3desc = '';
+    if (group.link4 == null) group.link4 = '';
+    if (group.link4desc == null) group.link4desc = '';
     return helpers.withVisibilityDefaults(group);
 };
 
@@ -244,7 +293,14 @@ const update = async (
     link1desc,
     link2,
     link2desc,
-    projectFramers
+    projectFramers,
+    longDescription,
+    slideshowDescription,
+    link3,
+    link3desc,
+    link4,
+    link4desc,
+    manualMembers
 ) => {
     // Input Validation
     helpers.isValidId(groupId);
@@ -259,17 +315,31 @@ const update = async (
 
     const website =
         link1 !== undefined
-            ? normalizeOptionalLink(link1, link1desc, 'Website URL', 'Website label')
+            ? normalizeOptionalLink(link1, link1desc, 'Website URL 1', 'Website label 1')
             : { link: oldGroup.link1 || '', linkdesc: oldGroup.link1desc || '' };
     const social =
         link2 !== undefined
-            ? normalizeOptionalLink(link2, link2desc, 'Social media URL', 'Social label')
+            ? normalizeOptionalLink(link2, link2desc, 'Social Media URL 2', 'Social label 2')
             : { link: oldGroup.link2 || '', linkdesc: oldGroup.link2desc || '' };
+    const website3 =
+        link3 !== undefined
+            ? normalizeOptionalLink(link3, link3desc, 'Website URL 3', 'Website label 3')
+            : { link: oldGroup.link3 || '', linkdesc: oldGroup.link3desc || '' };
+    const website4 =
+        link4 !== undefined
+            ? normalizeOptionalLink(link4, link4desc, 'Website URL 4', 'Website label 4')
+            : { link: oldGroup.link4 || '', linkdesc: oldGroup.link4desc || '' };
+    const oldManualMembers = Array.isArray(oldGroup.manualMembers) ? oldGroup.manualMembers : [];
+    const nextManualMembers = manualMembers !== undefined ? normalizeManualMembers(manualMembers) : oldManualMembers;
+    const existingNonManualPlayers = (oldGroup.players || []).filter((id) => !oldManualMembers.includes(id));
+    const nextPlayers = Array.from(new Set([...existingNonManualPlayers, groupLeader, ...nextManualMembers]));
 
     // Update record
     const updatedgroup = {
         groupName: xss(groupName),
         description: xss(groupDescription),
+        longDescription:
+            longDescription != null ? xss(helpers.optionalString(longDescription, 'Long description')) : oldGroup.longDescription || '',
         groupLeader,
         uppercaseTitle:
             uppercaseTitle !== undefined
@@ -284,11 +354,14 @@ const update = async (
                 ? normalizeSectionTitle(numericTitle, oldGroup.numericTitle || 'Numbered Members')
                 : oldGroup.numericTitle,
         comments: oldGroup.comments,
-        players: oldGroup.players,
-        totalNumberOfPlayers: oldGroup.totalNumberOfPlayers,
+        players: nextPlayers,
+        totalNumberOfPlayers: nextPlayers.length,
         groupImage: groupImage ? groupImage : oldGroup.groupImage,
         slideshowImages: oldGroup.slideshowImages || [],
-        slideshowDescription: oldGroup.slideshowDescription || '',
+        slideshowDescription:
+            slideshowDescription != null
+                ? xss(helpers.optionalString(slideshowDescription, 'Slideshow description'))
+                : oldGroup.slideshowDescription || '',
         visibility: visibility != null ? helpers.normalizeVisibility(visibility) : oldGroup.visibility || 'public',
         privateDescription:
             privateDescription != null
@@ -298,13 +371,31 @@ const update = async (
         link1desc: website.linkdesc,
         link2: social.link,
         link2desc: social.linkdesc,
+        link3: website3.link,
+        link3desc: website3.linkdesc,
+        link4: website4.link,
+        link4desc: website4.linkdesc,
         projectFramers:
             projectFramers !== undefined ? normalizeProjectFramers(projectFramers) : oldGroup.projectFramers || [],
+        manualMembers: nextManualMembers,
     };
 
     const groupCollection = await groups();
     const updatedInfo = await groupCollection.findOneAndReplace({ _id: new ObjectId(groupId) }, updatedgroup, { returnDocument: 'after' });
     if (!updatedInfo) throw 'Could not update group successfully';
+
+    const userCollection = await users();
+    await userCollection.updateMany(
+        { _id: { $in: nextManualMembers.map((id) => new ObjectId(id)) } },
+        { $addToSet: { groups: groupId } }
+    );
+    const removedManualMembers = oldManualMembers.filter((id) => !nextPlayers.includes(id));
+    if (removedManualMembers.length > 0) {
+        await userCollection.updateMany(
+            { _id: { $in: removedManualMembers.map((id) => new ObjectId(id)) } },
+            { $pull: { groups: groupId } }
+        );
+    }
 
     updatedInfo._id = updatedInfo._id.toString();
 
@@ -481,7 +572,14 @@ const editGroupImage = async (groupId, imagePath) => {
         group.link1desc,
         group.link2,
         group.link2desc,
-        group.projectFramers
+        group.projectFramers,
+        group.longDescription,
+        group.slideshowDescription,
+        group.link3,
+        group.link3desc,
+        group.link4,
+        group.link4desc,
+        group.manualMembers
     );
 };
 

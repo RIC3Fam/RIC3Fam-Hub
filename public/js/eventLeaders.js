@@ -22,10 +22,12 @@
             const row = document.createElement('div');
             row.className = 'leader-row';
             row.setAttribute('data-leader-row', '');
-            row.innerHTML = `
+            const titleMarkup = config.requireTitle === false ? '' : `
             <label class="form-label">Title
                 <input class="form-input leader-title" type="text" maxlength="80" placeholder="${config.titlePlaceholder}" value="">
-            </label>
+            </label>`;
+            row.innerHTML = `
+            ${titleMarkup}
             <label class="form-label">Person
                 <input class="form-input leader-search" type="text" placeholder="Type a name or username" autocomplete="off" value="">
                 <input type="hidden" class="leader-user-id" value="">
@@ -38,7 +40,7 @@
             const search = row.querySelector('.leader-search');
             const userId = row.querySelector('.leader-user-id');
             const note = row.querySelector('.leader-selected-note');
-            title.value = titleValue;
+            if (title) title.value = titleValue;
             search.value = labelValue;
             userId.value = userIdValue;
             if (userIdValue) note.hidden = false;
@@ -134,10 +136,11 @@
             (event) => {
                 const rows = editor.querySelectorAll('[data-leader-row]');
                 for (const row of rows) {
-                    const title = row.querySelector('.leader-title').value.trim();
+                    const titleInput = row.querySelector('.leader-title');
+                    const title = titleInput ? titleInput.value.trim() : '';
                     const userId = row.querySelector('.leader-user-id').value.trim();
                     if (!title && !userId) continue;
-                    if (!title || !userId) {
+                    if ((config.requireTitle !== false && !title) || !userId) {
                         event.preventDefault();
                         event.stopImmediatePropagation();
                         const errorLabel = document.getElementById('error-label');
@@ -164,11 +167,12 @@
     });
 
     initRoleEditor({
-        editorId: 'group-framers-editor',
-        addBtnId: 'add-framer-row',
+        editorId: 'group-manual-members-editor',
+        addBtnId: 'add-manual-member-row',
         formId: 'create-group-form',
-        fieldName: 'projectFramers',
-        titlePlaceholder: 'e.g. Project Framer',
-        incompleteError: 'Each project framer needs a title and a selected profile from search.',
+        fieldName: 'manualMembers',
+        titlePlaceholder: '',
+        incompleteError: 'Each manual member needs a selected profile from search.',
+        requireTitle: false,
     });
 })();
