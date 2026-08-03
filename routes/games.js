@@ -53,12 +53,15 @@ router
         const shortDescription = req.body.shortDescription;
 
         try {
+            if (!req.session.user) throw 'Must be logged in';
+            const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+            if (!isAdmin) throw 'Admin only';
             helpers.isValidNum(req.body.maxPlayers);
             let maxPlayersNumber = parseInt(maxCapacity, 10);
             startTime = helpers.stringHelper(startTime, 'Start Time');
             endTime = helpers.stringHelper(endTime, 'End Time');
             gameDate = helpers.stringHelper(gameDate, 'Event Date');
-            gamesData.formatAndValidateGame(gameName, gameDescription, gameLocation, maxPlayersNumber, gameDate, startTime, endTime, organizer, link, linkdesc);
+            await gamesData.formatAndValidateGame(gameName, gameDescription, gameLocation, maxPlayersNumber, gameDate, startTime, endTime, organizer, link, linkdesc);
 
             const createResult = await gamesData.create(
                 gameName,
@@ -266,7 +269,7 @@ router
 
             let gameLocation = { zip: req.body.zip, state: req.body.state, streetAddress: req.body.streetAddress, city: req.body.city };
 
-            gamesData.formatAndValidateGame(
+            await gamesData.formatAndValidateGame(
                 req.body.gameName,
                 req.body.gameDescription,
                 gameLocation,

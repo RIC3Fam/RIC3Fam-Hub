@@ -4,7 +4,7 @@ import { usersData, groupsData, picturesData } from './index.js';
 import { ObjectId } from 'mongodb';
 import xss from 'xss';
 
-const formatAndValidateGame = function (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer = undefined, link, linkdesc) {
+const formatAndValidateGame = async function (gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer = undefined, link, linkdesc) {
     gameName = helpers.stringHelper(gameName, 'Event name', 5, null);
     gameDescription = helpers.stringHelper(gameDescription, 'Event description', 1, null);
     gameDate = helpers.stringHelper(gameDate, 'Event date', 1, null);
@@ -25,7 +25,7 @@ const formatAndValidateGame = function (gameName, gameDescription, gameLocation,
     helpers.validateLocation(gameLocation);
 
     helpers.isValidId(organizer);
-    if (!usersData.isUserAdmin(organizer)) throw 'User is not an admin';
+    if (!(await usersData.isUserAdmin(organizer))) throw 'User is not an admin';
 
     return { gameName, gameDescription, gameDate, startTime, endTime, maxCapacity, gameLocation, link, linkdesc };
 };
@@ -62,7 +62,7 @@ const create = async (
     group3 = '',
     shortDescription = ''
 ) => {
-    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc);
+    let gameData = await formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, organizer, link, linkdesc);
 
     const groups = helpers.normalizeHostGroups(group, group2, group3);
     // Keep legacy single `group` field for older callers/templates
@@ -390,7 +390,7 @@ const update = async (
     listOnEventsPage,
     shortDescription
 ) => {
-    let gameData = formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
+    let gameData = await formatAndValidateGame(gameName, gameDescription, gameLocation, maxCapacity, gameDate, startTime, endTime, userId, link, linkdesc);
 
     const oldGame = await get(gameId); // Check if game exists
     const nextLeaders = leaders !== undefined ? normalizeLeaders(leaders) : oldGame.leaders || [];
