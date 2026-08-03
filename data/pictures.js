@@ -42,6 +42,20 @@ const generateUploadSignedUrl = async (id, filename, type, contentType = 'image/
     return url;
 };
 
+const uploadBufferToBucket = async (id, filename, type, buffer, contentType = 'image/jpeg') => {
+    const bucketName = process.env.BUCKET_NAME;
+    const objectPath = `${id}/${type}/${filename}`;
+
+    await storage.bucket(bucketName).file(objectPath).save(buffer, {
+        resumable: false,
+        metadata: {
+            contentType: contentType || 'image/jpeg',
+        },
+    });
+
+    return `https://storage.googleapis.com/${bucketName}/${objectPath}`;
+};
+
 /**
  *
  * @param {string} filename It is either the default or the url of the stored image
@@ -71,4 +85,4 @@ const undeletables = [
     'https://storage.googleapis.com/family-frisbee-media/icons/Full_court.png',
     'https://storage.googleapis.com/family-frisbee-media/icons/RIC3FamilyLogo.jpg',
 ];
-export default { generateUploadSignedUrl, deleteImageFromBucket, deleteUserFolder };
+export default { generateUploadSignedUrl, uploadBufferToBucket, deleteImageFromBucket, deleteUserFolder };
