@@ -14,7 +14,7 @@ import configRoutesFunction from './routes/index.js';
 const app = express();
 
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
 
 // In production set ALLOWED_ORIGINS to a comma-separated allowlist of origins.
 // When unset (e.g. local dev) the request origin is reflected, matching prior behavior.

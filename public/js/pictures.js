@@ -160,16 +160,16 @@ if (slideshowForm) {
                 filenames.push(files[i].name.replace(/\s/g, '-'));
             }
 
-            console.log('Getting signed urls');
-
-            const signedUrls = await getSlideshowUrls(filenames, isEventPage, groupId, gameId);
-
-            console.log('Uploading');
-
-            await handleUpload(files, signedUrls);
-            //event.currentTarget.submit();
+            console.log('Uploading slideshow files');
+            setMessage('Preparing to upload');
+            for (let i = 0; i < files.length; i++) {
+                await uploadSlideshowFile(files[i], filenames[i], isEventPage, groupId, gameId);
+                setMessage(`File ${files[i].name} uploaded successfully.`);
+            }
+            setMessage('Files done uploading!');
             const submitButton = slideshowForm.querySelector('button[type="submit"]');
             if (submitButton) submitButton.disabled = true;
+            location.reload();
         } catch (err) {
             setError(err);
         }
@@ -231,6 +231,42 @@ async function getSlideshowUrls(filenames, isEventPage = false, groupId = null, 
     const signedUrls = await getUrls(options, 'slideshow');
 
     return signedUrls;
+}
+
+function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error('Could not read file'));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function uploadSlideshowFile(file, filename, isEventPage = false, groupId = null, gameId = null) {
+    const fileData = await readFileAsDataUrl(file);
+    const options = {
+        filename,
+        fileData,
+        isEventPage,
+    };
+    if (groupId) options.groupId = groupId;
+    if (gameId) options.gameId = gameId;
+
+    const response = await fetch('/pictures/slideshow/direct', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+        body: JSON.stringify(options),
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `Server responded with status ${response.status}`);
+    }
+
+    return response.json();
 }
 
 /**

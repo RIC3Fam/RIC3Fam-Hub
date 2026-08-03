@@ -33,6 +33,42 @@ async function assertCanManageGameSlideshow(userId, game) {
     throw 'You are not the admin of this event';
 }
 
+async function resolveSlideshowTarget(req) {
+    const isEventPage = !!(req.body.isEventPage === true || req.body.isEventPage === 'true');
+    const groupId = req.body.groupId;
+    const gameId = req.body.gameId;
+
+    if (groupId) {
+        helpers.isValidId(groupId);
+        const group = await groupsData.get(groupId);
+        await assertCanManageGroupSlideshow(req.session.user?._id, group);
+        return { id: groupId, groupId, gameId: null, isEventPage: false };
+    }
+
+    if (gameId) {
+        helpers.isValidId(gameId);
+        const game = await gamesData.get(gameId);
+        await assertCanManageGameSlideshow(req.session.user?._id, game);
+        return { id: gameId, groupId: null, gameId, isEventPage: false };
+    }
+
+    if (isEventPage) {
+        const isAdmin = await usersData.isUserAdmin(req.session.user?._id);
+        if (!isAdmin) throw 'Admin only';
+        return { id: 'eventPage', groupId: null, gameId: null, isEventPage: true };
+    }
+
+    if (!req.session.user) throw 'Must be logged in';
+    return { id: req.session.user._id, groupId: null, gameId: null, isEventPage: false };
+}
+
+async function addSlideshowImageToTarget(target, imagePath) {
+    if (target.groupId) await groupsData.addSlideshowImage(target.groupId, imagePath);
+    else if (target.gameId) await gamesData.addSlideshowImage(target.gameId, imagePath);
+    else if (target.isEventPage) await mediaData.addEventPageSlideshowImage(imagePath);
+    else await usersData.addSlideshowImage(target.id, imagePath);
+}
+
 // req in the form of {filenames: ['filename.jpeg']}
 router
     .route('/slideshow')
@@ -200,6 +236,33 @@ router
         if (isEventPage) return res.redirect(303, '/events');
         return res.redirect(303, '/users/' + req.session.user._id);
     });
+
+router.route('/slideshow/direct').post(async function (req, res) {
+    try {
+        const filename = helpers.stringHelper(req.body.filename, 'Filename', 1, 150);
+        if (filename.includes(' ')) throw 'Filename cannot contain spaces';
+
+        const dataUrl = req.body.fileData;
+        if (typeof dataUrl !== 'string' || dataUrl.length === 0) throw 'File data was not provided!';
+        const match = dataUrl.match(/^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/);
+        if (!match) throw 'Only JPEG allowed!';
+
+        const fileBuffer = Buffer.from(match[1], 'base64');
+        const maxSize = 10 * 1024 * 1024;
+        if (fileBuffer.length > maxSize) throw `File ${filename} too large`;
+
+        const target = await resolveSlideshowTarget(req);
+        const imagePath = `slideshow/${filename}`;
+
+        await picturesData.uploadBufferToBucket(target.id, filename, 'slideshow', fileBuffer, 'image/jpeg');
+        await addSlideshowImageToTarget(target, imagePath);
+
+        return res.json({ ok: true });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: String(err) });
+    }
+});
 
 // req in the form of {filename: 'filename.jpeg'}
 router
