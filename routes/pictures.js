@@ -26,6 +26,13 @@ async function assertCanManageGroupSlideshow(userId, group) {
     throw 'You are not the leader of this group';
 }
 
+async function assertCanManageGameSlideshow(userId, game) {
+    if (!userId) throw 'Must be logged in';
+    if (game.organizer === userId) return;
+    if (await usersData.isUserAdmin(userId)) return;
+    throw 'You are not the admin of this event';
+}
+
 // req in the form of {filenames: ['filename.jpeg']}
 router
     .route('/slideshow')
@@ -57,9 +64,7 @@ router
             try {
                 helpers.isValidId(gameId);
                 const game = await gamesData.get(gameId);
-                if (game.organizer !== req.session.user._id) {
-                    throw 'You are not the admin of this event';
-                }
+                await assertCanManageGameSlideshow(req.session.user?._id, game);
                 id = gameId;
             } catch (err) {
                 console.log(err);
@@ -131,7 +136,7 @@ router
             } else if (gameId) {
                 helpers.isValidId(gameId);
                 const game = await gamesData.get(gameId);
-                if (game.organizer !== req.session.user._id) throw 'You are not the admin of this event';
+                await assertCanManageGameSlideshow(req.session.user._id, game);
                 await gamesData.updateSlideshowCaption(gameId, imageUrl, caption);
             } else if (isEventPage) {
                 const isAdmin = await usersData.isUserAdmin(req.session.user._id);
@@ -165,9 +170,7 @@ router
             } else if (gameId) {
                 helpers.isValidId(gameId);
                 const game = await gamesData.get(gameId);
-                if (game.organizer !== req.session.user._id) {
-                    throw 'You are not the admin of this event';
-                }
+                await assertCanManageGameSlideshow(req.session.user?._id, game);
                 id = gameId;
             } else if (isEventPage) {
                 const isAdmin = await usersData.isUserAdmin(req.session.user?._id);

@@ -125,6 +125,10 @@
             {{> partials/pictureSlider}}
             {{#if isOwner}}
                 {{> addToSlideshow gameId=game._id}}
+            {{else}}
+                {{#if currentUser.isAdmin}}
+                    {{> addToSlideshow gameId=game._id}}
+                {{/if}}
             {{/if}}
         </section>
 
