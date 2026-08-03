@@ -148,17 +148,14 @@ router
     .route("/create-event")
     .get(async (req, res) => {
         try {
-            let allGamesData = await gamesData.getAll();
-            let allGroupsData = await groupsData.getAll();
-            if(!req.session.user){
-                allGroupsData = {};
-            }else{
-                let userId = req.session.user._id;
-                allGroupsData = await groupsData.getAllGroupsbyUserID(userId);
-            }
+            if (!req.session.user) return res.redirect('/login');
+            const isAdmin = await usersData.isUserAdmin(req.session.user._id);
+            if (!isAdmin) throw 'Admin only';
+            let userId = req.session.user._id;
+            const allGroupsData = await groupsData.getAllGroupsbyUserID(userId);
             return res.render('createGame', {title:"Create Event", groups: allGroupsData, states: helpers.states});
         } catch (e) {
-            return res.status(400).render('error', {title: "Error", error: e});
+            return res.status(403).render('error', {title: "Error", error: e});
         }
     })
 
