@@ -290,6 +290,33 @@ router
     });
 
 router
+    .route('/:userId/password')
+    .post(async (req, res) => {
+        try {
+            if (!req.session.user) throw 'Must be logged in';
+            const userId = req.params.userId;
+            if (req.session.user._id !== userId) throw 'Not allowed';
+            await usersData.updateOwnPassword(userId, req.body.currentPassword, req.body.newPassword, req.body.confirmPassword);
+            return res.redirect('/users/edit/' + userId);
+        } catch (e) {
+            return res.status(400).render('error', { title: 'Error', error: e });
+        }
+    });
+
+router
+    .route('/:userId/admin-reset-password')
+    .post(async (req, res) => {
+        try {
+            if (!req.session.user) throw 'Must be logged in';
+            const userId = req.params.userId;
+            await usersData.adminResetPassword(req.session.user._id, userId, req.body.adminNewPassword, req.body.adminConfirmPassword);
+            return res.redirect('/users/' + userId);
+        } catch (e) {
+            return res.status(400).render('error', { title: 'Error', error: e });
+        }
+    });
+
+router
     .route('/delete/:userId')
     .post(async (req, res) => {
         try {

@@ -409,6 +409,44 @@ const updateAdminNotes = async (userId, adminNotes) => {
     return getUser(userId);
 };
 
+const updateOwnPassword = async (userId, currentPassword, newPassword, confirmPassword) => {
+    helpers.isValidId(userId);
+    currentPassword = helpers.stringHelper(currentPassword, 'Current password', 1, null);
+    newPassword = helpers.stringHelper(newPassword, 'New password', 1, null);
+    confirmPassword = helpers.stringHelper(confirmPassword, 'Confirm password', 1, null);
+    if (newPassword !== confirmPassword) throw "Passwords don't match";
+    helpers.validatePassword(newPassword);
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (!user) throw 'Could not find user';
+
+    const currentMatches = await bcrypt.compare(currentPassword, user.password);
+    if (!currentMatches) throw 'Current password is incorrect';
+
+    const hashPass = await bcrypt.hash(newPassword, 16);
+    const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashPass } });
+    if (!result.matchedCount) throw 'Could not update password';
+    return { passwordUpdated: true };
+};
+
+const adminResetPassword = async (adminId, userId, newPassword, confirmPassword) => {
+    helpers.isValidId(adminId);
+    helpers.isValidId(userId);
+    newPassword = helpers.stringHelper(newPassword, 'New password', 1, null);
+    confirmPassword = helpers.stringHelper(confirmPassword, 'Confirm password', 1, null);
+    if (newPassword !== confirmPassword) throw "Passwords don't match";
+    helpers.validatePassword(newPassword);
+
+    if (!(await isUserAdmin(adminId))) throw 'Admin only';
+
+    const userCollection = await users();
+    const hashPass = await bcrypt.hash(newPassword, 16);
+    const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { password: hashPass } });
+    if (!result.matchedCount) throw 'Could not update password';
+    return { passwordUpdated: true };
+};
+
 const editPfp = async (userId, imagePath) => {
     const user = await getUser(userId);
 
@@ -833,6 +871,8 @@ export default {
     editUser,
     editPfp,
     updateAdminNotes,
+    updateOwnPassword,
+    adminResetPassword,
     loginUser,
     searchUsers,
     sendFriendRequest,
