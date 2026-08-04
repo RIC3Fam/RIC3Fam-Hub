@@ -224,6 +224,8 @@ router
             let privateDescription = req.body.privateDescription;
             let preferredEmail = req.body.preferredEmail;
             let preferredPhone = req.body.preferredPhone;
+            let birthday = req.body.birthday;
+            let halfBirthday = req.body.halfBirthday;
             let optInCreativeRealEstate = req.body.optInCreativeRealEstate;
             let optInFrisbeeNotices = req.body.optInFrisbeeNotices;
             let optInCcsnUpdates = req.body.optInCcsnUpdates;
@@ -253,6 +255,8 @@ router
                 privateDescription,
                 preferredEmail,
                 preferredPhone,
+                birthday,
+                halfBirthday,
                 optInCreativeRealEstate,
                 optInFrisbeeNotices,
                 optInCcsnUpdates,
