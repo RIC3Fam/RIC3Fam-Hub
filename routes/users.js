@@ -41,7 +41,7 @@ router
             
             let isOwner = req.session.user != null && req.session.user._id.toString() == userId;
             let friends = await usersData.getIDName(userObj.friends);
-            let games = await gamesData.getIDName(userObj.games);
+            let games = await gamesData.getProfileEvents(userObj._id, userObj.games, req.session.user?._id);
             if (userObj.onlyRecentEvents) games = filterRecentProfileEvents(games);
             let groups = await groupsData.getIDName(userObj.groups);
             
