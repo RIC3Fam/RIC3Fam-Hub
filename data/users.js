@@ -125,6 +125,8 @@ export function formatAndValidateUser(userData, ignorePassword) {
     let preferredEmail = helpers.optionalString(userData.preferredEmail, 'Preferred email', 120);
     if (preferredEmail) helpers.isValidEmail(preferredEmail);
     let preferredPhone = helpers.optionalString(userData.preferredPhone, 'Preferred phone', 40);
+    let birthday = helpers.optionalString(userData.birthday, 'Birthday', 30);
+    let halfBirthday = helpers.optionalString(userData.halfBirthday, 'Half birthday', 30);
     const optInCreativeRealEstate = !!(
         userData.optInCreativeRealEstate === true ||
         userData.optInCreativeRealEstate === 'true' ||
@@ -170,6 +172,8 @@ export function formatAndValidateUser(userData, ignorePassword) {
         privateDescription,
         preferredEmail,
         preferredPhone,
+        birthday,
+        halfBirthday,
         optInCreativeRealEstate,
         optInFrisbeeNotices,
         optInCcsnUpdates,
@@ -238,6 +242,8 @@ const createUser = async (username, emailAddress, password, pfp, description, na
         privateDescription: '',
         preferredEmail: '',
         preferredPhone: '',
+        birthday: '',
+        halfBirthday: '',
         optInCreativeRealEstate: false,
         optInFrisbeeNotices: false,
         optInCcsnUpdates: false,
@@ -289,6 +295,8 @@ const editUser = async (
     privateDescription,
     preferredEmail = '',
     preferredPhone = '',
+    birthday = '',
+    halfBirthday = '',
     optInCreativeRealEstate = false,
     optInFrisbeeNotices = false,
     optInCcsnUpdates = false,
@@ -332,6 +340,8 @@ const editUser = async (
         privateDescription,
         preferredEmail,
         preferredPhone,
+        birthday,
+        halfBirthday,
         optInCreativeRealEstate,
         optInFrisbeeNotices,
         optInCcsnUpdates,
@@ -376,6 +386,8 @@ const editUser = async (
                 privateDescription: userData.privateDescription,
                 preferredEmail: userData.preferredEmail,
                 preferredPhone: userData.preferredPhone,
+                birthday: userData.birthday,
+                halfBirthday: userData.halfBirthday,
                 optInCreativeRealEstate: userData.optInCreativeRealEstate,
                 optInFrisbeeNotices: userData.optInFrisbeeNotices,
                 optInCcsnUpdates: userData.optInCcsnUpdates,
@@ -423,6 +435,8 @@ const editPfp = async (userId, imagePath) => {
         user.privateDescription || '',
         user.preferredEmail || '',
         user.preferredPhone || '',
+        user.birthday || '',
+        user.halfBirthday || '',
         !!user.optInCreativeRealEstate,
         !!user.optInFrisbeeNotices,
         !!user.optInCcsnUpdates,
@@ -470,6 +484,8 @@ const getUser = async (userId) => {
     if (user.link4 == null) user.link4 = '';
     if (user.link4desc == null) user.link4desc = '';
     if (user.onlyRecentEvents == null) user.onlyRecentEvents = false;
+    if (user.birthday == null) user.birthday = '';
+    if (user.halfBirthday == null) user.halfBirthday = '';
     return helpers.withVisibilityDefaults(user);
 };
 
@@ -595,6 +611,8 @@ export const loginUser = async (username, password) => {
         privateDescription: user.privateDescription || '',
         preferredEmail: user.preferredEmail || '',
         preferredPhone: user.preferredPhone || '',
+        birthday: user.birthday || '',
+        halfBirthday: user.halfBirthday || '',
         optInCreativeRealEstate: !!user.optInCreativeRealEstate,
         optInFrisbeeNotices: !!user.optInFrisbeeNotices,
         optInCcsnUpdates: !!user.optInCcsnUpdates,

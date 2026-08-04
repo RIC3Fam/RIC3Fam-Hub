@@ -110,10 +110,20 @@
             {{#if user.preferredPhone}}
                 <p>Phone: <a href="tel:{{user.preferredPhone}}">{{user.preferredPhone}}</a></p>
             {{/if}}
+            {{#if user.birthday}}
+                <p>Birthday: {{user.birthday}}</p>
+            {{/if}}
+            {{#if user.halfBirthday}}
+                <p>Half Birthday: {{user.halfBirthday}}</p>
+            {{/if}}
             {{#unless user.preferredEmail}}
                 {{#unless user.preferredPhone}}
-                    {{#unless user.privateDescription}}
-                        <p class="muted">No private contact info yet.</p>
+                    {{#unless user.birthday}}
+                        {{#unless user.halfBirthday}}
+                            {{#unless user.privateDescription}}
+                                <p class="muted">No private contact info yet.</p>
+                            {{/unless}}
+                        {{/unless}}
                     {{/unless}}
                 {{/unless}}
             {{/unless}}
