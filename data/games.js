@@ -475,6 +475,37 @@ const getIDName = async (gameIds) => {
     return ret;
 };
 
+const getProfileEvents = async (userId, gameIds = [], viewerId = null) => {
+    helpers.isValidId(userId);
+    const objectIds = [];
+    for (const gameId of gameIds || []) {
+        try {
+            const id = String(gameId).trim();
+            helpers.isValidId(id);
+            objectIds.push(new ObjectId(id));
+        } catch {
+            continue;
+        }
+    }
+
+    const query = {
+        $or: [
+            { players: userId },
+            ...(objectIds.length ? [{ _id: { $in: objectIds } }] : []),
+        ],
+    };
+
+    const gameCollection = await games();
+    let gameList = await gameCollection.find(query).toArray();
+    gameList = filterPrivateGames(gameList, viewerId);
+
+    return gameList.map((game) => ({
+        _id: game._id.toString(),
+        name: game.gameName,
+        gameDate: game.gameDate,
+    }));
+};
+
 // Goes through all (future) games to make sure they haven't passed and updates them if they are old
 // Bypasses getAll visibility filtering so private events still expire
 const keepStatusUpdated = async () => {
@@ -636,6 +667,7 @@ export default {
     searchGames,
     keepStatusUpdated,
     getIDName,
+    getProfileEvents,
     leaveGame,
     formatAndValidateGame,
     editGameImage,
