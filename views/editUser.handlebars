@@ -74,6 +74,20 @@
                 <input class="form-input" type="text" id="halfBirthday" name="halfBirthday" value="{{currentUser.halfBirthday}}" placeholder="Month and day">
                 <br>
 
+            <fieldset class="profile-password-reset">
+                <legend>Reset Password</legend>
+                <label class="form-label" for="currentPassword">Current Password:</label>
+                    <input class="form-input" type="password" id="currentPassword" name="currentPassword" form="password-reset-form" autocomplete="current-password">
+                    <br>
+                <label class="form-label" for="newPassword">New Password:</label>
+                    <input class="form-input" type="password" id="newPassword" name="newPassword" form="password-reset-form" autocomplete="new-password">
+                    <br>
+                <label class="form-label" for="confirmPassword">Confirm New Password:</label>
+                    <input class="form-input" type="password" id="confirmPassword" name="confirmPassword" form="password-reset-form" autocomplete="new-password">
+                    <br>
+                <button type="submit" class="form-submit-button" form="password-reset-form">Reset Password</button>
+            </fieldset>
+
             <h4>Updates &amp; notices</h4>
             <label class="form-label opt-in-label" for="onlyRecentEvents">
                 <input type="checkbox" id="onlyRecentEvents" name="onlyRecentEvents" value="true" {{#if currentUser.onlyRecentEvents}}checked{{/if}}>
@@ -99,6 +113,7 @@
             <button type="button" class="form-submit-button" onclick="window.history.back();">Cancel</button>
             <button type="submit" class="form-submit-button">Submit</button>
         </form>
+        <form id="password-reset-form" method="POST" action="/users/{{currentUser._id}}/password"></form>
     </div>
 
     {{> updatePfp}}

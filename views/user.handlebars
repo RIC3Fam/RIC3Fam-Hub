@@ -167,6 +167,15 @@
                 <textarea class="form-input" id="adminNotes" name="adminNotes" rows="4">{{user.adminNotes}}</textarea>
                 <button type="submit" class="form-submit-button">Save admin notes</button>
             </form>
+
+            <form method="POST" action="/users/{{user._id}}/admin-reset-password" class="admin-password-reset-form">
+                <h4 class="form-label">Reset Password</h4>
+                <label class="form-label" for="adminNewPassword">New Password</label>
+                <input class="form-input" type="password" id="adminNewPassword" name="adminNewPassword" autocomplete="new-password">
+                <label class="form-label" for="adminConfirmPassword">Confirm New Password</label>
+                <input class="form-input" type="password" id="adminConfirmPassword" name="adminConfirmPassword" autocomplete="new-password">
+                <button type="submit" class="form-submit-button">Reset Password</button>
+            </form>
         </section>
     {{/if}}
 
