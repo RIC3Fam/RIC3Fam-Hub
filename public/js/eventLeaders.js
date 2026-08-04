@@ -175,4 +175,13 @@
         incompleteError: 'Each manual member needs a selected profile from search.',
         requireTitle: false,
     });
+
+    initRoleEditor({
+        editorId: 'group-project-framers-editor',
+        addBtnId: 'add-project-framer-row',
+        formId: 'create-group-form',
+        fieldName: 'projectFramers',
+        titlePlaceholder: 'e.g. Coordinator',
+        incompleteError: 'Each featured profile needs a title and a selected profile from search.',
+    });
 })();

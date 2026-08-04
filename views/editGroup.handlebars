@@ -23,7 +23,7 @@
                 <br>
 
             <label class="form-label" for="longDescription">Long Description:</label>
-                <textarea class="form-input" id="longDescription" name="longDescription">{{groupObj.longDescription}}</textarea>
+                <textarea class="form-input group-long-description-input" id="longDescription" name="longDescription" rows="8">{{groupObj.longDescription}}</textarea>
                 <br>
             <label class="form-label" for="slideshowDescription">Picture gallery note:</label>
                 <textarea class="form-input" id="slideshowDescription" name="slideshowDescription">{{groupObj.slideshowDescription}}</textarea>
@@ -53,6 +53,26 @@
                 <input class="form-input" type="text" id="numericTitle" name="numericTitle" value="{{groupObj.numericTitle}}" placeholder="e.g., Digit Accounts">
                 <br>
 
+            <h4>Featured profiles</h4>
+            <div id="group-project-framers-editor">
+                {{#each projectFramers}}
+                    <div class="leader-row" data-leader-row>
+                        <label class="form-label">Title
+                            <input class="form-input leader-title" type="text" name="projectFramers[{{@index}}][title]" value="{{this.title}}" maxlength="80" placeholder="e.g., Coordinator">
+                        </label>
+                        <label class="form-label">Person
+                            <input class="form-input leader-search" type="text" value="{{this.label}}" placeholder="Type a name or username" autocomplete="off">
+                            <input type="hidden" class="leader-user-id" name="projectFramers[{{@index}}][userId]" value="{{this.userId}}">
+                            <ul class="leader-suggestions" hidden></ul>
+                            <span class="muted leader-selected-note">Selected profile linked</span>
+                        </label>
+                        <button type="button" class="reject-button remove-leader-row">Remove</button>
+                    </div>
+                {{/each}}
+            </div>
+            <button type="button" id="add-project-framer-row" class="form-submit-button">Add profile</button>
+            <br>
+
             <h4>Manual add</h4>
             <p class="muted">Search for profiles to add them to this group.</p>
             <div id="group-manual-members-editor">
@@ -71,6 +91,14 @@
             <button type="button" id="add-manual-member-row" class="form-submit-button">Add manual member</button>
             <br>
 
+            {{#if owner}}
+                <p class="title-person-line">
+                    <span class="leader-title-text">Group Leader</span>
+                    <span class="title-person-sep"> - </span>
+                    <a href="/users/{{owner._id}}">{{owner.username}}</a>
+                </p>
+            {{/if}}
+
             <label class="form-label" for="visibility">Visibility:</label>
                 <select class="form-input" id="visibility" name="visibility">
                     <option value="public" {{#elseEquals groupObj.visibility "private"}}selected{{/elseEquals}}>Public</option>
@@ -78,7 +106,7 @@
                 </select>
                 <br>
             <label class="form-label" for="privateDescription">Private Description:</label>
-                <textarea class="form-input" id="privateDescription" name="privateDescription">{{groupObj.privateDescription}}</textarea>
+                <textarea class="form-input group-private-description-input" id="privateDescription" name="privateDescription" rows="8">{{groupObj.privateDescription}}</textarea>
                 <br>
             {{#if currentUser}}
                 <button type="submit" id="group-submit-button" class="form-submit-button">Edit</button>

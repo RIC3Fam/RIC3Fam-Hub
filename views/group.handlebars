@@ -87,14 +87,6 @@
     </section>
 
     <div class="group-full-width">
-        {{#if owner}}
-            <p class="title-person-line">
-                <span class="leader-title-text">Group Leader</span>
-                <span class="title-person-sep"> - </span>
-                <a href="/users/{{owner._id}}">{{owner.username}}</a>
-            </p>
-        {{/if}}
-
         {{#if uppercaseMembers}}
             <p><strong>{{uppercaseTitle}}</strong></p>
             <ul>
@@ -129,6 +121,25 @@
                     <li><a href="/users/{{this._id}}">{{this.name}}</a></li>
                 {{/each}}
             </ul>
+        {{/if}}
+
+        {{#if owner}}
+            <p class="title-person-line">
+                <span class="leader-title-text">Group Leader</span>
+                <span class="title-person-sep"> - </span>
+                <a href="/users/{{owner._id}}">{{owner.username}}</a>
+            </p>
+        {{/if}}
+
+        {{#if projectFramers}}
+            <dl class="event-leaders-list">
+                {{#each projectFramers}}
+                    <div class="event-leader-row">
+                        <dt>{{this.title}}</dt>
+                        <dd><a href="/users/{{this._id}}">{{this.name}}</a></dd>
+                    </div>
+                {{/each}}
+            </dl>
         {{/if}}
 
         <a>Upcoming Events:</a>

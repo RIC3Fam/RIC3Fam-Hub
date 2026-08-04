@@ -23,7 +23,7 @@
                 <br>
 
             <label class="form-label" for="longDescription">Long Description:</label>
-                <textarea class="form-input" id="longDescription" name="longDescription"></textarea>
+                <textarea class="form-input group-long-description-input" id="longDescription" name="longDescription" rows="8"></textarea>
                 <br>
             <label class="form-label" for="slideshowDescription">Picture gallery note:</label>
                 <textarea class="form-input" id="slideshowDescription" name="slideshowDescription"></textarea>
@@ -53,6 +53,11 @@
                 <input class="form-input" type="text" id="numericTitle" name="numericTitle" placeholder="e.g., Digit Accounts">
                 <br>
 
+            <h4>Featured profiles</h4>
+            <div id="group-project-framers-editor"></div>
+            <button type="button" id="add-project-framer-row" class="form-submit-button">Add profile</button>
+            <br>
+
             <h4>Manual add</h4>
             <p class="muted">Search for profiles to add them to this group.</p>
             <div id="group-manual-members-editor"></div>
@@ -67,7 +72,7 @@
                 <br>
 
             <label class="form-label" for="privateDescription">Private Description:</label>
-                <textarea class="form-input" id="privateDescription" name="privateDescription"></textarea>
+                <textarea class="form-input group-private-description-input" id="privateDescription" name="privateDescription" rows="8"></textarea>
                 <br>
 
             <button type="submit" id="group-submit-button" class="form-submit-button">Create</button>

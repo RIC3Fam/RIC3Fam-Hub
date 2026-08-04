@@ -15,7 +15,7 @@
                 <textarea class="form-input" id="statement" name="statement">{{currentUser.statement}}</textarea>
                 <br>
             <label class="form-label" for="description">Description:</label>
-                <textarea class="form-input" id="description" name="description">{{currentUser.description}}</textarea>
+                <textarea class="form-input edit-user-description-input" id="description" name="description" rows="8">{{currentUser.description}}</textarea>
                 <br>
             <label class="form-label" for="link1">Website URL 1:</label>
                 <input class="form-input" type="url" id="link1" name="link1" value="{{currentUser.link1}}">
@@ -58,8 +58,8 @@
                 <br>
 
             <h4>Private Communications</h4>
-            <label class="form-label" for="privateDescription">Notes for/chat with RIC3 Fam:</label>
-                <textarea class="form-input" id="privateDescription" name="privateDescription">{{currentUser.privateDescription}}</textarea>
+            <label class="form-label" for="privateDescription">Private Description:</label>
+                <textarea class="form-input edit-user-private-description-input" id="privateDescription" name="privateDescription" rows="8">{{currentUser.privateDescription}}</textarea>
                 <br>
             <label class="form-label" for="preferredEmail">Preferred Communication (private) – Email:</label>
                 <input class="form-input" type="email" id="preferredEmail" name="preferredEmail" value="{{currentUser.preferredEmail}}" placeholder="name@example.com" autocomplete="email">
