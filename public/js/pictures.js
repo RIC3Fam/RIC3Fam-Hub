@@ -154,17 +154,22 @@ if (slideshowForm) {
                 }
             }
 
-            let filenames = [];
+            let uploads = [];
 
             for (var i = 0; i < files.length; i++) {
-                filenames.push(files[i].name.replace(/\s/g, '-'));
+                const filename = files[i].name.replace(/\s/g, '-');
+                uploads.push({
+                    file: files[i],
+                    filename,
+                    fileData: await readFileAsDataUrl(files[i]),
+                });
             }
 
             console.log('Uploading slideshow files');
-            setMessage('Preparing to upload');
-            for (let i = 0; i < files.length; i++) {
-                await uploadSlideshowFile(files[i], filenames[i], isEventPage, groupId, gameId);
-                setMessage(`File ${files[i].name} uploaded successfully.`);
+            setMessage('Uploading slideshow files');
+            for (let i = 0; i < uploads.length; i++) {
+                await uploadSlideshowFile(uploads[i], isEventPage, groupId, gameId);
+                setMessage(`File ${uploads[i].file.name} uploaded successfully.`);
             }
             setMessage('Files done uploading!');
             const submitButton = slideshowForm.querySelector('button[type="submit"]');
@@ -237,16 +242,21 @@ function readFileAsDataUrl(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error || new Error('Could not read file'));
+        reader.onerror = () => {
+            const message =
+                reader.error && reader.error.name === 'NotReadableError'
+                    ? `Could not read ${file.name}. Please copy it to a local folder, close any app using it, then choose it again.`
+                    : `Could not read ${file.name}.`;
+            reject(new Error(message));
+        };
         reader.readAsDataURL(file);
     });
 }
 
-async function uploadSlideshowFile(file, filename, isEventPage = false, groupId = null, gameId = null) {
-    const fileData = await readFileAsDataUrl(file);
+async function uploadSlideshowFile(upload, isEventPage = false, groupId = null, gameId = null) {
     const options = {
-        filename,
-        fileData,
+        filename: upload.filename,
+        fileData: upload.fileData,
         isEventPage,
     };
     if (groupId) options.groupId = groupId;
