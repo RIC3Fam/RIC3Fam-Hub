@@ -155,6 +155,9 @@
             {{#if organizer}}
                 <p class="event-admin-line">Admin: <a href="/users/{{organizer._id}}">{{organizer.name}}</a></p>
             {{/if}}
+            {{#if estimatedEndTime}}
+                <p class="event-estimated-end-line">Estimated End Time: {{estimatedEndTime}}</p>
+            {{/if}}
         </section>
     </div>
 </main>

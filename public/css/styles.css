@@ -498,6 +498,32 @@ footer a {
   }
 }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  .profile-hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "desc"
+      "pic"
+      "user"
+      "web"
+      "social";
+    justify-items: center;
+    text-align: center;
+    max-width: 560px;
+  }
+
+  .profile-short-desc-wrap {
+    min-height: 0;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .profile-short-desc {
+    text-align: center;
+    max-width: none;
+  }
+}
+
 /* END USER */
 
 /* PHOTO GALLERY — Pinterest-style vertical masonry via CSS multi-column.
