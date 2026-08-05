@@ -281,19 +281,23 @@ export function convertToMMDDYYYY(dateString) {
     if (!isValidDayBritainEdition(dateString)) {
         throw 'Not in correct format';
     }
-    const [year, month, day] = dateString.split('-');
-    return `${month}/${day}/${year}`;
+    const [year, month, day] = dateString.split('-').map(Number);
+    return `${month}/${day}/${String(year).slice(-2)}`;
 }
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-/** e.g. "Friday, 08/01/2026 from 5:00 PM to 8:00 PM" from YYYY-MM-DD + 12h times */
-export function formatEventSchedule(dateString, startTime12h, endTime12h) {
+export function formatDisplayTime(time12h) {
+    return String(time12h).replace(/\s*([AP])M$/, (_, marker) => marker.toLowerCase() + 'm');
+}
+
+/** e.g. "Friday, 8/1/26 starting 5:00pm" from YYYY-MM-DD + 12h time */
+export function formatEventSchedule(dateString, startTime12h) {
     if (!isValidDayBritainEdition(dateString)) throw 'Not in correct format';
     const [year, month, day] = dateString.split('-').map(Number);
     const weekday = WEEKDAYS[new Date(year, month - 1, day).getDay()];
     const mmddyyyy = convertToMMDDYYYY(dateString);
-    return `${weekday}, ${mmddyyyy} from ${startTime12h} to ${endTime12h}`;
+    return `${weekday}, ${mmddyyyy} starting ${formatDisplayTime(startTime12h)}`;
 }
 
 /** Caption from image URL filename; used for slideshow footers. */

@@ -21,12 +21,12 @@
                 <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="billboardHeight" value="{{home.billboard.height}}"></label>
             </div>
 
-            <h4>Towels (uploadable pictures)</h4>
+            <h4>Square signs (uploadable pictures)</h4>
             <fieldset class="home-hotspot-edit">
-                <legend>Towel 1</legend>
+                <legend>Left Square Sign 1</legend>
                 <input type="hidden" name="towel1ImageUrl" value="{{home.towel1.imageUrl}}">
-                <label class="form-label home-hotspot-link-label">Left Towel 1 Link URL
-                    <input class="form-input" type="url" name="towel1LinkUrl" value="{{home.towel1.linkUrl}}" placeholder="https://">
+                <label class="form-label home-hotspot-link-label">Left Square Sign 1 Link URL
+                    <input class="form-input" type="url" name="squareSign1LinkUrl" value="{{home.squareSign1LinkUrl}}" placeholder="https://">
                 </label>
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel1Top" value="{{home.towel1.top}}"></label>
@@ -36,10 +36,10 @@
                 </div>
             </fieldset>
             <fieldset class="home-hotspot-edit">
-                <legend>Towel 2</legend>
+                <legend>Right Square Sign 2</legend>
                 <input type="hidden" name="towel2ImageUrl" value="{{home.towel2.imageUrl}}">
-                <label class="form-label home-hotspot-link-label">Right Towel 2 Link URL
-                    <input class="form-input" type="url" name="towel2LinkUrl" value="{{home.towel2.linkUrl}}" placeholder="https://">
+                <label class="form-label home-hotspot-link-label">Right Square Sign 2 Link URL
+                    <input class="form-input" type="url" name="squareSign2LinkUrl" value="{{home.squareSign2LinkUrl}}" placeholder="https://">
                 </label>
                 <div class="home-hotspot-coords">
                     <label>Top % <input class="form-input" type="number" min="0" max="100" step="0.1" name="towel2Top" value="{{home.towel2.top}}"></label>
@@ -48,6 +48,14 @@
                     <label>Height % <input class="form-input" type="number" min="1" max="100" step="0.1" name="towel2Height" value="{{home.towel2.height}}"></label>
                 </div>
             </fieldset>
+
+            <h4>Towel links</h4>
+            <label class="form-label">Left Towel Link URL
+                <input class="form-input" type="url" name="towel1LinkUrl" value="{{home.towel1.linkUrl}}" placeholder="https://">
+            </label>
+            <label class="form-label">Right Towel Link URL
+                <input class="form-input" type="url" name="towel2LinkUrl" value="{{home.towel2.linkUrl}}" placeholder="https://">
+            </label>
 
             <h4>Artists in Residence(s) button</h4>
             <label class="form-label">Awning / upper door button URL
@@ -100,22 +108,22 @@
             <button type="submit" class="form-submit-button">Upload video</button>
         </form>
 
-        <h4>Upload towel 1 image (JPEG)</h4>
+        <h4>Upload square sign 1 image (JPEG)</h4>
         {{#if home.towel1.imageUrl}}
-            <p class="muted">Current: <img src="{{home.towel1.imageUrl}}" alt="Towel 1" class="home-edit-thumb"></p>
+            <p class="muted">Current: <img src="{{home.towel1.imageUrl}}" alt="Square sign 1" class="home-edit-thumb"></p>
         {{/if}}
         <form id="home-towel1-form" class="create-form">
             <input type="file" id="home-towel1-upload" accept="image/jpeg">
-            <button type="submit" class="form-submit-button">Upload towel 1</button>
+            <button type="submit" class="form-submit-button">Upload square sign 1</button>
         </form>
 
-        <h4>Upload towel 2 image (JPEG)</h4>
+        <h4>Upload square sign 2 image (JPEG)</h4>
         {{#if home.towel2.imageUrl}}
-            <p class="muted">Current: <img src="{{home.towel2.imageUrl}}" alt="Towel 2" class="home-edit-thumb"></p>
+            <p class="muted">Current: <img src="{{home.towel2.imageUrl}}" alt="Square sign 2" class="home-edit-thumb"></p>
         {{/if}}
         <form id="home-towel2-form" class="create-form">
             <input type="file" id="home-towel2-upload" accept="image/jpeg">
-            <button type="submit" class="form-submit-button">Upload towel 2</button>
+            <button type="submit" class="form-submit-button">Upload square sign 2</button>
         </form>
 
         <p id="error-label" hidden></p>

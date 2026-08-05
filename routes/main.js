@@ -38,6 +38,8 @@ router
             await mediaData.updateHomePageConfig({
                 buildingImageUrl: req.body.buildingImageUrl,
                 billboardVideoUrl: req.body.billboardVideoUrl,
+                squareSign1LinkUrl: req.body.squareSign1LinkUrl,
+                squareSign2LinkUrl: req.body.squareSign2LinkUrl,
                 artistsResidenceLinkUrl: req.body.artistsResidenceLinkUrl,
                 lowerCcsnLinkUrl: req.body.lowerCcsnLinkUrl,
                 lowerFrisbeeLinkUrl: req.body.lowerFrisbeeLinkUrl,

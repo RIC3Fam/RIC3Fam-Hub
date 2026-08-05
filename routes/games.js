@@ -123,7 +123,8 @@ router.route('/:gameId').get(async (req, res) => {
 
         const start12 = helpers.convertTo12Hour(gameObj.startTime);
         const end12 = helpers.convertTo12Hour(gameObj.endTime);
-        const eventSchedule = helpers.formatEventSchedule(gameObj.gameDate, start12, end12);
+        const eventSchedule = helpers.formatEventSchedule(gameObj.gameDate, start12);
+        const estimatedEndTime = helpers.formatDisplayTime(end12);
         gameObj.startTime = start12;
         gameObj.endTime = end12;
         gameObj.gameDate = helpers.convertToMMDDYYYY(gameObj.gameDate);
@@ -181,6 +182,7 @@ router.route('/:gameId').get(async (req, res) => {
             leaders,
             hostGroups,
             eventSchedule,
+            estimatedEndTime,
             isOwner: isOwner,
             isMember: isMember,
             slideshowImages: helpers.normalizeSlideshowSlides(gameObj.slideshowImages || []),

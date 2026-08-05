@@ -63,7 +63,7 @@ app.use(
         secret: process.env.SESSION_SECRET || 'dev-only-insecure-session-secret',
         saveUninitialized: false,
         resave: false,
-        cookie: { maxAge: 60 * 10000 }, // 1 hr
+        cookie: { maxAge: 60 * 10000 * 4 }, // 4x longer than prior timeout
     })
 );
 

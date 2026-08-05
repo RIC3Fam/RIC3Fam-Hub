@@ -26,6 +26,8 @@ const defaultHomeConfig = () => ({
     buildingImageUrl: DEFAULT_BUILDING,
     billboardVideoUrl: '',
     billboardPosterUrl: '',
+    squareSign1LinkUrl: '',
+    squareSign2LinkUrl: '',
     artistsResidenceLinkUrl: '',
     lowerCcsnLinkUrl: '',
     lowerFrisbeeLinkUrl: '',
@@ -100,6 +102,8 @@ const applyLatestLayout = (doc) => {
         buildingImageUrl: doc.buildingImageUrl || DEFAULT_BUILDING,
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: '',
+        squareSign1LinkUrl: doc.squareSign1LinkUrl || '',
+        squareSign2LinkUrl: doc.squareSign2LinkUrl || '',
         artistsResidenceLinkUrl: doc.artistsResidenceLinkUrl || '',
         lowerCcsnLinkUrl: doc.lowerCcsnLinkUrl || '',
         lowerFrisbeeLinkUrl: doc.lowerFrisbeeLinkUrl || '',
@@ -137,6 +141,8 @@ const withHomeDefaults = (doc) => {
         buildingImageUrl: doc.buildingImageUrl || base.buildingImageUrl,
         billboardVideoUrl: doc.billboardVideoUrl || '',
         billboardPosterUrl: doc.billboardPosterUrl || '',
+        squareSign1LinkUrl: helpers.optionalString(doc.squareSign1LinkUrl, 'Left square sign link', 2000),
+        squareSign2LinkUrl: helpers.optionalString(doc.squareSign2LinkUrl, 'Right square sign link', 2000),
         artistsResidenceLinkUrl: helpers.optionalString(doc.artistsResidenceLinkUrl, 'Artists in Residence link', 2000),
         lowerCcsnLinkUrl: helpers.optionalString(doc.lowerCcsnLinkUrl, 'Lower CCSN link', 2000),
         lowerFrisbeeLinkUrl: helpers.optionalString(doc.lowerFrisbeeLinkUrl, 'Lower RIC3 Fam Frisbee link', 2000),
@@ -329,6 +335,14 @@ const updateHomePageConfig = async (updates = {}) => {
                 ? helpers.optionalString(updates.billboardVideoUrl, 'Billboard video')
                 : current.billboardVideoUrl,
         billboardPosterUrl: '',
+        squareSign1LinkUrl:
+            updates.squareSign1LinkUrl != null
+                ? helpers.optionalString(updates.squareSign1LinkUrl, 'Left square sign link', 2000)
+                : current.squareSign1LinkUrl,
+        squareSign2LinkUrl:
+            updates.squareSign2LinkUrl != null
+                ? helpers.optionalString(updates.squareSign2LinkUrl, 'Right square sign link', 2000)
+                : current.squareSign2LinkUrl,
         artistsResidenceLinkUrl:
             updates.artistsResidenceLinkUrl != null
                 ? helpers.optionalString(updates.artistsResidenceLinkUrl, 'Artists in Residence link', 2000)

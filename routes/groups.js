@@ -30,7 +30,7 @@ const createResult = await groupsData.create(
                 req.body.link1desc,
                 req.body.link2,
                 req.body.link2desc,
-                [],
+                req.body.projectFramers || [],
                 req.body.longDescription,
                 req.body.slideshowDescription,
                 req.body.link3,
@@ -78,6 +78,20 @@ router.route('/:groupId').get(async (req, res) => {
        // Get the list of group members from the database
 let members = await usersData.getIDName(players);
 let manualMembers = await usersData.getIDName(manualMemberIds);
+let projectFramers = [];
+for (const row of groupObj.projectFramers || []) {
+    try {
+        const person = await usersData.getUser(row.userId);
+        projectFramers.push({
+            title: row.title,
+            _id: person._id,
+            name: person.name || person.username,
+            username: person.username,
+        });
+    } catch (e) {
+        continue;
+    }
+}
 
 // Separate the members into 3 distinct buckets based on their starting letters
 // Separate the members into 3 distinct buckets based on character rules
@@ -131,6 +145,7 @@ numericMembers.sort((a, b) => a.name.localeCompare(b.name));
         numericMembers: numericMembers,
         numericTitle: groupObj.numericTitle || "Numbered Members",
         manualMembers,
+        projectFramers,
         games: games,
         owner: owner,
         isMember: isMember,
@@ -199,11 +214,34 @@ router
                     continue;
                 }
             }
+            const projectFramers = [];
+            for (const row of groupObj.projectFramers || []) {
+                try {
+                    const person = await usersData.getUser(row.userId);
+                    projectFramers.push({
+                        title: row.title,
+                        userId: person._id,
+                        label: `${person.name || person.username} (@${person.username})`,
+                    });
+                } catch (e) {
+                    continue;
+                }
+            }
+            let owner = null;
+            if (groupObj.groupLeader) {
+                try {
+                    owner = await usersData.getUser(groupObj.groupLeader);
+                } catch (e) {
+                    owner = null;
+                }
+            }
 
             return res.render("editGroup", {
                 title: "Edit group",
                 groupObj,
                 manualMembers,
+                projectFramers,
+                owner,
             });
         } catch (e) {
             return res.status(400).render('error', { title: 'Error', error: e });
@@ -240,7 +278,7 @@ router
                 req.body.link1desc,
                 req.body.link2,
                 req.body.link2desc,
-                [],
+                req.body.projectFramers || [],
                 req.body.longDescription,
                 req.body.slideshowDescription,
                 req.body.link3,
