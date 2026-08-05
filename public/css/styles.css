@@ -436,6 +436,18 @@ footer a {
   margin-top: 12px;
 }
 
+.admin-notes-input {
+  display: block;
+  width: 100%;
+  min-height: 10em;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.admin-notes-form .form-submit-button {
+  margin-top: 8px;
+}
+
 .gallery-caption-edit {
   display: flex;
   gap: 8px;

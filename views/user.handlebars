@@ -157,14 +157,9 @@
     {{#if canSeeAdminNotes}}
         <section class="profile-section private-box admin-notes-box">
             <h3>Admin Notes</h3>
-            {{#if user.adminNotes}}
-                <div class="description-box">{{user.adminNotes}}</div>
-            {{else}}
-                <p class="muted">No admin notes yet.</p>
-            {{/if}}
             <form method="POST" action="/users/{{user._id}}/admin-notes" class="admin-notes-form">
                 <label class="form-label" for="adminNotes">Edit admin notes</label>
-                <textarea class="form-input" id="adminNotes" name="adminNotes" rows="4">{{user.adminNotes}}</textarea>
+                <textarea class="form-input admin-notes-input" id="adminNotes" name="adminNotes" rows="8" placeholder="No admin notes yet.">{{user.adminNotes}}</textarea>
                 <button type="submit" class="form-submit-button">Save admin notes</button>
             </form>
 
